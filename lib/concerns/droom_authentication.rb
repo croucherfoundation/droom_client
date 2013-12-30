@@ -80,22 +80,30 @@ protected
   end
 
   ## Stored Authentication
-  # is always by a uid/auth_token pair. It can be given as params or in a cookie. Http auth
-  # and http-options also possible but our focus is on API consumers at the moment.
+  # is always by auth_token. It can be given as header token, param or cookie.
 
   def authenticate_user
-    RequestStore.store[:current_user] ||= authenticate_from_params || authenticate_from_cookie
+    RequestStore.store[:current_user] ||= authenticate_from_header || authenticate_from_param || authenticate_from_cookie
   end
   
-  def authenticate_from_params
-    authenticate_with(params[:uid], params[:auth_token]) if params[:uid].present? && params[:auth_token].present?
+  # Sometimes the satellite services provide their own API services. Usually these are very simple,
+  # but they too might require droom authentication. In that case we require a header token and 
+  # a uid in the options hash.
+  #
+  def authenticate_from_header
+    token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
+    authenticate_with(token) if token
+  end
+
+  def authenticate_from_param
+    authenticate_with(params[:tok]) if params[:tok].present?
   end
   
-  # Auth is always remote, so that we also get single sign-out.
+  # Auth is always remote, so that single sign-out works too.
   # Note this returns user if found, false if none, allowing authenticate_user to try something else.
   #
-  def authenticate_with(uid, auth_token)
-    if user = User.from_credentials(uid, auth_token)
+  def authenticate_with(auth_token)
+    if user = User.authenticate(auth_token)
       sign_in(user)
     end
   end
@@ -126,7 +134,7 @@ protected
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
     if cookie.valid?
-      authenticate_with(cookie.uid, cookie.token)
+      authenticate_with(cookie.token)
     end
   end
 

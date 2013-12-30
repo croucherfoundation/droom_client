@@ -22,18 +22,13 @@ module DroomClient
       @cookies.delete cookie_name, cookie_options.merge(options)
     end
 
-    # The id of the resource (e.g. User) referenced in the cookie.
-    def uid
-      values[0]
-    end
-
     def token
-      values[1]
+      values[0]
     end
 
     # The Time at which the cookie was created.
     def created_at
-      valid? ? Time.at(value[2]) : nil
+      valid? ? Time.at(value[1]) : nil
     end
 
     # Whether the cookie appears valid.
@@ -62,7 +57,7 @@ module DroomClient
       begin
         signer.decode(@cookies[cookie_name])
       rescue SignedJson::Error
-        [nil, nil, nil]
+        [nil, nil]
       end
     end
 
@@ -71,7 +66,7 @@ module DroomClient
     end
 
     def encoded_value(resource)
-      signer.encode [ resource.uid, resource.authentication_token, Time.now ]
+      signer.encode [ resource.authentication_token, Time.now ]
     end
 
     def cookie_options

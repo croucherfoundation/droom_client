@@ -20,7 +20,7 @@ class User
     @associates = these
   end
 
-  def self.new_with_defaults
+  def self.new_with_defaults(attributes={})
     self.new({
       uid: nil,
       title: "",
@@ -33,13 +33,13 @@ class User
       permission_codes: "",
       remember_me: false,
       defer_confirmation: true
-    })
+    }.merge(attributes))
   end
 
-  def self.from_credentials(uid, token)
-    Rails.logger.debug "<== Authenticating user with #{uid}, #{token}"
+  def self.authenticate(token)
+    Rails.logger.debug "<== Authenticating user with #{token}"
     begin
-      self.get "/api/users/#{uid}/authenticate", token: token
+      self.get "/api/authenticate/#{token}"
     rescue JSON::ParserError
       nil
     end
@@ -65,9 +65,9 @@ class User
   end
 
   def sign_out!
-    # auth token is passed in request headers as with other api calls
-    # so this should be enough to invalidate the session of the current user
-    self.class.put "/api/users/deauthenticate"
+    # auth token is passed in request header as with other api calls so this
+    # should be enough to invalidate the session and token of the current user
+    self.class.put "/api/deauthenticate"
   end
 
   def unconfirmed?
