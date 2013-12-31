@@ -16,7 +16,6 @@ module DroomAuthentication
   extend ActiveSupport::Concern
   include ActionController::HttpAuthentication::Token::ControllerMethods
 
-
   mattr_accessor :navigational_formats
   @@navigational_formats = ["*/*", :html]
 
@@ -25,6 +24,7 @@ module DroomAuthentication
     helper_method :current_user
     helper_method :user_signed_in?
     rescue_from DroomClient::AuthRequired, with: :redirect_to_login
+    rescue_from PaginatedHer::AuthRequired, with: :redirect_to_login
   end
 
   def store_location!
@@ -71,6 +71,10 @@ protected
   #
   # Use in controllers to require various states of authentication.
 
+  def require_authenticated_user
+    raise DroomClient::AuthRequired unless authenticate_user
+  end
+
   def authenticate_user!
     raise DroomClient::AuthRequired unless authenticate_user
   end
@@ -89,7 +93,11 @@ protected
   def redirect_to_login(exception)
     store_location!
     if is_navigational_format?
-      flash[:alert] = I18n.t(:authentication_required)
+      if user_signed_in?
+        flash[:alert] = I18n.t(:permission_denied)
+      else
+        flash[:alert] = I18n.t(:authentication_required)
+      end
       redirect_to sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'

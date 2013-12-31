@@ -36,26 +36,11 @@ class User
   end
 
   def self.authenticate(token)
-    Rails.logger.debug "<== Authenticating user with #{token}"
     begin
       self.get "/api/authenticate/#{token}"
     rescue JSON::ParserError
       nil
     end
-  end
-  
-  def self.for(person)
-    self.where(person_uid: person.uid).first
-  end
-  
-  def self.find_or_create_for(person)
-    User.for(person) || User.create({
-      person_uid: person.uid,
-      given_name: person.given_name,
-      family_name: person.family_name,
-      chinese_name: person.chinese_name,
-      email: person.email
-    })
   end
 
   def send_confirmation_message!
@@ -79,14 +64,6 @@ class User
 
   def to_param
     uid
-  end
-
-  def person
-    Person.find(person_uid)
-  end
-  
-  def person?
-    !!person
   end
   
   def permitted?(key)
