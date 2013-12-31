@@ -1,3 +1,9 @@
 = DroomClient
 
-This project rocks and uses MIT-LICENSE.
+Notes:
+
+* We're just going to assume that this is happening in an environment that is either core data or a core data client, so the Person class is going to be available one way or another. If not, best avoid calling `user.person`.
+
+* the events api isn't yet set up in droom.
+
+* what should we do about the duplication of HkNames and Settings. It should be ok since they're identical, but not very pleasing. HkNames I guess will disappear from here once all person data is consolidated in core and the user class is just an authentication mechanism.

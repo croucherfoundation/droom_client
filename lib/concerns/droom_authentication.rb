@@ -14,12 +14,17 @@ require 'droom_client/auth_cookie'
 
 module DroomAuthentication
   extend ActiveSupport::Concern
+  include ActionController::HttpAuthentication::Token::ControllerMethods
+
+
+  mattr_accessor :navigational_formats
+  @@navigational_formats = ["*/*", :html]
 
   included do
     prepend_before_filter :authenticate_user
     helper_method :current_user
     helper_method :user_signed_in?
-    rescue_from "DroomClient::AuthRequired", with: :redirect_to_login
+    rescue_from DroomClient::AuthRequired, with: :redirect_to_login
   end
 
   def store_location!
@@ -52,6 +57,14 @@ module DroomAuthentication
     root_path
   end
 
+  def is_navigational_format?
+    DroomAuthentication.navigational_formats.include?(request_format)
+  end
+
+  def request_format
+    @request_format ||= request.format.try(:ref)
+  end
+
 protected
   
   ## Authentication filters
@@ -75,8 +88,13 @@ protected
 
   def redirect_to_login(exception)
     store_location!
-    flash[:alert] = I18n.t(:authentication_required)
-    redirect_to sign_in_path
+    if is_navigational_format?
+      flash[:alert] = I18n.t(:authentication_required)
+      redirect_to sign_in_path
+    else
+      Settings.auth['realm'] ||= 'Data Room'
+      request_http_token_authentication(Settings.auth.realm)
+    end
   end
 
   ## Stored Authentication
@@ -91,8 +109,11 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
-    authenticate_with(token) if token
+    authenticate_with_http_token do |token, options|
+      authenticate_with(token) if token
+    end
+    # token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
+    # authenticate_with(token) if token
   end
 
   def authenticate_from_param

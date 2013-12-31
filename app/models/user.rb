@@ -1,12 +1,11 @@
 class User
   include HkNames
-  include Her::PaginatedModel
+  include PaginatedHer::Model
 
   use_api DROOM
+  primary_key :uid
   collection_path "/api/users"
   root_element :user
-  request_new_object_on_build true
-  primary_key :uid
 
   def new?
     uid.nil?

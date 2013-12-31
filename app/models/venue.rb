@@ -1,5 +1,5 @@
 class Venue
-  include Her::PaginatedModel
+  include PaginatedHer::Model
 
   use_api DROOM
   collection_path "/api/venues"
