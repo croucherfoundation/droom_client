@@ -37,6 +37,8 @@ class User
 
   def self.authenticate(token)
     begin
+      path = build_request_path_from_string_or_symbol("/api/authenticate/#{token}")
+      Rails.logger.debug ">> authenticating with a call to #{path}"
       self.get "/api/authenticate/#{token}"
     rescue JSON::ParserError
       nil
