@@ -91,6 +91,8 @@ protected
   end
 
   def redirect_to_login(exception)
+    Rails.logger.warn "!!  redirect_to_login: #{exception.inspect}"
+    unset_auth_cookie(Settings.auth.cookie_domain)
     store_location!
     if is_navigational_format?
       if user_signed_in?
@@ -117,9 +119,7 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    Rails.logger.debug("??  authenticate_from_header")
     authenticate_with_http_token do |token, options|
-      Rails.logger.debug("??  token: #{token.inspect}")
       authenticate_with(token) if token
     end
     # token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
@@ -127,7 +127,6 @@ protected
   end
 
   def authenticate_from_param
-    Rails.logger.debug("??  authenticate_from_param: #{params[:tok].inspect}")
     authenticate_with(params[:tok]) if params[:tok].present?
   end
   
@@ -165,7 +164,6 @@ protected
   # Cookie holds encoded array of [uid, auth_token]
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
-    Rails.logger.debug("??  authenticate_from_cookie #{cookie.inspect}")
     if cookie.valid?
       authenticate_with(cookie.token)
     end
