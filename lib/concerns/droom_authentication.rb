@@ -20,7 +20,6 @@ module DroomAuthentication
   @@navigational_formats = ["*/*", :html]
 
   included do
-    prepend_before_filter :authenticate_user
     helper_method :current_user
     helper_method :user_signed_in?
     rescue_from DroomClient::AuthRequired, with: :redirect_to_login
@@ -91,7 +90,6 @@ protected
   end
 
   def redirect_to_login(exception)
-    Rails.logger.warn "!!  redirect_to_login: #{exception.inspect}"
     unset_auth_cookie(Settings.auth.cookie_domain)
     store_location!
     if is_navigational_format?
