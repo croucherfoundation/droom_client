@@ -81,6 +81,10 @@ module HasDroomUser
     user.formal_name if user?
   end
 
+  def colloquial_name
+    user.colloquial_name if user?
+  end
+
   def icon
     user.icon if user?
   end
