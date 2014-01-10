@@ -109,7 +109,11 @@ protected
   # is always by auth_token. It can be given as header token, param or cookie.
 
   def authenticate_user
-    RequestStore.store[:current_user] ||= authenticate_from_header || authenticate_from_param || authenticate_from_cookie
+    unless user_signed_in?
+      if user = authenticate_from_header || authenticate_from_param || authenticate_from_cookie
+        sign_in_and_remember(user)
+      end
+    end
   end
   
   # Sometimes the satellite services provide their own API services. Usually these are very simple,
@@ -132,9 +136,7 @@ protected
   # Note this returns user if found, false if none, allowing authenticate_user to try something else.
   #
   def authenticate_with(auth_token)
-    if user = User.authenticate(auth_token)
-      sign_in(user)
-    end
+    User.authenticate(auth_token)
   end
 
   def current_user
