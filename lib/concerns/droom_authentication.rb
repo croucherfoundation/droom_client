@@ -153,8 +153,8 @@ protected
   
   def sign_in_and_remember(user)
     sign_in(user)
-    Settings.auth[:period] ||= 0
-    set_auth_cookie_for(user, Settings.auth.cookie_domain, Settings.auth.period)
+    Settings.auth[:cookie_period] ||= 0
+    set_auth_cookie_for(user, Settings.auth.cookie_domain, Settings.auth.cookie_period)
   end
 
 
@@ -170,8 +170,8 @@ protected
     end
   end
 
-  def set_auth_cookie_for(user, domain, period=nil)
-    expires = Time.now + period.days if period && period != 0
+  def set_auth_cookie_for(user, domain=nil, period=nil)
+    expires = Time.now + period.hours if period && period != 0
     DroomClient::AuthCookie.new(cookies).set(user, domain: domain, expires: expires)
   end
   
