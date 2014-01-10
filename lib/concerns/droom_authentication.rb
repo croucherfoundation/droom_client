@@ -115,6 +115,7 @@ protected
         sign_in_and_remember(user)
       end
     end
+    user_signed_in?
   end
   
   # Sometimes the satellite services provide their own API services. Usually these are very simple,
