@@ -12,12 +12,10 @@ module DroomClient
       @cookies = cookies
     end
 
-    # Sets the cookie, referencing the given resource.id (e.g. User)
     def set(resource, options={})
       @cookies[cookie_name] = cookie_options.merge(options).merge(:value => encoded_value(resource))
     end
 
-    # Unsets the cookie via the HTTP response.
     def unset(options={})
       @cookies.delete cookie_name, cookie_options.merge(options)
     end
@@ -26,12 +24,10 @@ module DroomClient
       values[0]
     end
 
-    # The Time at which the cookie was created.
     def created_at
       valid? ? Time.at(value[1]) : nil
     end
 
-    # Whether the cookie appears valid.
     def valid?
       present? && values.all?
     end
@@ -40,7 +36,6 @@ module DroomClient
       @cookies[cookie_name].present?
     end
 
-    # Whether the cookie was set since the given Time
     def set_since?(time)
       created_at && created_at >= time
     end
@@ -51,7 +46,7 @@ module DroomClient
 
   private
     
-    # cookie value format is [uid, auth_token, time]
+    # cookie value format is [auth_token, time]
     #
     def values
       begin
