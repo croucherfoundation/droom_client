@@ -11,9 +11,9 @@ module HasDroomUser
   def user
     begin
       if user_uid
-        DroomClient::User.find(user_uid)
+        User.find(user_uid)
       end
-    rescue
+    rescue => e
       Rails.logger.warn "#{self.class} #{self.id} has a user_uid that corresponds to no known data room user. Perhaps someone has been deleted? Ignoring."
       nil
     end
@@ -91,10 +91,6 @@ module HasDroomUser
 
   def email
     user.email if user?
-  end
-  
-  def user
-    User.find(user_uid) if user_uid?
   end
     
 end
