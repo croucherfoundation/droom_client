@@ -44,16 +44,21 @@ module HkNames
   # The family name is held separately because for most purposes we will address people using the relatively 
   # reliable 'Dr Chan' or 'Mr Smith'.
   #
+  
+  def normalized_title
+    title.gsub('.', '').strip
+  end
+  
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(title.gsub('.', '').strip)
+    ['Mr', 'Ms', 'Mrs', '', nil].include?(normalized_title)
   end
   
   def title_if_it_matters
-    title.gsub('.', '').strip unless title_ordinary?
+    normalized_title unless title_ordinary?
   end
 
   def formal_name
-    [title, family_name].compact.join(' ')
+    [normalized_title, family_name].compact.join(' ')
   end
 
   # This is our best shot at a representation of how this person would normally be referred to. It combines
