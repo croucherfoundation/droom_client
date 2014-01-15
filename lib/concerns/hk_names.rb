@@ -45,11 +45,11 @@ module HkNames
   # reliable 'Dr Chan' or 'Mr Smith'.
   #
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(title)
+    ['Mr', 'Ms', 'Mrs', '', nil].include?(title.gsub('.', '').strip)
   end
   
   def title_if_it_matters
-    title unless title_ordinary?
+    title.gsub('.', '').strip unless title_ordinary?
   end
 
   def formal_name
