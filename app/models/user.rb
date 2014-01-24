@@ -14,7 +14,7 @@ class User
   def associates
     @associates ||= []
   end
-  
+
   def associates=(these)
     @associates = these
   end

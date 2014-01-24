@@ -55,6 +55,7 @@ protected
       @user = User.find(params[:id])
     else
       @user = current_user
+      Rails.logger.warn ">>  current_user is #{current_user.inspect}"
     end
   end
 

@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.0.2"
   s.add_dependency 'paginated_her'
+  s.add_dependency "faraday", "~> 0.8.9"
   s.add_dependency "faraday_middleware"
   s.add_dependency "memcached"
   s.add_dependency "signed_json"
