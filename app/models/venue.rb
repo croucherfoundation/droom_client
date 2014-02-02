@@ -6,8 +6,13 @@ class Venue
   root_element :venue
   request_new_object_on_build true
 
-  @associates = []
-  attr_accessor :associates
+  def associates
+    @associates ||= []
+  end
+
+  def associates=(these)
+    @associates = these
+  end
 
   def self.for_selection
     self.all.map{|venue| [venue.name, venue.slug]}
