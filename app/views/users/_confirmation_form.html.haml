@@ -2,6 +2,7 @@
 - destination ||= false
 
 = form_for @user, url: confirm_user_path(user), method: "PUT" do |f|
+  = hidden_field_tag :tok, params[:tok]
   - if destination
     = hidden_field_tag :destination, destination
   

@@ -57,7 +57,7 @@ class User
   end
 
   def unconfirmed?
-    !!self.confirmed
+    !self.confirmed?
   end
 
   def unconfirmed_email?
