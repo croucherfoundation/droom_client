@@ -1,4 +1,5 @@
 class UserSessionsController < ApplicationController
+  include DroomAuthentication
   skip_before_filter :authenticate_user
   before_filter :require_no_user!, only: [:new, :create]
 

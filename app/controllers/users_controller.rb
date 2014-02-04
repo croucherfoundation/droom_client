@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  include DroomAuthentication
   respond_to :html, :json
   before_filter :require_authenticated_user, only: [:index, :show, :edit, :update]
   before_filter :get_users, only: [:index]
