@@ -1,18 +1,23 @@
 require 'settings'
 require 'paginated_her'
-require 'memcached'
+require 'dalli-elasticache'
 require 'faraday_middleware/response/caching'
 
 Settings[:auth] ||= {}
 Settings.auth[:protocol] ||= 'http'
 Settings.auth[:port] ||= '80'
 Settings[:memcached] ||= {}
+Settings.memcached[:endpoint] ||= nil
 Settings.memcached[:host] ||= nil
-Settings.memcached[:port] ||= nil
+Settings.memcached[:port] ||= 11211
 Settings.memcached[:ttl] ||= 10.minutes
 
-if Settings.memcached.host && Settings.memcached.port
-  $cache ||= Memcached::Rails.new("#{Settings.memcached.host}:#{Settings.memcached.port}", logger: Rails.logger, default_ttl: Settings.memcached.ttl)
+if Settings.memcached.endpoint
+  elasticache_endpoint = Dalli::ElastiCache.new("#{Settings.memcached.endpoint}:#{Settings.memcached.port}", expires_in: Settings.memcached.ttl)
+  $cache ||= elasticache_endpoint.client
+
+elsif Settings.memcached.host
+  $cache ||= Dalli::Client.new("#{Settings.memcached.host}:#{Settings.memcached.port}", expires_in: Settings.memcached.ttl)
 end
 
 DROOM = Her::API.new

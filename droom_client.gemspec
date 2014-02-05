@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'paginated_her'
   s.add_dependency "faraday"
   s.add_dependency "faraday_middleware"
-  s.add_dependency "memcached"
+  s.add_dependency "dalli-elasticache"
   s.add_dependency "signed_json"
   
   s.add_development_dependency "sqlite3"
