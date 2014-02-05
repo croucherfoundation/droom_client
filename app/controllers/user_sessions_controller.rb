@@ -2,6 +2,7 @@ class UserSessionsController < ApplicationController
   include DroomAuthentication
   skip_before_filter :authenticate_user
   before_filter :require_no_user!, only: [:new, :create]
+  before_filter :authenticate_user!, only: [:destroy]
 
   def new
     @user = User.new_with_defaults
@@ -9,7 +10,7 @@ class UserSessionsController < ApplicationController
   end
 
   def create
-    if user = User.post("/users/sign_in.json", params[:user])
+    if user = User.sign_in(sign_in_params)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
       flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
@@ -20,13 +21,16 @@ class UserSessionsController < ApplicationController
   end
 
   def destroy
-    if @user = current_user
-      @user.sign_out!
-      RequestStore.store.delete :current_user
-      flash[:notice] = t("flash.goodbye", name: @user.formal_name).html_safe
-    end
+    current_user.sign_out!
+    flash[:notice] = t("flash.goodbye", name: current_user.formal_name).html_safe
+    RequestStore.store.delete :current_user
     unset_auth_cookie(Settings.auth.cookie_domain)
-    redirect_to after_sign_out_path_for(@user)
+    redirect_to after_sign_out_path_for(current_user)
   end
 
+  protected
+  
+  def sign_in_params
+    params.require(:user).permit(:email, :password, :remember_me)
+  end
 end

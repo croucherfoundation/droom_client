@@ -33,10 +33,8 @@ class UsersController < ApplicationController
     if @user
       sign_in_and_remember @user
       if @user.confirmed?
-        Rails.logger.warn "==  welcome: @user is confirmed"
         redirect_to after_sign_in_path_for(@user)
       else
-        Rails.logger.warn "==  welcome: user needs confirmation"
         respond_with @user
       end
     else

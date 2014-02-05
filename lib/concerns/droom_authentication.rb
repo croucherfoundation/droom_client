@@ -90,7 +90,6 @@ protected
   end
 
   def redirect_to_login(exception)
-    Rails.logger.warn "auth redirect: #{exception.inspect}"
     # unset_auth_cookie(Settings.auth.cookie_domain)
     store_location!
     if is_navigational_format?

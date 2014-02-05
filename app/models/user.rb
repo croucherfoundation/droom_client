@@ -35,11 +35,13 @@ class User
     }.merge(attributes))
   end
 
+  def self.sign_in(params)
+    self.post("/users/sign_in.json", params)
+  end
+
   def self.authenticate(token)
     begin
-      path = build_request_path_from_string_or_symbol("/api/authenticate/#{token}")
-      Rails.logger.debug ">> authenticating with a call to #{path}"
-      self.get "/api/authenticate/#{token}"
+      get "/api/authenticate/#{token}"
     rescue JSON::ParserError
       nil
     end
@@ -49,11 +51,9 @@ class User
     self.assign_attributes send_confirmation: true
     self.save
   end
-
+  
   def sign_out!
-    # auth token is passed in request header as with other api calls so this
-    # should be enough to invalidate the session and token of the current user
-    self.class.put "/api/deauthenticate"
+    self.class.get "/api/deauthenticate/#{authentication_token}"
   end
 
   def unconfirmed?
