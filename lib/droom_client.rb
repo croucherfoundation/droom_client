@@ -1,6 +1,6 @@
 require 'settingslogic'
 require 'request_store'
-require 'memcached'
+require 'dalli-elasticache'
 require 'droom_client/engine'
 
 module DroomClient
