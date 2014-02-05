@@ -9,7 +9,7 @@ Settings.auth[:port] ||= '80'
 Settings[:memcached] ||= {}
 Settings.memcached[:host] ||= nil
 Settings.memcached[:port] ||= nil
-Settings.memcached[:ttl] ||= 1.minute
+Settings.memcached[:ttl] ||= 10.minutes
 
 if Settings.memcached.host && Settings.memcached.port
   $cache ||= Memcached::Rails.new("#{Settings.memcached.host}:#{Settings.memcached.port}", logger: Rails.logger, default_ttl: Settings.memcached.ttl)
