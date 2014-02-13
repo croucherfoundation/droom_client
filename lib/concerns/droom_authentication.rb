@@ -176,7 +176,7 @@ protected
     DroomClient::AuthCookie.new(cookies).set(user, domain: domain, expires: expires)
   end
   
-  def unset_auth_cookie(domain=nil)
+  def unset_auth_cookie(domain=Settings.auth.cookie_domain)
     DroomClient::AuthCookie.new(cookies).unset(domain: domain)
   end
 
