@@ -8,7 +8,7 @@ class User
   root_element :user
 
   def new?
-    uid.nil?
+    !respond_to?(:uid) || uid.nil?
   end
 
   def associates
