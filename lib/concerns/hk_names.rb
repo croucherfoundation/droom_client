@@ -44,28 +44,35 @@ module HkNames
   # The family name is held separately because for most purposes we will address people using the relatively 
   # reliable 'Dr Chan' or 'Mr Smith'.
   #
+  def title
+    read_attribute(:title) || ordinary_title
+  end
+  
+  def ordinary_title
+    gender == 'f' ? "Ms" : "Mr"
+  end
   
   def normalized_title
     title.gsub('.', '').strip
   end
   
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(normalized_title)
+    ['Mr', 'Ms', 'Mrs', '', nil].include?(title)
   end
   
   def title_if_it_matters
-    normalized_title unless title_ordinary?
+    title unless title_ordinary?
   end
 
   def formal_name
-    [normalized_title, family_name].compact.join(' ')
+    [title, family_name].compact.join(' ')
   end
 
   # This is our best shot at a representation of how this person would normally be referred to. It combines
   # the informal name (which includes some logic to show chinese, anglo and mixed names correctly) with the title.
   #
   def colloquial_name
-    [title_if_it_matters, informal_name].compact.join(' ')
+    [title, informal_name].compact.join(' ')
   end
 
   # ### Completeness
