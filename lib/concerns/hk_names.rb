@@ -46,8 +46,9 @@ module HkNames
   #
   
   def normalized_title
-    title = ordinary_title unless title.present?
-    title.gsub('.', '').strip
+    t = self.title
+    t = ordinary_title unless t.present?
+    t.gsub('.', '').strip
   end
   
   def ordinary_title
@@ -55,7 +56,7 @@ module HkNames
   end
   
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(title)
+    ['Mr', 'Ms', 'Mrs', '', nil].include?(normalized_title)
   end
   
   def title_if_it_matters
