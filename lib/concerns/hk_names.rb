@@ -72,7 +72,7 @@ module HkNames
   # the informal name (which includes some logic to show chinese, anglo and mixed names correctly) with the title.
   #
   def colloquial_name
-    [title, informal_name].compact.join(' ')
+    [title_if_it_matters, informal_name].compact.join(' ')
   end
 
   # ### Completeness
