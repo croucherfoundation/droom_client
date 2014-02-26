@@ -1,3 +1,6 @@
+- stored_location = controller.stored_location_for(:user)
+- backto = URI.join(local_host, stored_location).to_s if stored_location
+
 #account
   %h1.pagetitle
     =t :please_sign_in
@@ -15,7 +18,7 @@
     %p
       = f.label :password
       %span.reminder
-        = link_to t(:forgot_password), droom_url("/users/password/new?backto=#{URI.encode(request.url)}")
+        = link_to t(:forgot_password), droom_url("/users/password/new", backto: backto)
       %br
       = f.password_field :password, :class => 'login'
 
@@ -26,3 +29,7 @@
     .buttons
       %p
         = f.submit t(:sign_in), :class => "go"
+
+
+%pre
+  = backto

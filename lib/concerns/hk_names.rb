@@ -44,7 +44,6 @@ module HkNames
   # The family name is held separately because for most purposes we will address people using the relatively 
   # reliable 'Dr Chan' or 'Mr Smith'.
   #
-  
   def normalized_title
     t = self.title
     t = ordinary_title unless t.present?

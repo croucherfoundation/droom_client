@@ -16,6 +16,7 @@ en:
     greeting: "<strong>Hello %{name}!</strong><br>You have signed in."
     goodbye: "<strong>Goodbye %{name}.</strong><br>You have signed out."
   forgot_password: "Forgotten your password?"
+  password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."
   placeholders:
     user:
       title: "e.g. Mr, Professor"
