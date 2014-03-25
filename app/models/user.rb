@@ -7,6 +7,10 @@ class User
   collection_path "/api/users"
   root_element :user
 
+  after_save :decache
+
+  attr_accessor :defer_confirmation
+
   def new?
     !respond_to?(:uid) || uid.nil?
   end
@@ -90,6 +94,12 @@ class User
 
   def thumbnail
     images[:thumbnail]
+  end
+
+  protected
+  
+  def decache
+    $cache.flush_all if $cache
   end
 
 end
