@@ -44,7 +44,7 @@ module DroomAuthentication
 
   def after_sign_in_path_for(user)
     path = use_stored_location_for(user) || default_location_for(user)
-    path = root_path if path == sign_in_path
+    path = root_path if path == droom_client.sign_in_path
     path
   end
   
@@ -98,7 +98,7 @@ protected
       else
         flash[:alert] = I18n.t(:authentication_required)
       end
-      redirect_to sign_in_path
+      redirect_to droom_client.sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'
       request_http_token_authentication(Settings.auth.realm)

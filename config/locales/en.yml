@@ -22,7 +22,7 @@ en:
       title: "e.g. Mr, Professor"
       family_name: "e.g. Chan"
       given_name: "e.g. Tai Wan, David"
-      chinese_name: "e.g .陳大衞"
+      chinese_name: "if relevant"
       password: "Six characters or more, please"
       email: "eg. chantaiwan@gmail.com"
       phone: "Phone"

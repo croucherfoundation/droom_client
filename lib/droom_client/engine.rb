@@ -1,6 +1,7 @@
 require 'concerns/droom_authentication'
 require 'concerns/has_droom_user'
 require 'concerns/hk_names'
+require 'concerns/user_administration'
 
 module DroomClient
   class Engine < ::Rails::Engine

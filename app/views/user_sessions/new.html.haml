@@ -9,7 +9,7 @@
     %p.standfirst.green
       = flash[:notice]
 
-  = form_for(@user, :url => sign_in_path, :method => 'post') do |f|
+  = form_for(@user, :url => droom_client.sign_in_path, :method => 'post') do |f|
     %p
       = f.label :email
       %br

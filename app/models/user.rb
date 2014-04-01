@@ -76,8 +76,18 @@ class User
     permission_codes.include?(key)
   end
   
+  def permit!(code)
+    #TODO
+    #permission_codes << code unless permission_codes.include?(code)
+    #save
+  end
+  
   def allowed_here?
     permitted?("#{Settings.service_name}.login")
+  end
+  
+  def permit_here
+    permit!("#{Settings.service_name}.login")
   end
 
   def admin?

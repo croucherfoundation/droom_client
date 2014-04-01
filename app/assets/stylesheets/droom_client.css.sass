@@ -1,0 +1,124 @@
+=icon($url)
+  display: inline-block
+  overflow: hidden
+  top: 32px
+  right: 32px
+  height: 32px
+  width: 32px
+  line-height: 32px
+  text-indent: 40px
+  background:
+    position: 0 0
+    repeat: no-repeat
+    image: image-url($url)
+  &:hover
+    background-position: 0 -32px
+  &:active
+    background-position: 0 -64px
+  &.waiting
+    background: 
+      image: image-url('droom_client/spinner.gif')
+      position: 8px 8px
+
+$dark: #4d4e53
+$mid: #9a9b9d
+$pale: #bdbdbd
+$blue: #549dc4
+
+form.user_chooser
+  fieldset.uk
+    float: right
+  fieldset.categories
+    span.category
+      display: inline-block
+      vertical-align: top
+      margin-right: 10px
+  fieldset.deadline
+    input.date
+      width: 150px
+      margin-right: 5px
+    input.time
+      width: 80px
+  fieldset.chooser
+    p.names
+      margin: 0
+      input[type="text"]
+        display: inline-block
+        vertical-align: middle
+        margin-right: 8px
+      input.title
+        width: 112px
+      input.family_name
+        width: 320px
+      input.given_name
+        width: 318px
+        margin-right: 0
+    p.contacts
+      margin-top: 10px
+      input.email
+        width: 462px
+        margin-right: 8px
+      input.phone
+        width: 206px
+        margin-right: 8px
+      input[type="submit"]
+        width: 100px
+        display: inline-block
+        vertical-align: top
+  ul.applications
+    height: 208px
+    padding: 0
+    overflow: auto
+    list-style: none
+    &:empty
+      display: none
+    li
+      float: left
+      width: 93px
+      overflow: hidden
+      margin: 5px 10px 5px 0
+      font-size: 90%
+      white-space: nowrap
+      color: $mid
+    
+  ul.suggestions
+    height: 52px
+    padding: 0
+    border: 1px dotted $pale
+    overflow: auto
+    list-style: none
+    &.waiting
+      background:
+        image: image-url('droom-client/spinner.gif')
+        position: center center
+        repeat: no-repeat
+    li.suggestion
+      float: left
+      height: 32px
+      overflow: hidden
+      margin: 10px
+      font-size: 1.3em
+      line-height: 30px
+      white-space: nowrap
+      a
+        color: $mid
+      &.chosen
+        a.reset
+          margin-left: 10px
+          display: inline-block
+          vertical-align: top
+          &:hover
+            overflow: hidden
+      img.thumb
+        width: 32px
+        height: 32px
+        display: inline-block
+        vertical-align: middle
+        margin-right: 10px
+
+a.invite
+  +icon("droom_client/message.png")
+  color: $blue
+  width: 16px
+  height: 16px
+

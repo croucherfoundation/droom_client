@@ -4,6 +4,12 @@
 module HasDroomUser
   extend ActiveSupport::Concern
 
+  included do
+    scope :by_user, -> uid {
+      where(user_uid: uid)
+    }
+  end
+
   ## Get
   #
   # Users are associated by uid in the hope of database and device independence. All we do here is go and get it.
