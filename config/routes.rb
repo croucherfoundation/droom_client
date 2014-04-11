@@ -5,6 +5,8 @@ DroomClient::Engine.routes.draw do
   delete '/users/sign_out' => "user_sessions#destroy", as: "sign_out"
   get '/users/preferences' => "users#edit", as: "preferences"
 
-  resources :users
+  resources :users do
+    put :confirm, on: :member
+  end
 
 end
