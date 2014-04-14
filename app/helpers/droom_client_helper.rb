@@ -35,7 +35,7 @@ module DroomClientHelper
         :data => {:menu => "#{classname}_#{thing.id}"}
       })
       html_options[:class] << " menu"
-      link_to t(:edit), "#", html_options if editable?(thing)
+      link_to t(:edit), "#", html_options
     end
   end
   
