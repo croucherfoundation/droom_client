@@ -26,22 +26,26 @@ class UsersController < ApplicationController
     respond_with @user
   end
   
-  # ...or confirm their account.
+  ## Confirmation
+  #
+  # This is the destination for welcome-to-X links in confirmation emails.
+  # A user with no password set will see a form and confirm only when it is submitted.
+  # Someone who has already set a password will see the usual confirmation message.
   
   def welcome
     @user = User.authenticate(params[:tok])
     if @user
+      @user.confirm! if @user.password_set?
       sign_in_and_remember @user
-      if @user.confirmed?
-        redirect_to after_sign_in_path_for(@user)
-      else
-        respond_with @user
-      end
+      respond_with @user
     else
       raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
     end
   end
 
+  # This is the destination of the password-setting form that appears if a user confirms their account
+  # and has not yet set a password.
+  #
   def confirm
     if @user = User.authenticate(params[:tok])
       sign_in_and_remember @user
@@ -53,7 +57,7 @@ class UsersController < ApplicationController
       raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
     end
   end
-
+  
 protected
 
   def get_user

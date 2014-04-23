@@ -35,7 +35,9 @@ class User
       password: "",
       permission_codes: "",
       remember_me: false,
-      defer_confirmation: true
+      confirmed: false,
+      defer_confirmation: true,
+      image: nil
     }.merge(attributes))
   end
 
@@ -60,6 +62,11 @@ class User
     self.class.get "/api/deauthenticate/#{authentication_token}"
   end
 
+  def confirm!
+    self.confirmed = true
+    self.save
+  end
+  
   def unconfirmed?
     !self.confirmed?
   end
