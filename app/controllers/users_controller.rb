@@ -28,25 +28,11 @@ class UsersController < ApplicationController
   
   ## Confirmation
   #
-  # This is the destination for welcome-to-X links in confirmation emails.
-  # A user with no password set will see a form and confirm only when it is submitted.
-  # Someone who has already set a password will see the usual confirmation message.
-  
-  def welcome
-    @user = User.authenticate(params[:tok])
-    if @user
-      @user.confirm! if @user.password_set?
-      sign_in_and_remember @user
-      respond_with @user
-    else
-      raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
-    end
-  end
-
-  # This is the destination of the password-setting form that appears if a user confirms their account
-  # and has not yet set a password.
+  # This is the destination of the password-setting form that appears if a user accepts a role invitation
+  # and has not yet set a password. A destination should have been provided by the acceptance view when the
+  # confirmation form was included.
   #
-  def confirm
+  def set_password
     if @user = User.authenticate(params[:tok])
       sign_in_and_remember @user
       @user.assign_attributes(user_params)

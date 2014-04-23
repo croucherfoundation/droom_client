@@ -6,7 +6,7 @@ DroomClient::Engine.routes.draw do
   get '/users/preferences' => "users#edit", as: "preferences"
 
   resources :users do
-    put :confirm, on: :member
+    put :set_password, on: :member
   end
 
 end

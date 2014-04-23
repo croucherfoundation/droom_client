@@ -36,7 +36,7 @@ class User
       permission_codes: "",
       remember_me: false,
       confirmed: false,
-      defer_confirmation: true,
+      defer_confirmation: false,
       image: nil
     }.merge(attributes))
   end

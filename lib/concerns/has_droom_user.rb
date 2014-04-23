@@ -12,7 +12,7 @@ module HasDroomUser
 
   ## Get
   #
-  # Users are associated by uid in the hope of database and device independence. All we do here is go and get it.
+  # Users are associated by uid in the hope of database and device independence. All we do here is go and get the user.
   #
   def user
     begin
@@ -49,7 +49,6 @@ module HasDroomUser
   # is also possible for people to update some of their account settings through a remote service.
   #
   def user_attributes=(attributes)
-    Rails.logger.debug "==>  #{self.class}#user_attributes = #{attributes.inspect}"
     if attributes.any?
       if self.user?
         self.user.assign_attributes(attributes)
