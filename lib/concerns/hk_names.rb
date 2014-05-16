@@ -11,7 +11,11 @@ module HkNames
   #
   # When a comma is found in the given name, we assume that they have followed the chinese, english format.
   # If not, we assume the whole name is Chinese.
-  #
+
+  def name?
+    family_name? || given_name?
+  end
+
   # ### Polite informality
   #
   # People with an English forename would normally be addressed as Jimmy Chan. People with only a Chinese

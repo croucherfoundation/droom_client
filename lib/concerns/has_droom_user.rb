@@ -95,6 +95,10 @@ module HasDroomUser
   end
 
   def email
+    read_attribute(:email) || user_email
+  end
+  
+  def user_email
     user.email if user?
   end
     
