@@ -3,7 +3,8 @@ module UserAdministration
 
   included do
     attr_accessor :newly_accepted
-    
+    attr_accessor :send_invitation
+
     scope :accepted, -> {
       where("accepted_at IS NOT NULL")
     }
@@ -38,8 +39,9 @@ module UserAdministration
   end
   
   # Note that this generally replaces the user-confirmation message that would be sent out by
-  # the data room. Defer_confirmation should be set on the newly-created user to prevent the
-  # standard data room invitation from being sent out.
+  # the data room. Defer_confirmation should have been set on the newly-created user to prevent
+  # the standard data room invitation also being sent out, and the acceptance route should always
+  # take in a password-setting confirmation step.
   #
   def invite!
     if user?
@@ -62,6 +64,16 @@ module UserAdministration
 
   def newly_accepted?
     !!newly_accepted
+  end
+  
+  def inviting?
+    !accepted? && !!send_invitation
+  end
+  
+  private
+  
+  def invite_if_inviting
+    self.invite! if inviting?
   end
   
 end

@@ -9,8 +9,6 @@ class User
 
   after_save :decache
 
-  attr_accessor :defer_confirmation
-
   def new?
     !respond_to?(:uid) || uid.nil?
   end
@@ -22,9 +20,22 @@ class User
   def associates=(these)
     @associates = these
   end
+  
+  def as_json(options={})
+    {
+      uid: uid,
+      title: title,
+      name: name,
+      given_name: given_name,
+      family_name: family_name,
+      chinese_name: chinese_name,
+      email: email,
+      phone: phone
+    }
+  end
 
   def self.new_with_defaults(attributes={})
-    self.new({
+    attributes = {
       uid: nil,
       title: "",
       given_name: "",
@@ -36,9 +47,10 @@ class User
       permission_codes: "",
       remember_me: false,
       confirmed: false,
-      defer_confirmation: false,
-      image: nil
-    }.merge(attributes))
+      defer_confirmation: false
+    }.with_indifferent_access.merge(attributes)
+    Rails.logger.warn "~~~> new_with_defaults(#{attributes.inspect})"
+    self.new(attributes)
   end
 
   def self.sign_in(params)
@@ -102,14 +114,17 @@ class User
   end
   
   def image
+    self.images ||= {}
     images[:standard]
   end
   
   def icon
+    self.images ||= {}
     images[:icon]
   end
 
   def thumbnail
+    self.images ||= {}
     images[:thumbnail]
   end
 

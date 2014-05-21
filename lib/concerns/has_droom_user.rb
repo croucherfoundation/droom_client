@@ -1,11 +1,16 @@
 # The purpose of this module is to make it easy to associate a droom user to a local object.
-# It often happens that 
-
+# It often happens that...
+#
+# Since the user is a remote resource, this association only partly resembles a normal activerecord association. 
+#
+# Requirements: user_uid column.
+#
 module HasDroomUser
   extend ActiveSupport::Concern
 
   included do
     scope :by_user, -> uid {
+      uid = uid.uid if uid.respond_to? :uid
       where(user_uid: uid)
     }
   end
@@ -50,16 +55,22 @@ module HasDroomUser
   #
   def user_attributes=(attributes)
     if attributes.any?
+      attributes.reverse_merge!(defer_confirmation: true) if confirmation_usually_deferred?
       if self.user?
-        self.user.assign_attributes(attributes)
+        self.user.assign_attributes(attributes.with_indifferent_access)
         self.user.save
       else
-        user = User.new_with_defaults
-        user.assign_attributes(attributes)
+        Rails.logger.warn "~~~> newing user with attributes #{attributes.inspect}"
+        user = User.new_with_defaults(attributes)
+        Rails.logger.warn "~~~> saving new user #{user.inspect}"
         user.save
         self.user = user
       end
     end
+  end
+  
+  def confirmation_usually_deferred?
+    true
   end
 
   def user?
@@ -84,6 +95,10 @@ module HasDroomUser
 
   def formal_name
     user.formal_name if user?
+  end
+
+  def informal_name
+    user.informal_name if user?
   end
 
   def colloquial_name
