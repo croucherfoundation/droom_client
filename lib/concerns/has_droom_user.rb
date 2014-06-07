@@ -95,6 +95,10 @@ module HasDroomUser
     user.colloquial_name if user?
   end
 
+  def title_if_it_matters
+    user.title_if_it_matters if user?
+  end
+
   def icon
     user.icon if user?
   end

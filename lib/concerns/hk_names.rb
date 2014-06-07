@@ -18,8 +18,8 @@ module HkNames
 
   # ### Polite informality
   #
-  # People with an English forename would normally be addressed as Jimmy Chan. People with only a Chinese
-  # forename should be addressed as Chan Tai Wan.
+  # People with an English forename would normally be addressed as Jimmy Chan. People with Chinese
+  # forenames should be addressed as Chan Tai Wan. Some people have both.
   #
   def informal_name
     # The standard form of the given name is Tai Wan, Ray
@@ -34,10 +34,8 @@ module HkNames
       english ||= chinese
     end
     if english
-      # People with an english name are called Ray Chan, by default
       [english, family_name].join(' ')
     else
-      # People without are called Chan Tai Wan
       [family_name, chinese].join(' ')
     end
   end
