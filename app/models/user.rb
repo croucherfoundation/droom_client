@@ -1,6 +1,9 @@
 class User
+  include ActiveSupport::Callbacks
   include HkNames
   include PaginatedHer::Model
+
+  define_callbacks :password_set
 
   use_api DROOM
   primary_key :uid
@@ -49,7 +52,6 @@ class User
       confirmed: false,
       defer_confirmation: false
     }.with_indifferent_access.merge(attributes)
-    Rails.logger.warn "~~~> new_with_defaults(#{attributes.inspect})"
     self.new(attributes)
   end
 
@@ -85,6 +87,14 @@ class User
 
   def unconfirmed_email?
     self.unconfirmed_email.present?
+  end
+
+  def set_password!(user_params)
+    run_callbacks :password_set do
+      assign_attributes(user_params)
+      assign_attributes(confirmed: true)
+      save
+    end
   end
 
   def to_param

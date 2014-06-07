@@ -17,6 +17,7 @@ en:
     goodbye: "<strong>Goodbye %{name}.</strong><br>You have signed out."
   forgot_password: "Forgotten your password?"
   password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."
+  password_strength: "Strength"
   placeholders:
     user:
       title: "e.g. Mr, Professor"
@@ -29,8 +30,12 @@ en:
   leave_password: "If you don't want to change your password, leave both boxes empty."
   notes:
     user_email: "This is the email that you use to sign in, and to which we send reminders and administrative messages."
+  password_strength_note: "The password-strength indication is just a guide based on complexity. We are not checking against a dictionary, so please also make sure that you don't use a dictionary word. Even with letter substitutions they are easy to guess."
   permission_denied: "The current account does not have permission to access that resource. Please sign in."
   please_sign_in: "Please sign in"
   preferences: "Preferences"
   sign_in: "Sign in"
   sign_out: "Sign out"
+  existing_user_instructions: "If the person you are adding already has a Croucher account, we will notice when you type in the email address and fill in the rest of the form for you. Suggestions will also appear, so you may be able to save some time by typing the email first."
+  cannot_invite: "Cannot invite"
+  password_set: "Thank you. Your account is now fully active."

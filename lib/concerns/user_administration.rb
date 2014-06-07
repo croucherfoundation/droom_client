@@ -22,6 +22,10 @@ module UserAdministration
     }
   end
 
+  def status
+    invited? ? accepted? ? "accepted" : "invited" : "uninvited"
+  end
+
   def invited?
     invited_at?
   end
@@ -67,7 +71,7 @@ module UserAdministration
   end
   
   def inviting?
-    !accepted? && !!send_invitation
+    !accepted? && send_invitation && send_invitation.to_s != "0"
   end
   
   private

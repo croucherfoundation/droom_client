@@ -60,9 +60,7 @@ module HasDroomUser
         self.user.assign_attributes(attributes.with_indifferent_access)
         self.user.save
       else
-        Rails.logger.warn "~~~> newing user with attributes #{attributes.inspect}"
         user = User.new_with_defaults(attributes)
-        Rails.logger.warn "~~~> saving new user #{user.inspect}"
         user.save
         self.user = user
       end
@@ -79,14 +77,6 @@ module HasDroomUser
   
   def confirmed?
     !!user.confirmed if user?
-  end
-  
-  def send_confirmation_message!
-    user.send_confirmation_message! if user?
-  end
-
-  def status
-    invited? ? accepted? ? "accepted" : "invited" : "uninvited"
   end
   
   def name
