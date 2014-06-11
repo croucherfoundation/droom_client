@@ -20,6 +20,14 @@ module UserAdministration
     scope :uninvited, -> {
       where("invited_at IS NULL")
     }
+    
+    scope :invitable, -> {
+      where("user_uid IS NOT NULL")
+    }
+
+    scope :uninvitable, -> {
+      where("user_uid IS NULL")
+    }
   end
 
   def status
@@ -32,6 +40,10 @@ module UserAdministration
 
   def uninvited?
     !invited?
+  end
+  
+  def invitable?
+    user?
   end
 
   def accepted?
@@ -48,7 +60,7 @@ module UserAdministration
   # take in a password-setting confirmation step.
   #
   def invite!
-    if user?
+    if invitable?
       if Settings.mailer && defined? Settings.mailer.constantize
         mailer = Settings.mailer.constantize
         invitation = mailer.send("invitation_to_#{self.class.to_s.downcase}".to_sym, self)
