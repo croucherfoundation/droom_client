@@ -23,7 +23,7 @@ class UsersController < ApplicationController
     authorize! :update, @user
     @user.assign_attributes(user_params)
     @user.save
-    respond_with @user
+    respond_with @user, location: droom_client.user_url(@user)
   end
   
   ## Confirmation

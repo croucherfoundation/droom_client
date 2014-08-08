@@ -1,7 +1,7 @@
 - if @user.persisted? && @user.unconfirmed_email?
   - @user.email = @user.unconfirmed_email
 
-= form_for [:droom_client, @user], html: {autocomplete: "off"} do |f|
+= form_for @user, url: droom_client.user_url(@user), method: "put", html: {autocomplete: "off"} do |f|
 
   %fieldset.contacts
     %p
