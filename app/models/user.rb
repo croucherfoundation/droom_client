@@ -50,6 +50,7 @@ class User
       permission_codes: "",
       remember_me: false,
       confirmed: false,
+      person_uid: nil,
       defer_confirmation: true
     }.with_indifferent_access.merge(attributes)
     self.new(attributes)

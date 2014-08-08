@@ -87,14 +87,12 @@ module UserAdministration
   end
   
   def remind!
-    if invited?
-      if Settings.mailer && defined? Settings.mailer.constantize
-        mailer = Settings.mailer.constantize
-        if mailer.respond_to? "reminder_to_#{self.class.to_s.downcase}".to_sym
-          reminder = mailer.send("reminder_to_#{self.class.to_s.downcase}".to_sym, self)
-          if reminder.deliver
-            self.update_column :reminded_at, Time.zone.now
-          end
+    if Settings.mailer && defined? Settings.mailer.constantize
+      mailer = Settings.mailer.constantize
+      if mailer.respond_to? "reminder_to_#{self.class.to_s.downcase}".to_sym
+        reminder = mailer.send("reminder_to_#{self.class.to_s.downcase}".to_sym, self)
+        if reminder.deliver
+          self.update_column :reminded_at, Time.zone.now
         end
       end
     end
@@ -118,7 +116,7 @@ module UserAdministration
   end
 
   def inviting?
-    !accepted? && send_invitation && send_invitation.to_s != "0"
+    send_invitation && (send_invitation.to_s != "0") && (send_invitation.to_s != "false") && !accepted?
   end
 
   def remind_if_reminding
@@ -126,7 +124,7 @@ module UserAdministration
   end
   
   def reminding?
-    !accepted? && invited? && send_reminder && send_reminder.to_s != "0"
+    send_reminder && (send_reminder.to_s != "0") && (send_reminder.to_s != "false") && invited? && !accepted?
   end
 
 end
