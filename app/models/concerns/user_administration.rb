@@ -84,6 +84,7 @@ module UserAdministration
         end
       end
     end
+    self.send_invitation = false
   end
   
   def remind!
@@ -96,6 +97,7 @@ module UserAdministration
         end
       end
     end
+    self.send_reminder = false
   end
 
   def accept!
