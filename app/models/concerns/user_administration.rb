@@ -2,8 +2,7 @@ module UserAdministration
   extend ActiveSupport::Concern
 
   included do
-    attr_accessor :newly_accepted
-    attr_accessor :send_invitation
+    attr_accessor :newly_accepted, :send_invitation, :send_reminder
 
     scope :accepted, -> {
       where("accepted_at IS NOT NULL")
@@ -19,6 +18,14 @@ module UserAdministration
 
     scope :uninvited, -> {
       where("invited_at IS NULL")
+    }
+
+    scope :reminded, -> {
+      where("reminded_at IS NOT NULL")
+    }
+
+    scope :unreminded, -> {
+      where("reminded_at IS NULL")
     }
     
     scope :invitable, -> {
@@ -42,6 +49,14 @@ module UserAdministration
     !invited?
   end
   
+  def reminded?
+    reminded_at?
+  end
+
+  def unreminded?
+    !reminded?
+  end
+
   def invitable?
     user?
   end
@@ -96,14 +111,22 @@ module UserAdministration
     !!newly_accepted
   end
   
-  def inviting?
-    !accepted? && send_invitation && send_invitation.to_s != "0"
-  end
-  
   private
   
   def invite_if_inviting
     self.invite! if inviting?
   end
+
+  def inviting?
+    !accepted? && send_invitation && send_invitation.to_s != "0"
+  end
+
+  def remind_if_reminding
+    self.remind! if reminding?
+  end
   
+  def reminding?
+    !accepted? && invited? && send_reminder && send_reminder.to_s != "0"
+  end
+
 end
