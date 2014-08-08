@@ -70,6 +70,20 @@ module UserAdministration
       end
     end
   end
+  
+  def remind!
+    if invited?
+      if Settings.mailer && defined? Settings.mailer.constantize
+        mailer = Settings.mailer.constantize
+        if mailer.respond_to? "reminder_to_#{self.class.to_s.downcase}".to_sym
+          reminder = mailer.send("reminder_to_#{self.class.to_s.downcase}".to_sym, self)
+          if reminder.deliver
+            self.update_column :reminded_at, Time.zone.now
+          end
+        end
+      end
+    end
+  end
 
   def accept!
     unless accepted?

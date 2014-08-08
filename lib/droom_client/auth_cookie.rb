@@ -61,7 +61,6 @@ module DroomClient
     end
 
     def encoded_value(resource)
-      Rails.logger.warn "cookie resource: #{resource.name}"
       signer.encode [ resource.authentication_token, Time.now ]
     end
 
