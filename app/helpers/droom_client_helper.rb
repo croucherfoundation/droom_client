@@ -20,7 +20,7 @@ module DroomClientHelper
   def droom_asset_host
     Settings.droom[:asset_protocol] ||= Settings.droom.protocol
     Settings.droom[:asset_host] ||= Settings.droom.host
-    "#{Settings.droom.asset_protocol}://#{Settings.droom.asset_host}"
+    "//#{Settings.droom.asset_host}"
   end
   
   def local_host
