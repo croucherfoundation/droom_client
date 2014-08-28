@@ -107,7 +107,7 @@ protected
 
   ## Stored Authentication
   # is always by auth_token. It can be given as header token, param or cookie.
-
+  #
   def authenticate_user
     unless user_signed_in?
       if user = authenticate_from_header || authenticate_from_param || authenticate_from_cookie
@@ -125,12 +125,17 @@ protected
     authenticate_with_http_token do |token, options|
       authenticate_with(token) if token
     end
-    # token, options = ActionController::HttpAuthentication::Token.token_and_options(request)
-    # authenticate_with(token) if token
   end
 
   def authenticate_from_param
     authenticate_with(params[:tok]) if params[:tok].present?
+  end
+  
+  def authenticate_from_cookie
+    cookie = DroomClient::AuthCookie.new(cookies)
+    if cookie.valid?
+      authenticate_with(cookie.token)
+    end
   end
   
   # Auth is always remote, so that single sign-out works too.
@@ -153,6 +158,7 @@ protected
   end
   
   def sign_in_and_remember(user)
+    Rails.logger.debug("sign_in_and_remember user ##{user.uid}")
     sign_in(user)
     Settings.auth[:cookie_period] ||= 0
     set_auth_cookie_for(user, Settings.auth.cookie_domain, Settings.auth.cookie_period)
@@ -164,12 +170,6 @@ protected
   # and then authentication is checked against the data room server.
   #
   # Cookie holds encoded array of [uid, auth_token]
-  def authenticate_from_cookie
-    cookie = DroomClient::AuthCookie.new(cookies)
-    if cookie.valid?
-      authenticate_with(cookie.token)
-    end
-  end
 
   def set_auth_cookie_for(user, domain=nil, period=0)
     expires = Time.now + period.to_i.hours if period && period.to_i != 0 

@@ -13,6 +13,7 @@ module DroomClient
     end
 
     def set(resource, options={})
+      Rails.logger.debug("AuthCookie.set resource ##{resource.uid}")
       @cookies[cookie_name] = cookie_options.merge(options).merge(:value => encoded_value(resource))
     end
 
@@ -29,6 +30,7 @@ module DroomClient
     end
 
     def valid?
+      Rails.logger.debug("AuthCookie.valid? #{present?.inspect}, #{values.all?.inspect}")
       present? && values.all?
     end
 
