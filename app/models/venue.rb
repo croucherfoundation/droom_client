@@ -4,9 +4,6 @@ class Venue
   use_api DROOM
   collection_path "/api/venues"
   root_element :venue
-  request_new_object_on_build true
-
-  after_save :decache
 
   def associates
     @associates ||= []
@@ -25,12 +22,6 @@ class Venue
       name: "",
       address: ""
     })
-  end
-
-  protected
-  
-  def decache
-    $cache.flush_all if $cache
   end
 
 end

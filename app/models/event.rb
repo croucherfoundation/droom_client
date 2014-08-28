@@ -7,7 +7,6 @@ class Event
   request_new_object_on_build true
 
   after_create :assign_to_associates
-  after_save :decache
 
   @associates = []
   attr_accessor :associates
@@ -20,8 +19,4 @@ protected
     end
   end
   
-  def decache
-    $cache.flush_all if $cache
-  end
-
 end
