@@ -16,14 +16,5 @@
         = f.label :password_confirmation, class: "required"
         = f.password_field :password_confirmation, placeholder: "", required: true
 
-      %span.col.strength{:data => {:role => "complexity"}}>
-        %strong
-          = t :password_strength
-        %span.complexity
-          Checking
-      
-    %p.formnote
-      = t :password_strength_note
-
     %p.buttons
       = f.submit "Save password and continue"
