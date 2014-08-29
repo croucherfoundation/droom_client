@@ -1,8 +1,8 @@
 - user ||= @user
 - destination ||= false
 
-= form_for @user, url: droom_client.set_password_user_path(user), method: "PUT" do |f|
-  = hidden_field_tag :tok, params[:tok]
+= form_for user, url: droom_client.set_password_user_path(user), method: "PUT" do |f|
+  = hidden_field_tag :tok, user.authentication_token
   - if destination
     = hidden_field_tag :destination, destination
   
