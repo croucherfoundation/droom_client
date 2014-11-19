@@ -55,11 +55,11 @@ module HasDroomUser
   #
   def user_attributes=(attributes)
     if attributes.any?
-      attributes.reverse_merge!(defer_confirmation: true) if confirmation_usually_deferred?
-      if self.user?
-        self.user.assign_attributes(attributes.with_indifferent_access)
-        self.user.save
+      if user = self.user
+        user.update_attributes(attributes.with_indifferent_access)
+        user.save
       else
+        attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
         user = User.new_with_defaults(attributes)
         user.save
         self.user = user
