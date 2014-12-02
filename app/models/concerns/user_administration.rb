@@ -105,12 +105,11 @@ module UserAdministration
   def accept!
     unless accepted?
       self.update_column :accepted_at, Time.zone.now
-      self.newly_accepted = true
     end
   end
 
   def newly_accepted?
-    !!newly_accepted
+    accepted_at > 1.hour.ago
   end
   
   private
