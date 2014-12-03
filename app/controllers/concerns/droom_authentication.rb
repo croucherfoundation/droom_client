@@ -179,5 +179,5 @@ protected
   def unset_auth_cookie(domain=Settings.auth.cookie_domain)
     DroomClient::AuthCookie.new(cookies).unset(domain: domain)
   end
-
+  
 end

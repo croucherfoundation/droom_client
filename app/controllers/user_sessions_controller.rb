@@ -25,6 +25,7 @@ class UserSessionsController < ApplicationController
     flash[:notice] = t("flash.goodbye", name: current_user.formal_name).html_safe
     RequestStore.store.delete :current_user
     unset_auth_cookie(Settings.auth.cookie_domain)
+    reset_session
     redirect_to after_sign_out_path_for(current_user)
   end
 
