@@ -109,7 +109,7 @@ module UserAdministration
   end
 
   def newly_accepted?
-    accepted_at > 1.hour.ago
+    accepted? && accepted_at > 1.hour.ago
   end
   
   private
