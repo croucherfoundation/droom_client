@@ -41,7 +41,7 @@ module DroomClientHelper
   
   def action_menu(thing, locals={})
     if can?(:edit, thing)
-      type = thing.class.to_s.downcase.underscore
+      type = thing.class.to_s.underscore
       classname = type.split('/').last
       locals[classname.to_sym] = thing
       render :partial => "#{type.pluralize}/action_menu", :locals => locals
