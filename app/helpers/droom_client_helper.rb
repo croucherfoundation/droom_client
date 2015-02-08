@@ -29,7 +29,7 @@ module DroomClientHelper
 
   def action_menulink(thing, html_options={})
     if can?(:edit, thing)
-      classname = thing.class.to_s.downcase.underscore.split('/').last
+      classname = thing.class.to_s.underscore.split('/').last
       html_options.reverse_merge!({
         :class => "",
         :data => {:menu => "#{classname}_#{thing.id}"}
