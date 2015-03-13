@@ -101,11 +101,11 @@ module MightHaveDroomUser
   end
 
   def informal_name
-    if user? then user.informal_name else [given_name, family_name].join(' ')
+    if user? then user.informal_name else [given_name, family_name].join(' ') end
   end
 
   def colloquial_name
-    if user? then user.colloquial_name else [title, given_name, family_name].join(' ')
+    if user? then user.colloquial_name else [title, given_name, family_name].join(' ') end
   end
     
 end
