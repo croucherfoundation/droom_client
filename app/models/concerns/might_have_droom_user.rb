@@ -99,5 +99,13 @@ module MightHaveDroomUser
   def icon
     user.icon if user?
   end
+
+  def informal_name
+    if user? then user.informal_name else [given_name, family_name].join(' ')
+  end
+
+  def colloquial_name
+    if user? then user.colloquial_name else [title, given_name, family_name].join(' ')
+  end
     
 end
