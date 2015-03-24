@@ -16,7 +16,7 @@ module MightHaveDroomUser
   def user
     unless @user
       begin
-        if user_uid
+        if user_uid.present?
           @user = User.find(user_uid)
         end
       rescue => e
