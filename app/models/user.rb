@@ -4,6 +4,7 @@ class User
   include PaginatedHer::Model
 
   define_callbacks :password_set
+  attr_accessor :defer_confirmation
 
   use_api DROOM
   primary_key :uid
