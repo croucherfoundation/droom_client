@@ -1,7 +1,7 @@
 class User
   include ActiveSupport::Callbacks
   include HkNames
-  include PaginatedHer::Model
+  include Her::JsonApi::Model
 
   define_callbacks :password_set
   attr_accessor :defer_confirmation

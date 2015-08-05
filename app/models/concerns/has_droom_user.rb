@@ -21,7 +21,7 @@ module HasDroomUser
   #
   def user
     begin
-      if user_uid
+      if user_uid?
         User.find(user_uid)
       end
     rescue => e
@@ -37,9 +37,9 @@ module HasDroomUser
   #
   # ### Assigning an existing user
   #
-  # +user=+ will be called in two situations: during a compound save with an existing user object, 
+  # +user=+ will be called in two situations: during a compound save with an existing user object,
   # or immediately upon the creeation of a new user, on the object that it was created with.
-  # We only save ourselves if nothing else is going on: if this record is new or has other changes,
+  # We only complete the save if nothing else is going on: if this record is new or has other changes,
   # we assume that this is part of a larger save operation.
   #
   def user=(user)

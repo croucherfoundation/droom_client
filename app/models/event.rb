@@ -1,5 +1,5 @@
 class Event
-  include PaginatedHer::Model
+  include Her::JsonApi::Model
 
   use_api DROOM
   collection_path "/api/events"
