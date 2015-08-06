@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "faraday"
   s.add_dependency "faraday_middleware"
   s.add_dependency "request_store"
+  s.add_dependency "signed_json"
   
   s.add_development_dependency "sqlite3"
 end
