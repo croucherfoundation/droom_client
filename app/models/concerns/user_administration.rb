@@ -79,27 +79,29 @@ module UserAdministration
       if Settings.mailer && defined? Settings.mailer.constantize
         mailer = Settings.mailer.constantize
         ensure_invitation_token
-        invitation = mailer.send("invitation_to_#{self.class.to_s.downcase}".to_sym, self)
+        invitation = mailer.send("invitation_to_#{self.class.to_s.underscore}".to_sym, self)
         if invitation.deliver
           self.update_column :invited_at, Time.zone.now
         end
       end
     end
     self.send_invitation = false
+    true
   end
   
   def remind!
     if Settings.mailer && defined? Settings.mailer.constantize
       mailer = Settings.mailer.constantize
-      if mailer.respond_to? "reminder_to_#{self.class.to_s.downcase}".to_sym
+      if mailer.respond_to? "reminder_to_#{self.class.to_s.underscore}".to_sym
         ensure_invitation_token
-        reminder = mailer.send("reminder_to_#{self.class.to_s.downcase}".to_sym, self)
+        reminder = mailer.send("reminder_to_#{self.class.to_s.underscore}".to_sym, self)
         if reminder.deliver
           self.update_column :reminded_at, Time.zone.now
         end
       end
     end
     self.send_reminder = false
+    true
   end
   
   def accept!

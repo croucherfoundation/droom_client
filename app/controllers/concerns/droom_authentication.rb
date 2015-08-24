@@ -1,13 +1,13 @@
-# Here we extract a small part of the authorize-or-redirect functionality normally 
+# Here we extract a small part of the authorize-or-redirect functionality normally
 # provided by devise or authlogic. No need for the full paraphernalia because we
-# don't manage users here; only user sessions. All we have to do is consult the data 
+# don't manage users here; only user sessions. All we have to do is consult the data
 # room and remember the response. As well as the local session we stash it in a cross-
 # domain cookie for basic SSO support.
 #
 # The actual consultation is done by our User resource class.
 #
-# This is separated out as a concern in order that it can be shared between several 
-# satellite applications. This and other shared functionality like the Her extensions 
+# This is separated out as a concern in order that it can be shared between several
+# satellite applications. This and other shared functionality like the Her extensions
 # will end up in their own gem once it all settles down.
 
 require 'droom_client/auth_cookie'
