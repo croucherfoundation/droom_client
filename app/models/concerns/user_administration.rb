@@ -1,3 +1,6 @@
+# Include this concern to give your class a mechanism for invitation and acceptance
+# that will do the right thing with data room users new and old.
+
 module UserAdministration
   extend ActiveSupport::Concern
 
@@ -41,6 +44,10 @@ module UserAdministration
     invited? ? accepted? ? "accepted" : "invited" : "uninvited"
   end
 
+  def invitable?
+    user?
+  end
+
   def invited?
     invited_at?
   end
@@ -57,10 +64,6 @@ module UserAdministration
     !reminded?
   end
 
-  def invitable?
-    user?
-  end
-
   def accepted?
     accepted_at?
   end
@@ -75,33 +78,26 @@ module UserAdministration
   # take in a password-setting confirmation step.
   #
   def invite!
-    if invitable?
-      if Settings.mailer && defined? Settings.mailer.constantize
-        mailer = Settings.mailer.constantize
-        ensure_invitation_token
-        invitation = mailer.send("invitation_to_#{self.class.to_s.underscore}".to_sym, self)
-        if invitation.deliver
-          self.update_column :invited_at, Time.zone.now
-        end
-      end
+    if send_email('invitation')
+      self.update_column :reminded_at, Time.zone.now
     end
-    self.send_invitation = false
-    true
   end
   
   def remind!
+    if send_email('reminder')
+      self.update_column :reminded_at, Time.zone.now
+    end
+  end
+
+  def send_email(message='invitation')
     if Settings.mailer && defined? Settings.mailer.constantize
       mailer = Settings.mailer.constantize
-      if mailer.respond_to? "reminder_to_#{self.class.to_s.underscore}".to_sym
+      if mailer.respond_to? "#{message}_to_#{self.class.to_s.underscore}".to_sym
         ensure_invitation_token
-        reminder = mailer.send("reminder_to_#{self.class.to_s.underscore}".to_sym, self)
-        if reminder.deliver
-          self.update_column :reminded_at, Time.zone.now
-        end
+        message = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
+        message.deliver
       end
     end
-    self.send_reminder = false
-    true
   end
   
   def accept!

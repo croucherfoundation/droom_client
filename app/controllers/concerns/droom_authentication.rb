@@ -165,14 +165,14 @@ protected
   end
 
 
-  ## Domain cookies 
+  ## Domain cookies
   # are used to provide simple SSO support. A shared secret is required to decode the cookie,
   # and then authentication is checked against the data room server.
   #
   # Cookie holds encoded array of [uid, auth_token]
-
+  #
   def set_auth_cookie_for(user, domain=nil, period=0)
-    expires = Time.now + period.to_i.hours if period && period.to_i != 0 
+    expires = Time.now + period.to_i.hours if period && period.to_i != 0
     DroomClient::AuthCookie.new(cookies).set(user, domain: domain, expires: expires)
   end
   
