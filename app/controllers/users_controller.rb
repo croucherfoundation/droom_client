@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   include DroomAuthentication
   respond_to :html, :json
-  before_filter :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
+  before_filter :require_authenticated_user, only: [:index, :show, :edit, :update]
   before_filter :get_users, only: [:index]
   before_filter :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   layout :no_layout_if_pjax
@@ -50,13 +50,15 @@ class UsersController < ApplicationController
   # response: json list of form values and user uids.
   #
   def suggest
+    Rails.logger.warn "???  suggest! #{params[:email]}"
     limit = params[:limit].presence || 10
     if params[:email].present?
       @users = User.where(email_q: params[:email], limit: limit)
+      Rails.logger.warn "->  users! #{@users.to_a.count}"
     elsif params[:name].present?
       @users = User.where(name_q: params[:name], limit: limit)
     end
-    render json: @users
+    render json: @users.to_a
   end
   
 protected
