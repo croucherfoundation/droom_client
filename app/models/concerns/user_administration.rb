@@ -79,13 +79,13 @@ module UserAdministration
   #
   def invite!
     if send_email('invitation')
-      self.update_column :reminded_at, Time.zone.now
+      self.update_column :invited_at, Time.zone.now if respond_to?(:invited_at)
     end
   end
   
   def remind!
     if send_email('reminder')
-      self.update_column :reminded_at, Time.zone.now
+      self.update_column(:reminded_at, Time.zone.now) if respond_to?(:reminded_at)
     end
   end
 
