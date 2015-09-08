@@ -10,7 +10,7 @@ class UserSessionsController < ApplicationController
   end
 
   def create
-    if user = User.sign_in(sign_in_params)
+    if user = User.sign_in(user: sign_in_params)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
       flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
