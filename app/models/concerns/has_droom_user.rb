@@ -72,7 +72,7 @@ module HasDroomUser
   end
 
   def user?
-    user_uid? && user
+    user_uid? && user.present?
   end
   
   def confirmed?
