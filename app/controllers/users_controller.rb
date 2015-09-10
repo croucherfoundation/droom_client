@@ -54,7 +54,6 @@ class UsersController < ApplicationController
     limit = params[:limit].presence || 10
     if params[:email].present?
       @users = User.where(email_q: params[:email], limit: limit)
-      Rails.logger.warn "->  users! #{@users.to_a.count}"
     elsif params[:name].present?
       @users = User.where(name_q: params[:name], limit: limit)
     end

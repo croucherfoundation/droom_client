@@ -22,7 +22,7 @@ module DroomAuthentication
   included do
     helper_method :current_user
     helper_method :user_signed_in?
-    rescue_from DroomClient::AuthRequired, with: :redirect_to_login
+    rescue_from "DroomClient::AuthRequired", with: :redirect_to_login
     rescue_from "Her::Unauthorized", with: :redirect_to_login
   end
 
@@ -90,6 +90,7 @@ protected
   end
 
   def redirect_to_login(exception)
+    Rails.logger.warn "!!! droom_client redirect_to_login"
     # unset_auth_cookie(Settings.auth.cookie_domain)
     store_location!
     if is_navigational_format?
@@ -98,6 +99,7 @@ protected
       else
         flash[:alert] = I18n.t(:authentication_required)
       end
+      Rails.logger.warn "!!! droom_client is redirecting to #{droom_client.sign_in_path}"
       redirect_to droom_client.sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'
@@ -158,7 +160,6 @@ protected
   end
   
   def sign_in_and_remember(user)
-    Rails.logger.debug("sign_in_and_remember user ##{user.uid}")
     sign_in(user)
     Settings.auth[:cookie_period] ||= 0
     set_auth_cookie_for(user, Settings.auth.cookie_domain, Settings.auth.cookie_period)
