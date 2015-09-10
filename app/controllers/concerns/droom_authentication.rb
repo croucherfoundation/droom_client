@@ -90,7 +90,6 @@ protected
   end
 
   def redirect_to_login(exception)
-    Rails.logger.warn "!!! droom_client redirect_to_login"
     # unset_auth_cookie(Settings.auth.cookie_domain)
     store_location!
     if is_navigational_format?
@@ -99,12 +98,16 @@ protected
       else
         flash[:alert] = I18n.t(:authentication_required)
       end
-      Rails.logger.warn "!!! droom_client is redirecting to #{droom_client.sign_in_path}"
-      redirect_to droom_client.sign_in_path
+      redirect_to sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'
       request_http_token_authentication(Settings.auth.realm)
     end
+  end
+
+  def sign_in_path
+    Settings[:droom_client_mount_point] ||= "/d"
+    Settings.droom_client_mount_point + droom_client.sign_in_path
   end
 
   ## Stored Authentication

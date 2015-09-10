@@ -16,7 +16,7 @@ class UserSessionsController < ApplicationController
       flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
       redirect_to after_sign_in_path_for(user)
     else
-      redirect_to droom_client.sign_in_path
+      redirect_to sign_in_path
     end
   end
 
