@@ -98,16 +98,11 @@ protected
       else
         flash[:alert] = I18n.t(:authentication_required)
       end
-      redirect_to sign_in_path
+      redirect_to droom_client.sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'
       request_http_token_authentication(Settings.auth.realm)
     end
-  end
-
-  def sign_in_path
-    Settings[:droom_client_mount_point] ||= "/d"
-    Settings.droom_client_mount_point + droom_client.sign_in_path
   end
 
   ## Stored Authentication
