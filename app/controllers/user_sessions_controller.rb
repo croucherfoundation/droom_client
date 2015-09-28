@@ -5,7 +5,7 @@ class UserSessionsController < ApplicationController
   before_filter :authenticate_user!, only: [:destroy]
 
   def new
-    @user = User.new_with_defaults
+    @user = User.new_with_defaults(email: params[:email])
     render
   end
 
@@ -14,7 +14,11 @@ class UserSessionsController < ApplicationController
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
       flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
-      redirect_to after_sign_in_path_for(user)
+      if params[:destination].present?
+        redirect_to params[:destination]
+      else
+        redirect_to after_sign_in_path_for(user)
+      end
     else
       redirect_to droom_client.sign_in_path
     end
