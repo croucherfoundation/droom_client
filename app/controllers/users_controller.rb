@@ -1,12 +1,12 @@
 class UsersController < ApplicationController
   include DroomAuthentication
   respond_to :html, :json
-  before_filter :require_authenticated_user, only: [:index, :show, :edit, :update]
+  before_filter :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
   before_filter :get_users, only: [:index]
   before_filter :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   layout :no_layout_if_pjax
 
-  # User-creation is always nested. 
+  # User-creation is always nested.
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
   def index
@@ -43,6 +43,14 @@ class UsersController < ApplicationController
     end
   end
   
+  ## Account checking
+  #
+  
+  def check_email
+    in_use = params[:email].present? && User.where(email: params[:email]).any?
+    render json: {unavailable: in_use}
+  end
+  
   ## Suggestion
   #
   # This is to support the user-picker widget.
@@ -50,7 +58,6 @@ class UsersController < ApplicationController
   # response: json list of form values and user uids.
   #
   def suggest
-    Rails.logger.warn "???  suggest! #{params[:email]}"
     limit = params[:limit].presence || 10
     if params[:email].present?
       @users = User.where(email_q: params[:email], limit: limit)
