@@ -12,7 +12,9 @@ class UserSessionsController < ApplicationController
     if user = User.sign_in(sign_in_params)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
-      flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
+      unless request.xhr?
+        flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
+      end
       if params[:destination].present?
         redirect_to params[:destination]
       else
@@ -25,13 +27,13 @@ class UserSessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    flash[:notice] = t("flash.goodbye", name: current_user.formal_name).html_safe
     RequestStore.store.delete :current_user
     unset_auth_cookie(Settings.auth.cookie_domain)
     reset_session
     if request.xhr?
       head :ok
     else
+      flash[:notice] = t("flash.goodbye", name: current_user.formal_name).html_safe
       redirect_to after_sign_out_path_for(current_user), method: "get"
     end
   end

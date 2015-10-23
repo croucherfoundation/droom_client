@@ -18,7 +18,6 @@ class UsersController < ApplicationController
   
   def create
     @user = User.new_with_defaults(user_params)
-    @user.send_confirmation = true
     if @user.save
       sign_in_and_remember @user
       if params[:destination].present?
