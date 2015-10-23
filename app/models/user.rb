@@ -47,6 +47,7 @@ class User
       given_name: "",
       family_name: "",
       chinese_name: "",
+      affiliation: "",
       email: "",
       phone: "",
       password: "",
