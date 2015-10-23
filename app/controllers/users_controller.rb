@@ -1,12 +1,37 @@
 class UsersController < ApplicationController
   include DroomAuthentication
   respond_to :html, :json
+  skip_before_filter :authenticate_user!
   before_filter :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
   before_filter :get_users, only: [:index]
   before_filter :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   layout :no_layout_if_pjax
 
-  # User-creation is always nested.
+
+
+
+  # User-creation is no longer always nested!
+  
+  def new
+    
+  end
+  
+  def create
+    @user = User.new_with_defaults(user_params)
+    @user.send_confirmation = true
+    if @user.save
+      sign_in_and_remember @user
+      if params[:destination].present?
+        redirect_to params[:destination]
+      else
+        respond_with @user
+      end
+    else
+      
+    end
+  end
+  
+  
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
   def index
@@ -90,7 +115,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :confirmed)
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed)
   end
 
 end

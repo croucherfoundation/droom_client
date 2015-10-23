@@ -7,9 +7,13 @@ class User
   attr_accessor :defer_confirmation
 
   use_api DROOM
-  primary_key :uid
   collection_path "/api/users"
+  primary_key :uid
   root_element :user
+
+  # temporary while we are not yet sending jsonapi data back to core properly
+  include_root_in_json true
+  parse_root_in_json false
 
   def new?
     !respond_to?(:uid) || uid.nil?
@@ -100,21 +104,21 @@ class User
   def to_param
     uid
   end
-  
+
   def permitted?(key)
     permission_codes.include?(key)
   end
-  
+
   def permit!(code)
     #TODO
     #permission_codes << code unless permission_codes.include?(code)
     #save
   end
-  
+
   def allowed_here?
     permitted?("#{Settings.service_name}.login")
   end
-  
+
   def permit_here
     permit!("#{Settings.service_name}.login")
   end
