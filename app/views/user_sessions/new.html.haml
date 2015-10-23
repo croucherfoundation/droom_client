@@ -1,6 +1,3 @@
-- stored_location = controller.stored_location_for(:user)
-- backto = URI.join(local_host, stored_location).to_s if stored_location
-
 #account
   %h1.pagetitle
     =t :please_sign_in
@@ -9,24 +6,4 @@
     %p.standfirst.green
       = flash[:notice]
 
-  = form_for(@user, :url => droom_client.sign_in_path, :method => 'post') do |f|
-    = hidden_field_tag :destination, params[:destination]
-    %p
-      = f.label :email
-      %br
-      = f.email_field :email, :class => 'login'
-
-    %p
-      = f.label :password
-      %span.reminder
-        = link_to t(:forgot_password), droom_url("/users/password/new", backto: backto)
-      %br
-      = f.password_field :password, :class => 'login'
-
-    %p
-      = f.check_box :remember_me
-      = f.label :remember_me, :class => "minor"
-
-    .buttons
-      %p
-        = f.submit t(:sign_in), :class => "go"
+  = render partial: "sign_in"

@@ -19,13 +19,18 @@ en:
   password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."
   password_strength: "Strength"
   placeholders:
+    signin:
+      email: "Email"
+      password: "Password"
+      password_confirmation: "Repeat password"
     user:
-      title: "e.g. Mr, Professor"
-      family_name: "e.g. Chan"
-      given_name: "e.g. Tai Wan, David"
-      chinese_name: "if relevant"
-      password: "Six characters or more, please"
-      email: "eg. chantaiwan@gmail.com"
+      title: "Title"
+      affiliation: "Affiliation"
+      family_name: "Family name"
+      given_name: "Given name"
+      chinese_name: "中国姓名"
+      password: "Password"
+      email: "Email"
       phone: "Phone"
   leave_password: "If you don't want to change your password, leave both boxes empty."
   notes:

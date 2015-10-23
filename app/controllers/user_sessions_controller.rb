@@ -5,7 +5,6 @@ class UserSessionsController < ApplicationController
   before_filter :authenticate_user!, only: [:destroy]
 
   def new
-    @user = User.new_with_defaults(email: params[:email])
     render
   end
 

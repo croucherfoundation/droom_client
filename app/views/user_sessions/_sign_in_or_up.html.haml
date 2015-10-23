@@ -1,0 +1,35 @@
+- user ||= User.new_with_defaults(email: params[:email])
+- if params[:destination]
+  - backto = params[:destination]
+- elsif stored_location = controller.stored_location_for(:user)
+  - backto = URI.join(local_host, stored_location).to_s if stored_location
+
+= form_for(user, url: droom_client.sign_in_path, method: 'post', html: {class: "sign_in_or_up"}) do |f|
+  = hidden_field_tag :destination, params[:destination]
+
+  .fields
+    %p.twocol.reversed
+      %span.col.first>
+        = f.email_field :email, :class => 'login', placeholder: t("placeholders.signin.email")
+      %span.col.last>
+        = f.password_field :password, :class => 'login', placeholder: t("placeholders.signin.password")
+    .signup
+      %p.threecol
+        %span.col.first>
+          = f.text_field :family_name, :class => 'login', placeholder: t("placeholders.user.family_name")
+        %span.col>
+          = f.text_field :given_name, :class => 'login', placeholder: t("placeholders.user.given_name")
+        %span.col.last>
+          = f.text_field :chinese_name, :class => 'login', placeholder: t("placeholders.user.chinese_name")
+      %p.twocol.unequal
+        %span.col.first>
+          = f.text_field :title, :class => 'login', placeholder: t("placeholders.user.title")
+        %span.col.last>
+          = f.text_field :affiliation, :class => 'login', placeholder: t("placeholders.user.affiliation")
+    %p
+      = f.check_box :remember_me
+      = f.label :remember_me, :class => "minor"
+
+  .buttons
+    %p
+      = f.submit t(:sign_in), :class => "go"

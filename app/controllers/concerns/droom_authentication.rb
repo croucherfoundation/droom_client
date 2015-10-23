@@ -91,14 +91,22 @@ protected
 
   def redirect_to_login(exception)
     # unset_auth_cookie(Settings.auth.cookie_domain)
+    Rails.logger.warn "@@@@@ redirect_to_login"
     store_location!
     if is_navigational_format?
-      if user_signed_in?
-        flash[:alert] = I18n.t(:permission_denied)
+      if pjax?
+        if signup_permitted?
+          render partial: 'user_sessions/sign_in_or_up'
+        else
+          render partial: 'user_sessions/sign_in'
+        end
       else
-        flash[:alert] = I18n.t(:authentication_required)
+        sign_in_path = droom_client.sign_in_path
+        dcmp = Settings.droom_client_mount_point
+        sign_in_path = dcmp + sign_in_path unless sign_in_path =~ /^#{dcmp}/
+        Rails.logger.warn "@@@@@ redirecting to #{sign_in_path}"
+        redirect_to sign_in_path
       end
-      redirect_to droom_client.sign_in_path
     else
       Settings.auth['realm'] ||= 'Data Room'
       request_http_token_authentication(Settings.auth.realm)
@@ -174,9 +182,21 @@ protected
     expires = Time.now + period.to_i.hours if period && period.to_i != 0
     DroomClient::AuthCookie.new(cookies).set(user, domain: domain, expires: expires)
   end
-  
+
   def unset_auth_cookie(domain=Settings.auth.cookie_domain)
     DroomClient::AuthCookie.new(cookies).unset(domain: domain)
   end
-  
+
+
+
+  protected
+
+  def pjax?
+    !!request.headers['X-PJAX']
+  end
+
+  def signup_permitted?
+    false
+  end
+
 end
