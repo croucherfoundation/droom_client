@@ -24,11 +24,6 @@
           = f.text_field :given_name, placeholder: t("placeholders.user.given_name")
         %span.col.last>
           = f.text_field :chinese_name, placeholder: t("placeholders.user.chinese_name")
-      %p.twocol.unequal
-        %span.col.first>
-          = f.text_field :title, placeholder: t("placeholders.user.title")
-        %span.col.last>
-          = f.text_field :affiliation, placeholder: t("placeholders.user.affiliation")
   .buttons
     %p
       = f.submit t(:sign_in), :class => "go"
