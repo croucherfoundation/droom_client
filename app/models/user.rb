@@ -36,7 +36,9 @@ class User
       family_name: family_name,
       chinese_name: chinese_name,
       email: email,
-      phone: phone
+      phone: phone,
+      password: password,
+      password_confirmation: password_confirmation
     }
   end
 
