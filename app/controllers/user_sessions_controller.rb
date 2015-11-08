@@ -27,13 +27,14 @@ class UserSessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
+    name = current_user.formal_name
     RequestStore.store.delete :current_user
     unset_auth_cookie(Settings.auth.cookie_domain)
     reset_session
     if request.xhr?
       head :ok
     else
-      flash[:notice] = t("flash.goodbye", name: current_user.formal_name).html_safe
+      flash[:notice] = t("flash.goodbye", name: name).html_safe
       redirect_to after_sign_out_path_for(current_user), method: "get"
     end
   end
