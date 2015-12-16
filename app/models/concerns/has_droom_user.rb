@@ -9,8 +9,8 @@ module HasDroomUser
   extend ActiveSupport::Concern
 
   included do
-    scope :by_user, -> uid {
-      uid = uid.uid if uid.respond_to? :uid
+    scope :by_user, -> user_or_uid {
+      uid = user_or_uid.respond_to?(:uid) ? user_or_uid.uid : user_or_uid
       where(user_uid: uid)
     }
   end
@@ -22,7 +22,7 @@ module HasDroomUser
   def user
     begin
       if user_uid?
-        User.find(user_uid)
+        @_user ||= User.find(user_uid)
       end
     rescue => e
       Rails.logger.warn "#{self.class} #{self.id} has a user_uid that corresponds to no known data room user. Perhaps someone has been deleted? Ignoring."
@@ -45,6 +45,7 @@ module HasDroomUser
   def user=(user)
     also_save = self.persisted? && !self.changed?
     self.user_uid = user.uid
+    @_user = user
     self.save if also_save
   end
 
@@ -60,9 +61,9 @@ module HasDroomUser
         user.save
       else
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
-        user = User.new_with_defaults(attributes)
-        user.save
-        self.user = user
+        @_user = User.new_with_defaults(attributes)
+        @_user.save
+        self.user = @_user
       end
     end
   end
@@ -110,5 +111,5 @@ module HasDroomUser
   def user_email
     user.email if user?
   end
-    
+
 end

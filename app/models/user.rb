@@ -53,6 +53,7 @@ class User
       email: "",
       phone: "",
       password: "",
+      password_confirmation: "",
       permission_codes: "",
       remember_me: false,
       confirmed: false,
@@ -103,7 +104,7 @@ class User
       save
     end
   end
-
+  
   def to_param
     uid
   end
