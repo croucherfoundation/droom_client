@@ -27,6 +27,21 @@ module MightHaveDroomUser
     @user
   end
 
+  def find_or_create_user
+    unless user
+      if email
+        @_user = User.create({
+          given_name: given_name,
+          family_name: family_name,
+          chinese_name: chinese_name,
+          email: email
+        })
+        self.user_uid = @_user.uid
+      end
+    end
+    @_user
+  end
+
   ## Set
   #
   # Users are assigned in two ways: by direct association to an existing user object, or by the inline creation of a new
