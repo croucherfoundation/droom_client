@@ -45,7 +45,7 @@ module UserAdministration
   end
 
   def invitable?
-    user || respond_to(:email?) && email?
+    user || respond_to?(:email?) && email?
   end
 
   def invited?
