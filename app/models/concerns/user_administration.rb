@@ -90,12 +90,12 @@ module UserAdministration
   end
 
   def send_email(message='invitation')
-    if Settings.mailer && defined? Settings.mailer.constantize
+    if Settings.mailer && defined?(Settings.mailer.constantize)
       mailer = Settings.mailer.constantize
       if mailer.respond_to? "#{message}_to_#{self.class.to_s.underscore}".to_sym
         if ensure_invitation_token && ensure_user
-          message = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
-          message.deliver
+          m = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
+          m.deliver
         end
       end
     end
@@ -134,12 +134,15 @@ module UserAdministration
   end
 
   def ensure_invitation_token
+    token = false
     if respond_to? :invitation_token
       while !self.invitation_token?
         token = generate_token
         self.update_column(:invitation_token, token) unless self.class.find_by(invitation_token: token)
       end
+      token = self.invitation_token # positive response allows mailing to continue
     end
+    token
   end
 
   def generate_token(length=12)
