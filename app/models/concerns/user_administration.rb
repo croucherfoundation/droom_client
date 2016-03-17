@@ -45,7 +45,7 @@ module UserAdministration
   end
 
   def invitable?
-    user?
+    email?
   end
 
   def invited?

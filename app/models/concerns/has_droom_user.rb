@@ -24,10 +24,28 @@ module HasDroomUser
       if user_uid?
         @_user ||= User.find(user_uid)
       end
+      if email?
+        @_user ||= User.where(email: email).first
+      end
     rescue => e
       Rails.logger.warn "#{self.class} #{self.id} has a user_uid that corresponds to no known data room user. Perhaps someone has been deleted? Ignoring."
       nil
     end
+  end
+
+  def find_or_create_user
+    unless user
+      if email
+        @_user = User.create({
+          given_name: given_name,
+          family_name: family_name,
+          chinese_name: chinese_name,
+          email: email
+        })
+        self.user_uid = @_user.uid
+      end
+    end
+    @_user
   end
 
   ## Set
