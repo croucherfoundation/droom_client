@@ -93,9 +93,10 @@ module UserAdministration
     if Settings.mailer && defined? Settings.mailer.constantize
       mailer = Settings.mailer.constantize
       if mailer.respond_to? "#{message}_to_#{self.class.to_s.underscore}".to_sym
-        ensure_invitation_token
-        message = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
-        message.deliver
+        if ensure_invitation_token && ensure_user
+          message = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
+          message.deliver
+        end
       end
     end
   end
@@ -126,6 +127,10 @@ module UserAdministration
   
   def reminding?
     send_reminder && (send_reminder.to_s != "0") && (send_reminder.to_s != "false") && invited? && !accepted?
+  end
+
+  def ensure_user
+    find_or_create_user
   end
 
   def ensure_invitation_token
