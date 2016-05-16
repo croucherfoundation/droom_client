@@ -1,7 +1,7 @@
 # The purpose of this module is to make it easy to associate a droom user to a local object.
 # It often happens that...
 #
-# Since the user is a remote resource, this association only partly resembles a normal activerecord association. 
+# Since the user is a remote resource, this association only partly resembles a normal activerecord association.
 #
 # Requirements: user_uid column.
 #
@@ -68,6 +68,13 @@ module HasDroomUser
     self.save if also_save
   end
 
+  # Nil or value is meaningful. Empty string means that no value was set.
+  def user_uid=(uid="")
+    if uid != ""
+      write_attribute(:user_uid, uid)
+    end
+  end
+
   # ### Nested creation of a new user
   #
   # +user_attributes=+ is only usually called during the nested creation of a new user object but it
@@ -80,9 +87,11 @@ module HasDroomUser
         user.save
       else
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
-        @_user = User.new_with_defaults(attributes)
-        @_user.save
-        self.user = @_user
+        Rails.logger.warn "!!! NEW USER attributes=#{attributes.inspect}"
+        user = User.new_with_defaults(attributes)
+        user.save
+        Rails.logger.warn "!!! CREATED USER with uid #{user.uid}"
+        self.user = user
       end
     end
   end

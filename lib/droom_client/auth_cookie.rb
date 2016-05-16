@@ -25,7 +25,7 @@ module DroomClient
     end
 
     def created_at
-      valid? ? Time.at(value[1]) : nil
+      DateTime.parse(values[1]) if valid?
     end
 
     def valid?

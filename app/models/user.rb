@@ -40,7 +40,7 @@ class User
     }
   end
 
-  def self.new_with_defaults(attributes={})
+  def self.new_with_defaults(atts={})
     attributes = {
       uid: nil,
       title: "",
@@ -57,7 +57,7 @@ class User
       confirmed: false,
       person_uid: nil,
       defer_confirmation: true
-    }.with_indifferent_access.merge(attributes)
+    }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
 
