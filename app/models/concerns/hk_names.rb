@@ -65,7 +65,11 @@ module HkNames
   end
 
   def formal_name
-    [normalized_title, family_name].compact.join(' ')
+    if title.present? || respond_to?(:gender) && gender?
+      [normalized_title, family_name].map(&:presence).compact.join(' ')
+    else
+      [given_name, family_name].map(&:presence).compact.join(' ')
+    end
   end
 
   # This is our best shot at a representation of how this person would normally be referred to. It combines
