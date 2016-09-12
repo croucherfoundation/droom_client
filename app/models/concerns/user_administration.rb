@@ -1,6 +1,10 @@
 # Include this concern to give your class a mechanism for invitation and acceptance
 # that will do the right thing with data room users new and old.
-
+#
+# If object.user is not provided by HasDroomUser or similar, but by some more abstract
+# means as in the case of eg a yearbook page -> person -> user, then you will need to
+# override `ensure_user`.
+#
 module UserAdministration
   extend ActiveSupport::Concern
 

@@ -35,8 +35,9 @@ class User
       given_name: given_name,
       family_name: family_name,
       chinese_name: chinese_name,
-      email: email,
-      phone: phone
+      emails: emails,
+      phones: phones,
+      addresses: addresses
     }
   end
 
@@ -48,14 +49,14 @@ class User
       family_name: "",
       chinese_name: "",
       affiliation: "",
-      email: "",
-      phone: "",
+      emails: [],
+      phones: [],
+      addresses: [],
       password: "",
       password_confirmation: "",
       permission_codes: "",
       remember_me: false,
       confirmed: false,
-      person_uid: nil,
       defer_confirmation: true
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
@@ -71,6 +72,10 @@ class User
     rescue JSON::ParserError
       nil
     end
+  end
+
+  def email
+    emails.first if emails
   end
 
   def send_confirmation_message!
