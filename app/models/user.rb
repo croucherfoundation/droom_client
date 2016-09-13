@@ -36,7 +36,9 @@ class User
       family_name: family_name,
       chinese_name: chinese_name,
       emails: emails,
+      email: email,
       phones: phones,
+      phone: phone,
       addresses: addresses
     }
   end
@@ -76,6 +78,10 @@ class User
 
   def email
     emails.first if emails
+  end
+
+  def phone
+    phones.first if phones
   end
 
   def send_confirmation_message!
