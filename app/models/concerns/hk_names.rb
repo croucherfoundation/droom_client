@@ -18,57 +18,51 @@ module HkNames
 
   # ### Polite informality
   #
-  # People with an English forename would normally be addressed as Jimmy Chan. People with Chinese
-  # forenames should be addressed as Chan Tai Wan. Some people have both.
+  # There are three possible name forms here: Johny Chan, Chan Tai Wan and sometimes Chan Tai Wan, Johnny.
+  # It is not possible for us to distinguish them programmatically, but we do know that a given name
+  # with a comma includes both chinese and english versions. In that case we favour the english component
+  # for informal use, but in every other case we just print `given_name family_name`. This shows a fully
+  # Chinese name in the wrong order, but apparently when printed in latin script that's quite acceptable.
+  #
+  # This also gives sane results in the common but incorrect case where people have given us Johnny Tai Wan.
   #
   def informal_name
-    # The standard form of the given name is Tai Wan, Ray
-    # But some people are known only as Ray.
     chinese, english = given_name.split(/,\s*/)
-    parts = chinese.split(/\s+/)
-
-    # Here we can't tell the difference between people with one chinese given name and one anglo given name
-    # but the order of names is reversed in the latter case. For now we assume that the presence of a chinese
-    # name or two given names indicates that the chinese word ordering should be used.
-    unless chinese_name? || parts.length > 1
-      english ||= chinese
-    end
-    if english
-      [english, family_name].join(' ')
-    else
-      [family_name, chinese].join(' ')
-    end
+    given = english.presence || chinese # nb. if no comma then chinese will hold the whole name
+    [given, family_name].join(' ')
   end
   alias :name :informal_name
 
   # ### Formality
   #
-  # The family name is held separately because for most purposes we will address people using the relatively 
-  # reliable 'Dr Chan' or 'Mr Smith'.
+  # For most purposes we can address people using the relatively reliable 'Dr Chan' or 'Mr Smith'.
   #
   def normalized_title
-    t = self.title
-    t = ordinary_title unless t.present?
+    t = self.title.presence || default_title
     t.gsub('.', '').strip
   end
   
-  def ordinary_title
-    gender == 'f' ? "Ms" : "Mr"
+  def default_title
+    if respond_to? :gender
+      gender == 'f' ? "Ms" : "Mr"
+    else
+      ""
+    end
   end
   
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(normalized_title)
+    ['Mr', 'Ms', 'Mrs', '', nil].include?(title)
   end
   
   def title_if_it_matters
-    normalized_title unless title_ordinary?
+    title unless title_ordinary?
   end
 
   def formal_name
-    if title.present? || respond_to?(:gender) && gender?
-      [normalized_title, family_name].map(&:presence).compact.join(' ')
+    if normalized_title.present?
+      [normalized_title, family_name].compact.join(' ')
     else
-      [given_name, family_name].map(&:presence).compact.join(' ')
+      [given_name, family_name].compact.join(' ')
     end
   end
 
@@ -95,5 +89,5 @@ module HkNames
     chinese, english = given_name.split(/,\s*/)
     [family_name, chinese].join(' ')
   end
-
+  
 end
