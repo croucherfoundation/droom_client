@@ -6,12 +6,13 @@ module HkNames
   # With Anglo-Chinese Hong Kong names it is difficult to be sure of the right presentation for each individual.
   #
   # We hold the name in three fields: title, given name and family name. People with both a Chinese and an
-  # English forename are encouraged to enter their given name in the form Tai Wan, Jimmy. The family_name 
-  # should always be a single, usually Chinese, surname: Chan or Smith.
+  # English forename are encouraged to enter their given name in the form Tai Wan, Jimmy. Quite often we get
+  # no punctuation and it could be Tai Wan Jimmy, Jimmy Tai Wan, Jimmy TW Chan, TW Jimmy Chan, etc.
+  # The family_name should always be a single, usually Chinese, surname: Chan or Smith.
   #
   # When a comma is found in the given name, we assume that they have followed the chinese, english format.
-  # If not, we assume the whole name is Chinese.
-
+  # If not then we can only show the whole name.
+  #
   def name?
     family_name? || given_name?
   end
@@ -22,13 +23,13 @@ module HkNames
   # It is not possible for us to distinguish them programmatically, but we do know that a given name
   # with a comma includes both chinese and english versions. In that case we favour the english component
   # for informal use, but in every other case we just print `given_name family_name`. This shows a fully
-  # Chinese name in the wrong order, but apparently when printed in latin script that's quite acceptable.
+  # Chinese name in the wrong order, but apparently when printed in latin script that's acceptable.
   #
-  # This also gives sane results in the common but incorrect case where people have given us Johnny Tai Wan.
+  # This also gives sane results in the common but incorrect case where people have given us Johnny Tai Wan Chan.
   #
   def informal_name
     chinese, english = given_name.split(/,\s*/)
-    given = english.presence || chinese # nb. if no comma then chinese will hold the whole name
+    given = english.presence || chinese # nb. if no comma then chinese will hold the whole name and we'll show that.
     [given, family_name].join(' ')
   end
   alias :name :informal_name
@@ -51,7 +52,7 @@ module HkNames
   end
   
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', '', nil].include?(title)
+    ['Mr', 'Ms', 'Mrs', 'Miss', '', nil].include?(title)
   end
   
   def title_if_it_matters
@@ -75,10 +76,10 @@ module HkNames
 
   # ### Completeness
   #
-  # For record-keeping purposes we show the whole name: Chan Tai Wan, Jimmy.
+  # For record-keeping purposes we show the whole name.
   #
   def whole_name
-    [family_name, given_name].compact.join(' ')
+    [given_name, family_name].compact.join(' ')
   end
 
   # ### Compatibility

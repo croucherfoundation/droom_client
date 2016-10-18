@@ -87,7 +87,6 @@ module HasDroomUser
         user.save
       else
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
-        Rails.logger.warn "!!! NEW USER attributes=#{attributes.inspect}"
         user = User.new_with_defaults(attributes)
         user.save
         Rails.logger.warn "!!! CREATED USER with uid #{user.uid}"
@@ -95,7 +94,36 @@ module HasDroomUser
       end
     end
   end
-  
+
+  # We sometimes keep a local cache of some values that really belong to the user,
+  # so as to speed up the display of lists or handle the case where no user exists.
+  #
+  def synchronise_user_characteristics
+    if user
+      [:title, :given_name, :family_name, :chinese_name, :email].each do |col|
+        if send("#{col}_changed?")
+          user.send "#{col}=".to_sym, send(col)
+        elsif user.send(col) != send(col)
+          send "#{col}=".to_sym, user.send(col)
+        end
+      end
+      user.save if user.changed?
+    else
+      user = User.new_with_defaults({
+        title: title,
+        given_name: given_name,
+        family_name: family_name,
+        chinese_name: chinese_name,
+        email: email,
+        defer_confirmation: confirmation_usually_deferred?
+      })
+      user.save
+      Rails.logger.warn "!!! SYNC CREATED USER with uid #{user.uid}"
+      self.user = user
+    end
+  end
+
+
   def confirmation_usually_deferred?
     true
   end
