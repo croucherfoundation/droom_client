@@ -1,8 +1,8 @@
 class UserSessionsController < ApplicationController
   include DroomAuthentication
-  skip_before_filter :authenticate_user
-  before_filter :require_no_user!, only: [:new, :create]
-  before_filter :authenticate_user!, only: [:destroy]
+  skip_before_ation :authenticate_user!
+  before_action :require_no_user!, only: [:new, :create]
+  before_action :authenticate_user!, only: [:destroy]
 
   def new
     render

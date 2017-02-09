@@ -1,14 +1,12 @@
 class UsersController < ApplicationController
   include DroomAuthentication
+
   respond_to :html, :json
   skip_before_filter :authenticate_user!
   before_filter :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
   before_filter :get_users, only: [:index]
   before_filter :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   layout :no_layout_if_pjax
-
-
-
 
   # User-creation is no longer always nested!
   
