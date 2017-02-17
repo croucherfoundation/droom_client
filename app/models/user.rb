@@ -137,11 +137,15 @@ class User
   end
 
   def admin?
-    permitted?("#{Settings.service_name}.admin")
+    sysadmin? || permitted?("#{Settings.service_name}.admin")
+  end
+
+  def sysadmin?
+    status == "admin"
   end
 
   def senior?
-    status == "senior"
+    sysadmin? || status == "senior"
   end
 
   def internal?
