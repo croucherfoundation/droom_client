@@ -26,7 +26,7 @@ class User
   def associates=(these)
     @associates = these
   end
-  
+
   def as_json(options={})
     {
       uid: uid,
@@ -139,7 +139,19 @@ class User
   def admin?
     permitted?("#{Settings.service_name}.admin")
   end
-  
+
+  def senior?
+    status == "senior"
+  end
+
+  def internal?
+    senior? || status == "internal"
+  end
+
+  def external?
+    !internal?
+  end
+
   def image
     self.images ||= {}
     images[:standard]
