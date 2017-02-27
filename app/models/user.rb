@@ -88,16 +88,24 @@ class User
     self.assign_attributes send_confirmation: true
     self.save
   end
-  
+
   def sign_out!
     self.class.get "/api/deauthenticate/#{authentication_token}"
+  end
+
+  def self.reindex_user
+    begin
+      get '/api/reindex_user'
+    rescue JSON::ParserError
+      nil
+    end
   end
 
   def confirm!
     self.confirmed = true
     self.save
   end
-  
+
   def unconfirmed?
     !self.confirmed?
   end
@@ -113,7 +121,7 @@ class User
       save
     end
   end
-  
+
   def to_param
     uid
   end
@@ -160,7 +168,7 @@ class User
     self.images ||= {}
     images[:standard]
   end
-  
+
   def icon
     self.images ||= {}
     images[:icon]

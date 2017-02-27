@@ -34,6 +34,10 @@ module HasDroomUser
     @_user
   end
 
+  def reindex_user
+    User.reindex_user
+  end
+
   def find_or_create_user
     unless user
       if email
@@ -131,11 +135,11 @@ module HasDroomUser
   def user?
     user_uid? && user.present?
   end
-  
+
   def confirmed?
     !!user.confirmed if user?
   end
-  
+
   def name
     user.name if user?
   end
@@ -163,7 +167,7 @@ module HasDroomUser
   def email
     read_attribute(:email) || user_email
   end
-  
+
   def user_email
     user.email if user?
   end
