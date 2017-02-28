@@ -34,10 +34,6 @@ module HasDroomUser
     @_user
   end
 
-  def reindex_user
-    User.reindex_user
-  end
-
   def find_or_create_user
     unless user
       if email
