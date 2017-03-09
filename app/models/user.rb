@@ -95,7 +95,7 @@ class User
 
   def self.reindex_user
     begin
-      get '/api/reindex_user'
+      post '/api/reindex_user'
     rescue JSON::ParserError
       nil
     end
