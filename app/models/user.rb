@@ -93,9 +93,9 @@ class User
     self.class.get "/api/deauthenticate/#{authentication_token}"
   end
 
-  def self.reindex_user
+  def self.reindex_user(user_uid)
     begin
-      post '/api/reindex_user'
+      post "/api/users/#{user_uid}/reindex"
     rescue JSON::ParserError
       nil
     end
