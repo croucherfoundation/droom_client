@@ -59,7 +59,8 @@ class User
       permission_codes: "",
       remember_me: false,
       confirmed: false,
-      defer_confirmation: true
+      defer_confirmation: true,
+      status: ''
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
