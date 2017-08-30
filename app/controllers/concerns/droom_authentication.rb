@@ -106,6 +106,16 @@ protected
         dcmp = Settings.droom_client_mount_point
         sign_in_path = dcmp + sign_in_path unless sign_in_path =~ /^#{dcmp}/
         Rails.logger.warn "@@@@@ redirecting to #{sign_in_path}"
+        if !exception.message.blank?
+          begin
+            jsonified_msg = JSON.parse(exception.message)
+            if jsonified_msg.key?('error')
+              flash[:error] = jsonified_msg['error']
+            end
+          rescue => e
+            Rails.logger.warn "@@@@@ Failed to parse the exception message as JSON due to #{e}"
+          end
+        end
         redirect_to sign_in_path
       end
     else
