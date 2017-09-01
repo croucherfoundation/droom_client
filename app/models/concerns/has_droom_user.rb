@@ -36,15 +36,13 @@ module HasDroomUser
 
   def find_or_create_user
     unless user
-      if email
-        @_user = User.create({
-          given_name: given_name,
-          family_name: family_name,
-          chinese_name: chinese_name,
-          email: email
-        })
-        self.user_uid = @_user.uid
-      end
+      @_user = User.create({
+        given_name: given_name,
+        family_name: family_name,
+        chinese_name: chinese_name,
+        email: email
+      })
+      self.user_uid = @_user.uid
     end
     @_user
   end
@@ -128,7 +126,8 @@ module HasDroomUser
 
   def ensure_user
     unless user?
-      synchronise_user_characteristics
+      find_or_create_user
+      save
     end
   end
 
