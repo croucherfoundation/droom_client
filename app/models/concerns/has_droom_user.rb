@@ -89,14 +89,18 @@ module HasDroomUser
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
         user = User.new_with_defaults(attributes)
         user.save
-        Rails.logger.warn "!!! CREATED USER with uid #{user.uid}"
         self.user = user
       end
     end
   end
 
-  # We sometimes keep a local cache of some values that really belong to the user,
+  # We sometimes keep a local version of some values that really belong to the user,
   # so as to speed up the display of lists or handle the case where no user exists.
+  # This happens eg. when third parties are being added to a course lecturer list
+  # who might later have to log in and contribute to the course.
+  #
+  # More central user-havers like the Person in core data will ensure that they
+  # always have a user, even if it is not active, and delegate to that user.
   #
   def synchronise_user_characteristics
     if user
@@ -118,11 +122,15 @@ module HasDroomUser
         defer_confirmation: confirmation_usually_deferred?
       })
       user.save
-      Rails.logger.warn "!!! SYNC CREATED USER with uid #{user.uid}"
       self.user = user
     end
   end
 
+  def ensure_user
+    unless user?
+      synchronise_user_characteristics
+    end
+  end
 
   def confirmation_usually_deferred?
     true
