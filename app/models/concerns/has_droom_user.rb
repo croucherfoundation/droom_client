@@ -126,8 +126,9 @@ module HasDroomUser
 
   def ensure_user
     unless user?
-      find_or_create_user
-      save
+      if user = find_or_create_user
+        self.update_column :user_uid, user.uid
+      end
     end
   end
 
