@@ -106,9 +106,7 @@ module UserAdministration
   end
   
   def accept!
-    unless accepted?
-      self.update_column :accepted_at, Time.zone.now
-    end
+    self.update_column :accepted_at, Time.zone.now if respond_to?(:accepted_at)
   end
 
   def newly_accepted?
