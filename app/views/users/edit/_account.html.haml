@@ -1,3 +1,6 @@
+- content_for :title do
+  = t :edit_account_settings
+
 - if @user.persisted? && @user.unconfirmed_email?
   - @user.email = @user.unconfirmed_email
 

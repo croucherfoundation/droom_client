@@ -15,6 +15,9 @@ class User
   include_root_in_json true
   parse_root_in_json false
 
+  # login is a collection post
+  custom_post :sign_in
+
   def new?
     !respond_to?(:uid) || uid.nil?
   end
@@ -35,38 +38,38 @@ class User
       given_name: given_name,
       family_name: family_name,
       chinese_name: chinese_name,
-      emails: emails,
       email: email,
-      phones: phones,
       phone: phone,
-      addresses: addresses
+      mobile: mobile,
+      address: address,
+      correspondence_address: correspondence_address
     }
   end
 
   def self.new_with_defaults(atts={})
     attributes = {
       uid: nil,
+      authentication_token: nil,
       title: "",
       given_name: "",
       family_name: "",
       chinese_name: "",
       affiliation: "",
-      emails: [],
-      phones: [],
-      addresses: [],
+      email: nil,
+      phone: nil,
+      mobile: nil,
+      address: nil,
+      correspondence_address: nil,
       password: "",
       password_confirmation: "",
       permission_codes: "",
       remember_me: false,
       confirmed: false,
       defer_confirmation: true,
-      status: ''
+      status: '',
+      password: nil # for login transmission
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
-  end
-
-  def self.sign_in(params)
-    self.post("/users/sign_in.json", params)
   end
 
   def self.authenticate(token)
@@ -75,14 +78,6 @@ class User
     rescue JSON::ParserError
       nil
     end
-  end
-
-  def email
-    emails.first if emails
-  end
-
-  def phone
-    phones.first if phones
   end
 
   def send_confirmation_message!

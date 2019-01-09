@@ -79,8 +79,12 @@ protected
     raise DroomClient::AuthRequired unless authenticate_user
   end
 
+  def require_user!
+    raise DroomClient::AuthRequired unless user_signed_in?
+  end
+
   def require_admin!
-    user_signed_in? && current_user.admin?
+    raise DroomClient::AuthRequired unless user_signed_in? && current_user.admin?
   end
 
   def require_no_user!
@@ -135,7 +139,7 @@ protected
     end
     user_signed_in?
   end
-  
+
   # Sometimes the satellite services provide their own API services. Usually these are very simple,
   # but they too might require droom authentication. In that case we require a header token and 
   # a uid in the options hash.

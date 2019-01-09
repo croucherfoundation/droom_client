@@ -2,18 +2,18 @@ class UsersController < ApplicationController
   include DroomAuthentication
 
   respond_to :html, :json
-  skip_before_filter :authenticate_user!
-  before_filter :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
-  before_filter :get_users, only: [:index]
-  before_filter :get_user, only: [:show, :edit, :update, :confirm, :welcome]
+  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
+  before_action :get_users, only: [:index]
+  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome]
+  before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
   # User-creation is no longer always nested!
-  
+
   def new
     
   end
-  
+
   def create
     @user = User.new_with_defaults(user_params)
     if @user.save
@@ -27,27 +27,26 @@ class UsersController < ApplicationController
       
     end
   end
-  
-  
+
+
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
   def index
     respond_with @users.to_a
   end
-  
-  # But people can change basic settings
+
+
+  # But users can change account settings and contact information
   #
-  def edit
-    respond_with @user
-  end
-  
+
   def update
     authorize! :update, @user
     @user.assign_attributes(user_params)
     @user.save
     respond_with @user, location: droom_client.user_url(@user)
   end
-  
+
+
   ## Confirmation
   #
   # This is the destination of the password-setting form that appears if a user accepts a role invitation
@@ -64,15 +63,17 @@ class UsersController < ApplicationController
       raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
     end
   end
-  
+
+
   ## Account checking
   #
-  
+
   def check_email
     in_use = params[:email].present? && User.where(email: params[:email]).any?
     render json: {unavailable: in_use}
   end
-  
+
+
   ## Suggestion
   #
   # This is to support the user-picker widget.
@@ -88,8 +89,22 @@ class UsersController < ApplicationController
     end
     render json: @users.to_a
   end
-  
+
+
 protected
+
+  def get_view
+    @view = params[:view] if permitted_views.include?(params[:view])
+    @view ||= default_view
+  end
+
+  def permitted_views
+    %w{account contacts}
+  end
+
+  def default_view
+    'account'
+  end
 
   def get_user
     if params[:id].present? && can?(:manage, User)
@@ -105,14 +120,14 @@ protected
       @show = params[:show] || 10
       @page = params[:page] || 1
       unless @show == 'all'
-        @users = @users.page(@page).per(@show) 
+        @users = @users.page(@page).per(@show)
       end
       @users
     end
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed)
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address)
   end
 
 end

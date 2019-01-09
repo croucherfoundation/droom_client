@@ -1,6 +1,5 @@
 class UserSessionsController < ApplicationController
   include DroomAuthentication
-  skip_before_action :authenticate_user!
   before_action :require_no_user!, only: [:new, :create]
   before_action :authenticate_user!, only: [:destroy]
 
@@ -9,7 +8,7 @@ class UserSessionsController < ApplicationController
   end
 
   def create
-    if user = User.sign_in(sign_in_params)
+    if user = User.sign_in(sign_in_params.to_h)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
       unless request.xhr?
