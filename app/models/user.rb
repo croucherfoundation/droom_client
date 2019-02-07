@@ -60,14 +60,13 @@ class User
       mobile: nil,
       address: nil,
       correspondence_address: nil,
-      password: "",
-      password_confirmation: "",
+      password: nil,
+      password_confirmation: nil,
       permission_codes: "",
       remember_me: false,
       confirmed: false,
       defer_confirmation: true,
-      status: '',
-      password: nil # for login transmission
+      status: ''
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
@@ -104,10 +103,6 @@ class User
 
   def unconfirmed?
     !self.confirmed?
-  end
-
-  def unconfirmed_email?
-    self.unconfirmed_email.present?
   end
 
   def set_password!(user_params)
@@ -173,6 +168,10 @@ class User
   def thumbnail
     self.images ||= {}
     images[:thumbnail]
+  end
+
+  def best_address
+    correspondence_address.presence || address
   end
 
 end
