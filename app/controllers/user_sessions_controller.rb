@@ -4,10 +4,12 @@ class UserSessionsController < ApplicationController
   before_action :authenticate_user!, only: [:destroy]
 
   def new
+    Rails.logger.warn "Session new: #{sign_in_params.inspect}"
     render
   end
 
   def create
+    Rails.logger.warn "Session create: #{sign_in_params.inspect}"
     if user = User.sign_in(sign_in_params.to_h)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
@@ -41,6 +43,10 @@ class UserSessionsController < ApplicationController
   protected
   
   def sign_in_params
-    params.require(:user).permit(:email, :password, :remember_me)
+    if params[:user]
+      params.require(:user).permit(:email, :password, :remember_me)
+    else
+      {}
+    end
   end
 end

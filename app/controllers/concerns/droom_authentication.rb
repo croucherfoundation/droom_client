@@ -22,9 +22,9 @@ module DroomAuthentication
   included do
     helper_method :current_user
     helper_method :user_signed_in?
-    rescue_from "DroomClient::AuthRequired", with: :redirect_to_login
-    rescue_from "Her::Unauthorized", with: :redirect_to_login
-    rescue_from "Her::Errors::Unauthorized", with: :redirect_to_login
+    rescue_from DroomClient::AuthRequired, with: :redirect_to_login
+    # rescue_from Her::Unauthorized, with: :redirect_to_login
+    # rescue_from Her::Errors::Unauthorized, with: :redirect_to_login
   end
 
   def store_location!
