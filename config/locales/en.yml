@@ -15,6 +15,7 @@ en:
   flash:
     greeting: "<strong>Hello %{name}!</strong><br>You have signed in."
     goodbye: "<strong>Goodbye %{name}.</strong><br>You have signed out."
+    not_recognised: "<strong>Not recognised</strong><br>Sorry: this email / password combination is not correct."
   forgot_password: "Forgotten your password?"
   or_sign_up: "or create a new account"
   password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."

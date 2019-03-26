@@ -9,7 +9,6 @@ class UserSessionsController < ApplicationController
   end
 
   def create
-    Rails.logger.warn "Session create: #{sign_in_params.inspect}"
     if user = User.sign_in(sign_in_params.to_h)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
@@ -22,6 +21,7 @@ class UserSessionsController < ApplicationController
         redirect_to after_sign_in_path_for(user)
       end
     else
+      flash[:error] = t("flash.not_recognised").html_safe
       redirect_to droom_client.sign_in_path
     end
   end

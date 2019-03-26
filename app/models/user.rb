@@ -16,7 +16,7 @@ class User
   parse_root_in_json false
 
   # login is a collection post
-  custom_post :sign_in
+  # custom_post :sign_in
 
   def new?
     !respond_to?(:uid) || uid.nil?
@@ -75,6 +75,20 @@ class User
     begin
       get "/api/authenticate/#{token}"
     rescue JSON::ParserError
+      nil
+    end
+  end
+
+  def self.sign_in(params)
+    begin
+      user = post "/api/users/sign_in", params
+      if user.id
+        user
+      else
+        nil
+      end
+    rescue => e
+      Rails.logger.warn "[droom_client] sign in fail: #{e.message}"
       nil
     end
   end
