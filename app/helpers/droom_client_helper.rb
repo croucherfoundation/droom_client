@@ -14,15 +14,13 @@ module DroomClientHelper
   end
 
   def droom_host
-    "#{Settings.droom.protocol}://#{Settings.droom.host}"
+    ENV['DROOM_URL'] || "#{Settings.droom.protocol}://#{Settings.droom.host}"
   end
 
   def droom_asset_host
-    Settings.droom[:asset_protocol] ||= Settings.droom.protocol
-    Settings.droom[:asset_host] ||= Settings.droom.host
-    "//#{Settings.droom.asset_host}"
+    ENV['DROOM_ASSET_URL'] || "//#{Settings.droom.asset_host}" || droom_host
   end
-  
+
   def local_host
     "#{request.protocol}#{request.host}"
   end

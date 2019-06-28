@@ -71,7 +71,7 @@ module DroomClient
     end
 
     def signer
-      secret = Settings.auth.secret
+      secret = ENV['AUTH_SECRET'] || Settings.auth.secret
       @signer ||= SignedJson::Signer.new(secret)
     end
 
