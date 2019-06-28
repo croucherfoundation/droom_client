@@ -57,22 +57,29 @@ module DroomClient
     end
 
     def cookie_name
-      Settings.auth.cookie_name
+      ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
+    end
+
+    def cookie_domain
+      ENV['DROOM_AUTH_COOKIE_DOMAIN'] || Settings.auth.cookie_domain
+    end
+
+    def auth_secret
+      ENV['DROOM_AUTH_SECRET'] || Settings.auth.secret
     end
 
     def encoded_value(resource)
-      signer.encode [ resource.authentication_token, Time.now ]
+      signer.encode [resource.authentication_token, Time.now]
     end
 
     def cookie_options
       @session_options ||= Rails.configuration.session_options
-      @session_options[:domain] = Settings.auth.cookie_domain
+      @session_options[:domain] = cookie_domain
       @session_options.slice(:path, :domain, :secure, :httponly)
     end
 
     def signer
-      secret = ENV['AUTH_SECRET'] || Settings.auth.secret
-      @signer ||= SignedJson::Signer.new(secret)
+      @signer ||= SignedJson::Signer.new(auth_secret)
     end
 
   end
