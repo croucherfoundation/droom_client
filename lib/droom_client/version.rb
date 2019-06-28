@@ -1,3 +1,3 @@
 module DroomClient
-  VERSION = "0.12"
+  VERSION = "0.12.0"
 end

@@ -3,12 +3,10 @@ require 'faraday_middleware'
 require 'her'
 require 'her/middleware/json_api_parser'
 
-Settings[:auth] ||= {}
-Settings.auth[:protocol] ||= 'http'
-Settings.auth[:port] ||= '80'
+api_url = ENV['DROOM_URL'] || "#{Settings.auth.protocol}://#{Settings.auth.host}:#{Settings.auth.port}"
 
 DROOM = Her::API.new
-DROOM.setup url: "#{Settings.auth.protocol}://#{Settings.auth.host}:#{Settings.auth.port}" do |c|
+DROOM.setup url: api_url do |c|
   # Request
   c.use FaradayMiddleware::EncodeJson
   # Response

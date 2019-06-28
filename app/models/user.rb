@@ -71,9 +71,9 @@ class User
     self.new(attributes)
   end
 
-  def self.authenticate(token)
+  def self.authenticate(token, time)
     begin
-      get "/api/authenticate/#{token}"
+      get "/api/authenticate/#{token}/#{time}"
     rescue JSON::ParserError
       nil
     end

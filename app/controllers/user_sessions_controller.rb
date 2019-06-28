@@ -4,7 +4,6 @@ class UserSessionsController < ApplicationController
   before_action :authenticate_user!, only: [:destroy]
 
   def new
-    Rails.logger.warn "Session new: #{sign_in_params.inspect}"
     render
   end
 
@@ -15,7 +14,8 @@ class UserSessionsController < ApplicationController
       unless request.xhr?
         flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
       end
-      if params[:destination].present?
+      destination = params[:destination]
+      if destination.present? && destination =~ /^\//
         redirect_to params[:destination]
       else
         redirect_to after_sign_in_path_for(user)

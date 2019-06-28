@@ -95,7 +95,7 @@ protected
   end
 
   def redirect_to_login(exception)
-    # unset_auth_cookie(Settings.auth.cookie_domain)
+    unset_auth_cookie
     Rails.logger.warn "@@@@@ redirect_to_login"
     store_location!
     if is_navigational_format?
@@ -164,8 +164,8 @@ protected
   # Auth is always remote, so that single sign-out works too.
   # Note this returns user if found, false if none, allowing authenticate_user to try something else.
   #
-  def authenticate_with(auth_token)
-    User.authenticate(auth_token)
+  def authenticate_with(combined_token)
+    User.authenticate(combined_token)
   end
 
   def current_user
@@ -182,8 +182,7 @@ protected
   
   def sign_in_and_remember(user)
     sign_in(user)
-    Settings.auth[:cookie_period] ||= 0
-    set_auth_cookie_for(user, Settings.auth.cookie_domain, Settings.auth.cookie_period)
+    set_auth_cookie_for(user)
   end
 
 
@@ -193,13 +192,12 @@ protected
   #
   # Cookie holds encoded array of [uid, auth_token]
   #
-  def set_auth_cookie_for(user, domain=nil, period=0)
-    expires = Time.now + period.to_i.hours if period && period.to_i != 0
-    DroomClient::AuthCookie.new(cookies).set(user, domain: domain, expires: expires)
+  def set_auth_cookie_for(user)
+    DroomClient::AuthCookie.new(cookies).set(user, domain: Settings.auth.cookie_domain)
   end
 
-  def unset_auth_cookie(domain=Settings.auth.cookie_domain)
-    DroomClient::AuthCookie.new(cookies).unset(domain: domain)
+  def unset_auth_cookie
+    DroomClient::AuthCookie.new(cookies).unset(domain: Settings.auth.cookie_domain)
   end
 
 

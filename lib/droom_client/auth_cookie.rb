@@ -29,7 +29,6 @@ module DroomClient
     end
 
     def valid?
-      Rails.logger.debug("AuthCookie.valid? #{present?.inspect}, #{values.all?.inspect}")
       present? && values.all?
     end
 

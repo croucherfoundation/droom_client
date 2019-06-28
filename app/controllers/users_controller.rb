@@ -50,7 +50,7 @@ class UsersController < ApplicationController
   ## Confirmation
   #
   # This is the destination of the password-setting form that appears if a user accepts a role invitation
-  # and has not yet set a password. A destination should have been provided by the acceptance view when the
+  # and has not yet set a password. A final destination should have been provided by the acceptance view when the
   # confirmation form was included.
   #
   def set_password
