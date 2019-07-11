@@ -1,15 +1,13 @@
-require 'addressable/uri'
-
 module DroomClientHelper
 
   def droom_url(path, params={})
-    uri = Addressable::URI.join(droom_host, path)
+    uri = URI.join(droom_host, path)
     uri.query_values = params if params.any?
     uri.to_s
   end
 
   def droom_asset_url(path)
-    Addressable::URI.join(droom_asset_host, '/assets', path.sub(/^\//, '')).to_s
+    URI.join(droom_asset_host, 'assets/', path.sub(/^\//, '')).to_s
   end
 
   def droom_host
