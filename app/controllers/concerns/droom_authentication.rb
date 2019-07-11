@@ -156,7 +156,7 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
-    if cookie.valid?
+    if cookie.valid? && cookie.fresh?
       authenticate_with(cookie.token)
     end
   end

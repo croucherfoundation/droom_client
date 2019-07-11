@@ -36,6 +36,10 @@ module DroomClient
       @cookies[cookie_name].present?
     end
 
+    def fresh?
+      set_since?(Time.now - cookie_lifespan.hours)
+    end
+
     def set_since?(time)
       created_at && created_at >= time
     end
@@ -66,6 +70,10 @@ module DroomClient
 
     def auth_secret
       ENV['DROOM_AUTH_SECRET'] || Settings.auth.secret
+    end
+
+    def cookie_lifespan
+      ENV['DROOM_AUTH_COOKIE_EXPIRY'] || Settings.auth.cookie_period
     end
 
     def encoded_value(resource)
