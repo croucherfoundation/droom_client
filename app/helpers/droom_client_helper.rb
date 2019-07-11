@@ -9,7 +9,7 @@ module DroomClientHelper
   end
 
   def droom_asset_url(path)
-    Addressable::URI.join(droom_asset_host, 'assets', path).to_s
+    Addressable::URI.join(droom_asset_host, path).to_s
   end
 
   def droom_host
