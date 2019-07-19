@@ -10,7 +10,7 @@ class UserSessionsController < ApplicationController
   def create
     if user = User.sign_in(sign_in_params.to_h)
       RequestStore.store[:current_user] = user
-      set_auth_cookie_for(user, Settings.auth.cookie_domain, params[:user][:remember_me])
+      set_auth_cookie_for(user)
       unless request.xhr?
         flash[:notice] = t("flash.greeting", name: user.formal_name).html_safe
       end
@@ -30,7 +30,7 @@ class UserSessionsController < ApplicationController
     current_user.sign_out!
     name = current_user.formal_name
     RequestStore.store.delete :current_user
-    unset_auth_cookie(Settings.auth.cookie_domain)
+    unset_auth_cookie
     reset_session
     if request.xhr?
       head :ok
