@@ -37,7 +37,7 @@ module DroomClient
     end
 
     def fresh?
-      set_since?(Time.now - cookie_lifespan.hours)
+      set_since?(Time.now - cookie_lifespan.minutes)
     end
 
     def set_since?(time)

@@ -72,19 +72,19 @@ protected
   # Use in controllers to require various states of authentication.
 
   def require_authenticated_user
-    raise DroomClient::AuthRequired unless authenticate_user
+    raise DroomClient::AuthRequired('require_authenticated_user') unless authenticate_user
   end
 
   def authenticate_user!
-    raise DroomClient::AuthRequired unless authenticate_user
+    raise DroomClient::AuthRequired('authenticate_user!') unless authenticate_user
   end
 
   def require_user!
-    raise DroomClient::AuthRequired unless user_signed_in?
+    raise DroomClient::AuthRequired('require_user!') unless user_signed_in?
   end
 
   def require_admin!
-    raise DroomClient::AuthRequired unless user_signed_in? && current_user.admin?
+    raise DroomClient::AuthRequired('require_admin!') unless user_signed_in? && current_user.admin?
   end
 
   def require_no_user!
@@ -95,8 +95,9 @@ protected
   end
 
   def redirect_to_login(exception)
+    Rails.logger.warn "🔫 redirect_to_login: #{exception.message.inspect}"
+    Rails.logger.warn "🔫 current_user: #{current_user.inspect}"
     store_location!
-    sign_out
     if is_navigational_format?
       if pjax?
         if signup_permitted?
@@ -115,7 +116,7 @@ protected
               flash[:error] = jsonified_msg['error']
             end
           rescue => e
-            Rails.logger.warn "@@@@@ Failed to parse the exception message as JSON due to #{e}"
+            Rails.logger.warn "@@@@@ Failed to parse the exception message as JSON due to #{e}."
           end
         end
         redirect_to sign_in_path
@@ -149,7 +150,9 @@ protected
   end
 
   def authenticate_from_param
-    authenticate_with(params[:tok]) if params[:tok].present?
+    if params[:tok].present?
+      authenticate_with(params[:tok])
+    end
   end
   
   def authenticate_from_cookie
