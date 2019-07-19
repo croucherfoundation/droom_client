@@ -193,11 +193,11 @@ protected
   # Cookie holds encoded array of [uid, auth_token]
   #
   def set_auth_cookie_for(user)
-    DroomClient::AuthCookie.new(cookies).set(user, domain: Settings.auth.cookie_domain)
+    DroomClient::AuthCookie.new(cookies).set(user)
   end
 
   def unset_auth_cookie
-    DroomClient::AuthCookie.new(cookies).unset(domain: Settings.auth.cookie_domain)
+    DroomClient::AuthCookie.new(cookies).unset
   end
 
 
