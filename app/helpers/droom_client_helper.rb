@@ -1,13 +1,13 @@
 module DroomClientHelper
 
   def droom_url(path, params={})
-    uri = URI.join(droom_host, path)
+    uri = URI.join(droom_host, path.sub(/^\//, ''))
     uri.query = params.to_query if params.any?
     uri.to_s
   end
 
   def droom_link_url(path, params={})
-    uri = URI.build(host: droom_asset_host, path: path.sub(/^\//, ''), query: params.to_query)
+    uri = URI.join(droom_asset_host, path.sub(/^\//, ''))
     uri.query = params.to_query if params.any?
     uri.to_s
   end
