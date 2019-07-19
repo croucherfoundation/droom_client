@@ -73,7 +73,7 @@ module DroomClient
     end
 
     def cookie_lifespan
-      ENV['DROOM_AUTH_COOKIE_EXPIRY'] || Settings.auth.cookie_period
+      (ENV['DROOM_AUTH_COOKIE_EXPIRY'] || Settings.auth.cookie_period).to_i
     end
 
     def encoded_value(resource)
