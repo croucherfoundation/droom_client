@@ -95,9 +95,8 @@ protected
   end
 
   def redirect_to_login(exception)
-    unset_auth_cookie
-    Rails.logger.warn "@@@@@ redirect_to_login"
     store_location!
+    sign_out
     if is_navigational_format?
       if pjax?
         if signup_permitted?
@@ -109,7 +108,6 @@ protected
         sign_in_path = droom_client.sign_in_path
         dcmp = Settings.droom_client_mount_point
         sign_in_path = dcmp + sign_in_path unless sign_in_path =~ /^#{dcmp}/
-        Rails.logger.warn "@@@@@ redirecting to #{sign_in_path}"
         if !exception.message.blank?
           begin
             jsonified_msg = JSON.parse(exception.message)
@@ -160,7 +158,7 @@ protected
       authenticate_with(cookie.token)
     end
   end
-  
+
   # Auth is always remote, so that single sign-out works too.
   # Note this returns user if found, false if none, allowing authenticate_user to try something else.
   #
@@ -183,6 +181,11 @@ protected
   def sign_in_and_remember(user)
     sign_in(user)
     set_auth_cookie_for(user)
+  end
+
+  def sign_out
+    RequestStore.store[:current_user] = nil
+    unset_auth_cookie
   end
 
 

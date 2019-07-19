@@ -73,7 +73,12 @@ class User
 
   def self.authenticate(token)
     begin
-      get "/api/authenticate/#{token}"
+      user = get "/api/authenticate/#{token}"
+      if user && user.persisted?
+        user
+      else
+        nil
+      end
     rescue JSON::ParserError
       nil
     end

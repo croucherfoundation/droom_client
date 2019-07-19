@@ -49,7 +49,7 @@ module DroomClient
     end
 
   private
-    
+
     # cookie value format is [auth_token, time]
     #
     def values
