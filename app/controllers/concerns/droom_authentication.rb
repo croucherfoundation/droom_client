@@ -72,19 +72,19 @@ protected
   # Use in controllers to require various states of authentication.
 
   def require_authenticated_user
-    raise DroomClient::AuthRequired('require_authenticated_user') unless authenticate_user
+    raise DroomClient::AuthRequired, 'require_authenticated_user fails'unless authenticate_user
   end
 
   def authenticate_user!
-    raise DroomClient::AuthRequired('authenticate_user!') unless authenticate_user
+    raise DroomClient::AuthRequired, 'authenticate_user! fails' unless authenticate_user
   end
 
   def require_user!
-    raise DroomClient::AuthRequired('require_user!') unless user_signed_in?
+    raise DroomClient::AuthRequired, 'require_user! fails' unless user_signed_in?
   end
 
   def require_admin!
-    raise DroomClient::AuthRequired('require_admin!') unless user_signed_in? && current_user.admin?
+    raise DroomClient::AuthRequired, 'require_admin! fails' unless user_signed_in? && current_user.admin?
   end
 
   def require_no_user!
@@ -157,6 +157,7 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
+    Rails.logger.warn "🔫 authenticate_from_cookie: valid: #{cookie.valid?.inspect}, fresh: #{cookie.fresh?.inspect}"
     if cookie.valid? && cookie.fresh?
       authenticate_with(cookie.token)
     end
