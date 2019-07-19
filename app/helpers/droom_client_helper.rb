@@ -10,6 +10,10 @@ module DroomClientHelper
     URI.join(droom_asset_host, 'assets/', path.sub(/^\//, '')).to_s
   end
 
+  def droom_link_url(path)
+    URI.join(droom_asset_host, path.sub(/^\//, '')).to_s
+  end
+
   def droom_host
     ENV['DROOM_API_URL'] || "#{Settings.droom.protocol}://#{Settings.droom.host}"
   end

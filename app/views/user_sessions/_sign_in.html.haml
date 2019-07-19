@@ -12,7 +12,7 @@
   %p
     = f.password_field :password, :class => 'login', placeholder: t("placeholders.signin.password")
     %span.reminder
-      = link_to t(:forgot_password), droom_url("/users/password/new", backto: backto)
+      = link_to t(:forgot_password), droom_link_url("/users/password/new", backto: backto)
 
   .buttons
     %p
