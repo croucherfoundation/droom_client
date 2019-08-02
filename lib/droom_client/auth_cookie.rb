@@ -12,14 +12,14 @@ module DroomClient
       @cookies = cookies
     end
 
-    def set(resource, opt={})
+    def set(resource, opts={})
       cookie = cookie_options.merge(opts).merge(:value => encoded_value(resource))
       Rails.logger.warn "🔫 droom_client.set will assign new cookie time value: #{cookie.inspect}"
       @cookies[cookie_name] = cookie
     end
 
-    def unset(options={})
-      @cookies.delete cookie_name, cookie_options.merge(options)
+    def unset(opts={})
+      @cookies.delete cookie_name, cookie_options.merge(opts)
     end
 
     def token
