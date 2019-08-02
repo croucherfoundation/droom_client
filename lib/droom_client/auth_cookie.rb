@@ -81,7 +81,7 @@ module DroomClient
     end
 
     def encoded_value(resource)
-      signer.encode [resource.authentication_token, Time.now]
+      signer.encode [resource.unique_session_id, Time.now]
     end
 
     def cookie_options

@@ -2,7 +2,7 @@
 - destination ||= false
 
 = form_for user, url: droom_client.set_password_user_path(user), method: "PUT" do |f|
-  = hidden_field_tag :tok, user.authentication_token
+  = hidden_field_tag :tok, user.unique_session_id
   - if destination
     = hidden_field_tag :destination, destination
 

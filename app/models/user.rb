@@ -49,7 +49,7 @@ class User
   def self.new_with_defaults(atts={})
     attributes = {
       uid: nil,
-      authentication_token: nil,
+      unique_session_id: nil,
       title: "",
       given_name: "",
       family_name: "",
@@ -104,7 +104,7 @@ class User
   end
 
   def sign_out!
-    self.class.get "/api/deauthenticate/#{authentication_token}"
+    self.class.get "/api/deauthenticate/#{unique_session_id}"
   end
 
   def self.reindex_user(user_uid)
