@@ -14,7 +14,6 @@ module DroomClient
 
     def set(resource, opts={})
       cookie = cookie_options.merge(opts).merge(:value => encoded_value(resource))
-      Rails.logger.warn "🔫 droom_client.set will assign new cookie time value: #{cookie.inspect}"
       @cookies[cookie_name] = cookie
     end
 
@@ -27,9 +26,7 @@ module DroomClient
     end
 
     def created_at
-      dt = DateTime.parse(values[1]) if valid?
-      Rails.logger.warn "🔫 created_at: #{dt.inspect}"
-      dt
+      DateTime.parse(values[1]) if valid?
     end
 
     def valid?
