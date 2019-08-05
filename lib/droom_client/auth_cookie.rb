@@ -81,6 +81,7 @@ module DroomClient
     end
 
     def encoded_value(resource)
+      Rails.logger.warn "🔫 encoded_value: #{resource.inspect}, #{Time.now}"
       signer.encode [resource.unique_session_id, Time.now]
     end
 

@@ -200,6 +200,7 @@ protected
   # Cookie holds encoded array of [uid, auth_token]
   #
   def set_auth_cookie_for(user)
+    Rails.logger.warn "🔫 set_auth_cookie_for: #{user.inspect}"
     DroomClient::AuthCookie.new(cookies).set(user)
   end
 
