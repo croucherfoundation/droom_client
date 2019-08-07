@@ -72,30 +72,26 @@ class User
   end
 
   def self.authenticate(token)
-    begin
-      user = get "/api/authenticate/#{token}"
-      if user && user.persisted?
-        user
-      else
-        nil
-      end
-    rescue JSON::ParserError
+    user = get "/api/authenticate/#{token}"
+    if user && user.persisted?
+      user
+    else
       nil
     end
+  rescue JSON::ParserError
+    nil
   end
 
   def self.sign_in(params)
-    begin
-      user = post "/api/users/sign_in", params
-      if user.id
-        user
-      else
-        nil
-      end
-    rescue => e
-      Rails.logger.warn "[droom_client] sign in fail: #{e.message}"
+    user = post "/api/users/sign_in", params
+    if user.id
+      user
+    else
       nil
     end
+  rescue => e
+    Rails.logger.warn "[droom_client] sign in fail: #{e.message}"
+    nil
   end
 
   def send_confirmation_message!
