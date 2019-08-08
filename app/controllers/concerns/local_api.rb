@@ -11,7 +11,7 @@ module LocalApi
 
   def local_request?
     if local_subnet_defined?
-      permitted_ip_range = IPAddr.new(ENV['LOCAL_SUBNET'] || "172.0.0.0/8")
+      permitted_ip_range = IPAddr.new(ENV['LOCAL_SUBNET'])
       permitted_ip_range === IPAddr.new(request.ip)
     else
       false
@@ -19,7 +19,7 @@ module LocalApi
   end
 
   def local_subnet_defined?
-    ENV['LOCAL_SUBNET'].present
+    ENV['LOCAL_SUBNET'].present?
   end
 
 end
