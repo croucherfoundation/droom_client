@@ -157,7 +157,7 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
-    Rails.logger.warn "🔫 authenticate_from_cookie: valid: #{cookie.valid?.inspect}, fresh: #{cookie.fresh?.inspect}"
+    Rails.logger.warn "⚠️ authenticate_from_cookie: valid: #{cookie.valid?.inspect}, fresh: #{cookie.fresh?.inspect}"
     if cookie.valid? && cookie.fresh?
       authenticate_with(cookie.token)
     end
@@ -211,6 +211,31 @@ protected
 
 
   protected
+
+  # A before_filter call to `assert_local_request!` will raise an error unless the request has
+  # come in from the local subnet (which is usually a docker / ECS private network)
+  #
+  # We only do this on the controllers that deliver sensitive information. Country and
+  # institution lists are available to all, with CORS settings that permit ajax access.
+  #
+  def assert_local_request!
+    raise CanCan::AccessDenied unless local_request?
+  end
+
+  # Unlike the data room we default to permissive: in production you _must_ define a local subnet to secure the API.
+  #
+  def local_request?
+    if local_subnet_defined?
+      permitted_ip_range = IPAddr.new(ENV['LOCAL_SUBNET'] || Settings.api.local_subnet)
+      permitted_ip_range === IPAddr.new(request.ip)
+    else
+      true
+    end
+  end
+
+  def local_subnet_defined?
+    ENV['LOCAL_SUBNET'].present? || Settings['api'].present? && Settings['api']['local_subnet'].present?
+  end
 
   def pjax?
     !!request.headers['X-PJAX']
