@@ -96,7 +96,6 @@ protected
 
   def redirect_to_login(exception)
     Rails.logger.warn "🔫 redirect_to_login: #{exception.message.inspect}"
-    Rails.logger.warn "🔫 current_user: #{current_user.inspect}"
     store_location!
     if is_navigational_format?
       if pjax?
@@ -109,16 +108,6 @@ protected
         sign_in_path = droom_client.sign_in_path
         dcmp = Settings.droom_client_mount_point
         sign_in_path = dcmp + sign_in_path unless sign_in_path =~ /^#{dcmp}/
-        if !exception.message.blank?
-          begin
-            jsonified_msg = JSON.parse(exception.message)
-            if jsonified_msg.key?('error')
-              flash[:error] = jsonified_msg['error']
-            end
-          rescue => e
-            Rails.logger.warn "@@@@@ Failed to parse the exception message as JSON due to #{e}."
-          end
-        end
         redirect_to sign_in_path
       end
     else
@@ -157,7 +146,6 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
-    Rails.logger.warn "⚠️ authenticate_from_cookie: valid: #{cookie.valid?.inspect}, fresh: #{cookie.fresh?.inspect}"
     if cookie.valid? && cookie.fresh?
       authenticate_with(cookie.token)
     end
@@ -200,7 +188,6 @@ protected
   # Cookie holds encoded array of [uid, auth_token]
   #
   def set_auth_cookie_for(user)
-    Rails.logger.warn "🔫 set_auth_cookie_for: #{user.inspect}"
     DroomClient::AuthCookie.new(cookies).set(user)
   end
 

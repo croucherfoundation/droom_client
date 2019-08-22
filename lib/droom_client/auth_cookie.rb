@@ -13,12 +13,13 @@ module DroomClient
     end
 
     def set(resource, opts={})
-      cookie = cookie_options.merge(opts).merge(path: "/", value: encoded_value(resource))
+      cookie = cookie_options.merge(opts).merge(same_site: :lax, path: "/", value: encoded_value(resource))
       @cookies[cookie_name] = cookie
     end
 
     def unset(opts={})
-      @cookies.delete cookie_name, cookie_options.merge(opts)
+      options = cookie_options.merge(opts).merge(same_site: :lax, path: "/")
+      @cookies.delete cookie_name, options
     end
 
     def token
@@ -78,7 +79,6 @@ module DroomClient
     end
 
     def encoded_value(resource)
-      Rails.logger.warn "🔫 encoded_value: #{resource.inspect}, #{Time.now}"
       signer.encode [resource.unique_session_id, Time.now]
     end
 

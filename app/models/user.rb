@@ -72,7 +72,6 @@ class User
   end
 
   def self.authenticate(token)
-    Rails.logger.warn "⚠️ User.authenticate"
     user = get "/api/authenticate/#{token}"
     if user && user.persisted?
       user
