@@ -134,7 +134,7 @@ module HasDroomUser
   def cache_user_attributes
     if user
       [:name, :email].each do |col|
-        if has_attribute?(col) && read_attribute?(col) != user.send(col)
+        if has_attribute?(col) && read_attribute(col) != user.send(col)
           write_attribute col, user.send(col)
         end
       end
