@@ -100,13 +100,15 @@ module HasDroomUser
   # More central user-havers like the Person in core data will ensure that they
   # always have a user, even if it is not active, and delegate to that user.
   #
-  def synchronise_user_characteristics
+  def synchronise_with_user
     if user
       [:title, :given_name, :family_name, :chinese_name, :email].each do |col|
-        if send("#{col}_changed?")
-          user.send "#{col}=".to_sym, send(col)
-        elsif user.send(col) != send(col)
-          send "#{col}=".to_sym, user.send(col)
+        if has_attribute?(col)
+          if send("#{col}_changed?")
+            user.send "#{col}=".to_sym, send(col)
+          elsif user.send(col) != send(col)
+            send "#{col}=".to_sym, user.send(col)
+          end
         end
       end
       user.save if user.changed?
@@ -121,6 +123,21 @@ module HasDroomUser
       })
       user.save
       self.user = user
+    end
+  end
+
+  # In the case of very thin local user-linking models like the Screener or Interviewer in the
+  # application system, we can avoid a lot of API work by keeping a local copy of name,
+  # email and other values that tend to appear in lists. Names are pulled from the remote
+  # service, not pushed from the data room so we can't guarantee that they are up to date.
+  #
+  def cache_user_attributes
+    if user
+      [:name, :email].each do |col|
+        if has_attribute?(col) && send(col) != user.send(col)
+          send "#{col}=".to_sym, user.send(col)
+        end
+      end
     end
   end
 
@@ -145,6 +162,10 @@ module HasDroomUser
   end
 
   def name
+    read_attribute(:name).presence || user_name
+  end
+
+  def user_name
     user.name if user?
   end
 
@@ -169,7 +190,7 @@ module HasDroomUser
   end
 
   def email
-    read_attribute(:email) || user_email
+    read_attribute(:email).presence || user_email
   end
 
   def user_email
