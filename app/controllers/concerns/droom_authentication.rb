@@ -72,7 +72,7 @@ protected
   # Use in controllers to require various states of authentication.
 
   def require_authenticated_user
-    raise DroomClient::AuthRequired, 'require_authenticated_user fails'unless authenticate_user
+    raise DroomClient::AuthRequired, 'require_authenticated_user fails' unless authenticate_user
   end
 
   def authenticate_user!

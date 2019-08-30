@@ -1,7 +1,7 @@
 class User
+  include Her::JsonApi::Model
   include ActiveSupport::Callbacks
   include HkNames
-  include Her::JsonApi::Model
 
   define_callbacks :password_set
   attr_accessor :defer_confirmation

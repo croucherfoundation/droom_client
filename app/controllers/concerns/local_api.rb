@@ -9,6 +9,10 @@ module LocalApi
     raise CanCan::AccessDenied unless local_request?
   end
 
+  def assert_local_request_or_signed_in!
+    raise CanCan::AccessDenied unless local_request? || user_signed_in?
+  end
+
   def local_request?
     if local_subnet_defined?
       permitted_ip_range = IPAddr.new(ENV['LOCAL_SUBNET'])

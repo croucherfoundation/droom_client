@@ -2,13 +2,12 @@ class UsersController < ApplicationController
   include DroomAuthentication
 
   respond_to :html, :json
+
   before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
   before_action :get_users, only: [:index]
   before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
-
-  # User-creation is no longer always nested!
 
   def new
     
