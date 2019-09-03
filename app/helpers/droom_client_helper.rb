@@ -13,7 +13,7 @@ module DroomClientHelper
   end
 
   def droom_asset_url(path)
-    uri = URI.join(droom_asset_host, 'assets/', path.sub(/^\//, ''))
+    uri = URI.join(droom_asset_host, 'shared_assets/', path.sub(/^\//, ''))
     uri.to_s
   end
 
