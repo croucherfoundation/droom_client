@@ -89,6 +89,10 @@ class User
     nil
   end
 
+  def sign_out!
+    self.class.get "/api/deauthenticate/#{unique_session_id}"
+  end
+
   # Present email and password (usually from login form), get user object back with authentication attributes.
   #
   def self.sign_in(params)
@@ -106,16 +110,12 @@ class User
   # Present user id (usually from an association, eg upon accepting invitation), get user object back with authentication attributes.
   #
   def self.for_authentication(uid)
-    user = get "/api/authenticable/#{uid}"
+    user = get "/api/users/authenticable/#{uid}"
   end
 
   def send_confirmation_message!
     self.assign_attributes send_confirmation: true
     self.save
-  end
-
-  def sign_out!
-    self.class.get "/api/deauthenticate/#{unique_session_id}"
   end
 
   def self.reindex_user(user_uid)
