@@ -71,6 +71,13 @@ class User
     self.new(attributes)
   end
 
+  ## Retrieval
+  #
+  # User#find returns a user data object suitable for management or display but without auth information.
+  # The other calls below return a smaller user object with only the auth information needed for greeting and session creation.
+  #
+  # Present token (usually from auth_cookie), get user object back with authentication attributes.
+  #
   def self.authenticate(token)
     user = get "/api/authenticate/#{token}"
     if user && user.persisted?
@@ -82,6 +89,8 @@ class User
     nil
   end
 
+  # Present email and password (usually from login form), get user object back with authentication attributes.
+  #
   def self.sign_in(params)
     user = post "/api/users/sign_in", params
     if user.id
@@ -92,6 +101,12 @@ class User
   rescue => e
     Rails.logger.warn "[droom_client] sign in fail: #{e.message}"
     nil
+  end
+
+  # Present user id (usually from an association, eg upon accepting invitation), get user object back with authentication attributes.
+  #
+  def self.for_authentication(uid)
+    user = get "/api/authenticable/#{uid}"
   end
 
   def send_confirmation_message!

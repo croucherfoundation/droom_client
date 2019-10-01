@@ -95,7 +95,6 @@ protected
   end
 
   def redirect_to_login(exception)
-    Rails.logger.warn "🔫 redirect_to_login: #{exception.message.inspect}"
     store_location!
     if is_navigational_format?
       if pjax?
@@ -111,8 +110,7 @@ protected
         redirect_to sign_in_path
       end
     else
-      Settings.auth['realm'] ||= 'Data Room'
-      request_http_token_authentication(Settings.auth.realm)
+      request_http_token_authentication('Data Room')
     end
   end
 
@@ -129,7 +127,7 @@ protected
   end
 
   # Sometimes the satellite services provide their own API services. Usually these are very simple,
-  # but they too might require droom authentication. In that case we require a header token and 
+  # but they too might require droom authentication. In that case we require a header token and
   # a uid in the options hash.
   #
   def authenticate_from_header
