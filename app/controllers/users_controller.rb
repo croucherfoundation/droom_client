@@ -3,15 +3,13 @@ class UsersController < ApplicationController
 
   respond_to :html, :json
 
+  skip_before_action :authenticate_user!, raise: false
   before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
   before_action :get_users, only: [:index]
   before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
-  def new
-    
-  end
 
   def create
     @user = User.new_with_defaults(user_params)
@@ -80,6 +78,7 @@ class UsersController < ApplicationController
   # response: json list of form values and user uids.
   #
   def suggest
+    authorize! :manage, User
     limit = params[:limit].presence || 10
     if params[:email].present?
       @users = User.where(email_q: params[:email], limit: limit)
