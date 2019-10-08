@@ -144,13 +144,16 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
+    Rails.logger.warn "⚠️ authenticate_from_cookie: #{cookie.valid?}, #{cookie.fresh?}"
     if cookie.valid? && cookie.fresh?
-      authenticate_with(cookie.token)
+      user = authenticate_with(cookie.token)
+      Rails.logger.warn "⚠️ -> user: #{user.inspect}"
+      user
     end
   end
 
   # Auth is always remote, so that single sign-out works too.
-  # Note this returns user if found, false if none, allowing authenticate_user to try something else.
+  # Note this returns user if found, false if none, so that we can chain authentication attempts.
   #
   def authenticate_with(combined_token)
     User.authenticate(combined_token)
