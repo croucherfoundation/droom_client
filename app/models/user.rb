@@ -137,7 +137,7 @@ class User
 
   def set_password!(user_params)
     run_callbacks :password_set do
-      assign_attributes(user_params)
+      assign_attributes(user_params.to_h)
       assign_attributes(confirmed: true)
       save
     end
