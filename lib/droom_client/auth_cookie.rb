@@ -14,11 +14,13 @@ module DroomClient
 
     def set(resource, opts={})
       cookie = cookie_options.merge(opts).merge(same_site: :lax, path: "/", value: encoded_value(resource))
+      Rails.logger.warn "🍪 Setting auth cookie at #{Time.now}" if cookie_debug?
       @cookies[cookie_name] = cookie
     end
 
     def unset(opts={})
       options = cookie_options.merge(opts).merge(same_site: :lax, path: "/")
+      Rails.logger.warn "🍪 Unsetting auth cookie" if cookie_debug?
       @cookies.delete cookie_name, options
     end
 
@@ -35,11 +37,14 @@ module DroomClient
     end
 
     def present?
+      Rails.logger.warn "🍪 Auth cookie presence: #{@cookies[cookie_name].present?.inspect} with values #{inspect}" if cookie_debug?
       @cookies[cookie_name].present?
     end
 
     def fresh?
-      set_since?(Time.now - cookie_lifespan.minutes)
+      fresh = set_since?(Time.now - cookie_lifespan.minutes)
+      Rails.logger.warn "🍪 Auth cookie freshness: #{fresh.inspect} with dates #{Time.now} vs #{created_at} and lifespan #{cookie_lifespan.minutes}" if cookie_debug?
+      fresh
     end
 
     def set_since?(time)
@@ -80,6 +85,10 @@ module DroomClient
 
     def encoded_value(resource)
       signer.encode [resource.unique_session_id, Time.now]
+    end
+
+    def debug_cookies?
+      ENV['DROOM_AUTH_COOKIE_DEBUG']
     end
 
     def cookie_options

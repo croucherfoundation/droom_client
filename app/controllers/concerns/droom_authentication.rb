@@ -144,10 +144,8 @@ protected
   
   def authenticate_from_cookie
     cookie = DroomClient::AuthCookie.new(cookies)
-    Rails.logger.warn "⚠️ authenticate_from_cookie: #{cookie.valid?}, #{cookie.fresh?}"
     if cookie.valid? && cookie.fresh?
       user = authenticate_with(cookie.token)
-      Rails.logger.warn "⚠️ -> user: #{user.inspect}"
       user
     end
   end
