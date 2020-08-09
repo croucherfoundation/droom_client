@@ -18,11 +18,11 @@ module DroomClientHelper
   end
 
   def droom_host
-    ENV['DROOM_API_URL'] || "#{Settings.droom.protocol}://#{Settings.droom.host}"
+    ENV['DROOM_API_URL']
   end
 
   def droom_asset_host
-    ENV['DROOM_URL'] || "//#{Settings.droom.asset_host}" || droom_host
+    ENV['DROOM_URL']
   end
 
   def local_host

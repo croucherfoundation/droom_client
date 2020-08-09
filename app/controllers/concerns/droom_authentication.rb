@@ -220,7 +220,7 @@ protected
   end
 
   def local_subnet_defined?
-    ENV['LOCAL_SUBNET'].present? || Settings['api'].present? && Settings['api']['local_subnet'].present?
+    ENV['LOCAL_SUBNET'].present?
   end
 
   def pjax?
