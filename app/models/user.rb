@@ -85,7 +85,7 @@ class User
     else
       nil
     end
-  rescue JSON::ParserError
+  rescue JSON::ParserError, Her::Errors::ParseError
     nil
   end
 
@@ -121,7 +121,7 @@ class User
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
-    rescue JSON::ParserError
+    rescue JSON::ParserError, Her::Errors::ParseError
       nil
     end
   end
