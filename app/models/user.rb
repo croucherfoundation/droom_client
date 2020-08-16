@@ -131,6 +131,11 @@ class User
     self.save
   end
 
+  def update_last_request_at!
+    self.last_request_at=Time.now
+    self.save
+  end
+
   def unconfirmed?
     !self.confirmed?
   end
