@@ -15,13 +15,15 @@
         = f.label :password_confirmation, class: "required"
         = f.password_field :password_confirmation, placeholder: "", required: true
 
-    %p.buttons{:data => {:role => "meter"}}>
-      = f.submit "Continue"
-      %span.meter{data: {role: "gauge"}}
+    %p.password_quality.floating{data: {role: "meter"}}
       %span.instructions{data: {role: "warnings"}}
-        The strength of your password will be measured as you type.
-
-    %p.password_quality
+      %span.meter{data: {role: "gauge"}}
+        %svg
+          %use{"xlink:href" => "#warning_symbol"}
+    
+    = f.submit "Continue"
+    
+    %p
       %span.notes{data: {role: "notes"}}
         When the password is strong enough, the 'confirmation' box will become available, and when the two passwords match the 'continue' button will go green and become clickable.
         Dictionary words, repetition and common passwords are likely to be rejected. Please add complication, either in the form of punctuation and strange characters or just by adding more words.
