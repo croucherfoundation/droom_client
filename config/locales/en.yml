@@ -30,7 +30,7 @@ en:
       affiliation: "Affiliation"
       family_name: "Family name"
       given_name: "Given name"
-      chinese_name: "中国姓名"
+      chinese_name: "中文名字"
       password: "Password"
       email: "Email"
       phone: "Phone"
