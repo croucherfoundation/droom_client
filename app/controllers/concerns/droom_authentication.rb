@@ -166,6 +166,7 @@ protected
   end
   
   def sign_in(user)
+    user.update_last_request_at!
     RequestStore.store[:current_user] = user
   end
   
