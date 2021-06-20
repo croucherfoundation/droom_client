@@ -67,7 +67,11 @@ class UsersController < ApplicationController
 
   def check_email
     in_use = params[:email].present? && User.where(email: params[:email]).any?
-    render json: {unavailable: in_use}
+    message = 'whoops'
+    if in_use
+      message = 'oops'
+    end
+    render json: {message: message}
   end
 
 
