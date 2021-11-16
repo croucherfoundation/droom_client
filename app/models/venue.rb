@@ -1,9 +1,12 @@
-class Venue
-  include Her::JsonApi::Model
+class Venue < ActiveResource::Base
+  # include Her::JsonApi::Model
 
-  use_api DROOM
-  collection_path "/api/venues"
-  root_element :venue
+  # use_api DROOM
+  # collection_path "/api/venues"
+  # root_element :venue
+  
+  self.site = ENV['DROOM']
+  self.include_format_in_path = false
 
   def associates
     @associates ||= []

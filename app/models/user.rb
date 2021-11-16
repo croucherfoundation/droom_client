@@ -1,19 +1,21 @@
-class User
-  include Her::JsonApi::Model
+class User < ActiveResource::Base
+  self.site = ENV['DROOM']
+  self.include_format_in_path = false
+
   include ActiveSupport::Callbacks
   include HkNames
 
   define_callbacks :password_set
   attr_accessor :defer_confirmation
 
-  use_api DROOM
-  collection_path "/api/users"
-  primary_key :uid
-  root_element :user
+  # use_api DROOM
+  # collection_path "/api/users"
+  # primary_key :uid
+  # root_element :user
 
   # temporary while we are not yet sending jsonapi data back to core properly
-  include_root_in_json true
-  parse_root_in_json false
+  # include_root_in_json true
+  # parse_root_in_json false
 
   # login is a collection post
   # custom_post :sign_in
