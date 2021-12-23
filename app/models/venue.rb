@@ -4,6 +4,11 @@ class Venue < ActiveResource::Base
 
   self.primary_key = 'slug'
 
+  def save
+    self.prefix_options[:venue] = self.attributes
+    super
+  end
+
   def associates
     @associates ||= []
   end
