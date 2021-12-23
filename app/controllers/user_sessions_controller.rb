@@ -27,7 +27,7 @@ class UserSessionsController < ApplicationController
   end
 
   def destroy
-    current_user.sign_out!
+    User.sign_out!(current_user)
     name = current_user.formal_name
     RequestStore.store.delete :current_user
     unset_auth_cookie
@@ -41,7 +41,7 @@ class UserSessionsController < ApplicationController
   end
 
   protected
-  
+
   def sign_in_params
     if params[:user]
       params.require(:user).permit(:email, :password, :remember_me)

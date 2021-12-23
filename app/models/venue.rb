@@ -1,12 +1,8 @@
 class Venue < ActiveResource::Base
-  # include Her::JsonApi::Model
+  include FormatApiResponse
+  include DroomActiveResourceConfig
 
-  # use_api DROOM
-  # collection_path "/api/venues"
-  # root_element :venue
-  
-  self.site = ENV['DROOM']
-  self.include_format_in_path = false
+  self.primary_key = 'slug'
 
   def associates
     @associates ||= []
