@@ -69,7 +69,7 @@ module MightHaveDroomUser
   def user_attributes=(attributes)
     if attributes.any?
       if user = self.user
-        user.update_attributes(attributes.with_indifferent_access)
+        user.update(attributes.with_indifferent_access)
         user.save
       else
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
