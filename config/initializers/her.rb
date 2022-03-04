@@ -11,6 +11,5 @@ DROOM.setup url: api_url do |c|
   c.use FaradayMiddleware::EncodeJson
   # Response
   c.use Her::Middleware::JsonApiParser
-  c.use Faraday::Adapter::NetHttp
+  c.adapter Faraday::Adapter::NetHttp
 end
-
