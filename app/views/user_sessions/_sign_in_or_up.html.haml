@@ -23,7 +23,7 @@
         %span.col>
           = f.text_field :given_name, placeholder: t("placeholders.user.given_name")
         %span.col.last>
-          = f.text_field :chinese_name, placeholder: t("placeholders.user.chinese_name")
+          = text_field_tag "user[chinese_name]", nil, placeholder: t("placeholders.user.chinese_name")
   .buttons
     %p
       = f.submit t(:sign_in), :class => "go"
