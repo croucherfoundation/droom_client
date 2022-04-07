@@ -1,22 +1,14 @@
-class User
-  include Her::JsonApi::Model
+class User < ActiveResource::Base
+  include FormatApiResponse
+  include DroomActiveResourceConfig
+
   include ActiveSupport::Callbacks
   include HkNames
 
   define_callbacks :password_set
   attr_accessor :defer_confirmation
 
-  use_api DROOM
-  collection_path "/api/users"
-  primary_key :uid
-  root_element :user
-
-  # temporary while we are not yet sending jsonapi data back to core properly
-  include_root_in_json true
-  parse_root_in_json false
-
-  # login is a collection post
-  # custom_post :sign_in
+  self.primary_key = 'uid'
 
   def new?
     !respond_to?(:uid) || uid.nil?
@@ -79,29 +71,31 @@ class User
   # Present token (usually from auth_cookie), get user object back with authentication attributes.
   #
   def self.authenticate(token)
-    user = get "/api/authenticate/#{token}"
-    if user && user.persisted?
+    response = get "authenticate/#{token}"
+    user = get_user(response)
+  rescue => e
+    nil
+  end
+
+  def self.get_user(response)
+    if user = find(response['uid'])
+      user.attributes[:unique_session_id] = response['unique_session_id']
       user
     else
       nil
     end
-  rescue JSON::ParserError, Her::Errors::ParseError
-    nil
   end
 
-  def sign_out!
-    self.class.get "/api/deauthenticate/#{unique_session_id}"
+  def self.sign_out!(user)
+    get "deauthenticate/#{user.unique_session_id}"
   end
 
   # Present email and password (usually from login form), get user object back with authentication attributes.
   #
   def self.sign_in(params)
-    user = post "/api/users/sign_in", params
-    if user.id
-      user
-    else
-      nil
-    end
+    response = User.post(:sign_in, user: params)
+    response = ActiveSupport::JSON.decode(response.body)['data']['attributes']
+    user = get_user(response)
   rescue => e
     Rails.logger.warn "[droom_client] sign in fail: #{e.message}"
     nil
@@ -110,7 +104,7 @@ class User
   # Present user id (usually from an association, eg upon accepting invitation), get user object back with authentication attributes.
   #
   def self.for_authentication(uid)
-    user = get "/api/users/authenticable/#{uid}"
+    user = get "authenticable/#{uid}"
   end
 
   def send_confirmation_message!
@@ -120,8 +114,8 @@ class User
 
   def self.reindex_user(user_uid)
     begin
-      post "/api/users/#{user_uid}/reindex"
-    rescue JSON::ParserError, Her::Errors::ParseError
+      post "#{user_uid}/reindex"
+    rescue => e
       nil
     end
   end

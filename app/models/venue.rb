@@ -1,9 +1,13 @@
-class Venue
-  include Her::JsonApi::Model
+class Venue < ActiveResource::Base
+  include FormatApiResponse
+  include DroomActiveResourceConfig
 
-  use_api DROOM
-  collection_path "/api/venues"
-  root_element :venue
+  self.primary_key = 'slug'
+
+  def save
+    self.prefix_options[:venue] = self.attributes
+    super
+  end
 
   def associates
     @associates ||= []
