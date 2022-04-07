@@ -73,7 +73,7 @@ class User < ActiveResource::Base
   def self.authenticate(token)
     response = get "authenticate/#{token}"
     user = get_user(response)
-  rescue JSON::ParserError, Her::Errors::ParseError
+  rescue => e
     nil
   end
 
@@ -115,7 +115,7 @@ class User < ActiveResource::Base
   def self.reindex_user(user_uid)
     begin
       post "#{user_uid}/reindex"
-    rescue JSON::ParserError, Her::Errors::ParseError
+    rescue => e
       nil
     end
   end
