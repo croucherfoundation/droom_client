@@ -66,7 +66,9 @@ class User
       remember_me: false,
       confirmed: false,
       defer_confirmation: true,
-      status: ''
+      status: "",
+      preferred_pronoun: "",
+      preferred_professional_name: ""
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
