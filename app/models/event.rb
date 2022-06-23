@@ -1,5 +1,5 @@
 class Event < ActiveResource::Base
-  include FormatApiResponse
+  include DroomFormatApiResponse
   include DroomActiveResourceConfig
 
   after_create :assign_to_associates

@@ -1,5 +1,5 @@
 class Venue < ActiveResource::Base
-  include FormatApiResponse
+  include DroomFormatApiResponse
   include DroomActiveResourceConfig
 
   self.primary_key = 'slug'

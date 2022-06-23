@@ -4,7 +4,7 @@ module DroomActiveResourceConfig
   included do
     self.site                   = ENV['DROOM_API_URL']
     self.prefix                 = '/api/'
-    self.format                 = FormatApiResponse
+    self.format                 = DroomFormatApiResponse
     self.include_format_in_path = false
   end
 end

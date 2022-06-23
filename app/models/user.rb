@@ -1,5 +1,5 @@
 class User < ActiveResource::Base
-  include FormatApiResponse
+  include DroomFormatApiResponse
   include DroomActiveResourceConfig
 
   include ActiveSupport::Callbacks
