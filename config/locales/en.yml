@@ -34,6 +34,7 @@ en:
       password: "Password"
       email: "Email"
       phone: "Phone"
+      preferred_professional_name: "Professtional name"
   leave_password: "If you don't want to change your password, leave both boxes empty."
   notes:
     user_email: "This is the email that you use to sign in, and to which we send reminders and administrative messages."
