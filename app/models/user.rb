@@ -135,6 +135,11 @@ class User < ActiveResource::Base
     self.save
   end
 
+  def save
+    self.prefix_options[:user] = self.attributes
+    super
+  end
+
   def update_last_request_at!
     self.last_request_at=Time.now
     self.save
