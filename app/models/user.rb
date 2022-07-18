@@ -1,5 +1,5 @@
 class User < ActiveResource::Base
-  include FormatApiResponse
+  include DroomFormatApiResponse
   include DroomActiveResourceConfig
 
   include ActiveSupport::Callbacks
@@ -38,6 +38,14 @@ class User < ActiveResource::Base
     }
   end
 
+  def email_name
+    unless title.present?
+      given_name
+    else
+      [title, family_name].join(' ')
+    end
+  end
+
   def self.new_with_defaults(atts={})
     attributes = {
       uid: nil,
@@ -58,7 +66,9 @@ class User < ActiveResource::Base
       remember_me: false,
       confirmed: false,
       defer_confirmation: true,
-      status: ''
+      status: "",
+      preferred_pronoun: "",
+      preferred_professional_name: ""
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
@@ -123,6 +133,11 @@ class User < ActiveResource::Base
   def confirm!
     self.confirmed = true
     self.save
+  end
+
+  def save
+    self.prefix_options[:user] = self.attributes
+    super
   end
 
   def update_last_request_at!
