@@ -114,7 +114,8 @@ class User < ActiveResource::Base
   # Present user id (usually from an association, eg upon accepting invitation), get user object back with authentication attributes.
   #
   def self.for_authentication(uid)
-    user = get "authenticable/#{uid}"
+    response = get "authenticable/#{uid}"
+    user = get_user(response)
   end
 
   def send_confirmation_message!
