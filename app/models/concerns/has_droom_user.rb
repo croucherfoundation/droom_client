@@ -102,7 +102,7 @@ module HasDroomUser
   #
   def synchronise_with_user
     if user
-      [:title, :given_name, :family_name, :chinese_name, :email].each do |col|
+      [:title, :given_name, :family_name, :chinese_name, :email, :emai, :preferred_professional_name, :preferred_pronoun].each do |col|
         if has_attribute?(col)
           if send("#{col}_changed?")
             user.send "#{col}=".to_sym, send(col)
@@ -119,7 +119,9 @@ module HasDroomUser
         family_name: family_name,
         chinese_name: chinese_name,
         email: email,
-        defer_confirmation: confirmation_usually_deferred?
+        defer_confirmation: confirmation_usually_deferred?,
+        preferred_professional_name: preferred_professional_name,
+        preferred_pronoun: preferred_pronoun
       })
       user.save
       self.user = user
