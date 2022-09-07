@@ -65,11 +65,33 @@ module DroomAuthentication
     @request_format ||= request.format.try(:ref)
   end
 
+  def sso_url(user)
+    url = ENV['DISCOURSE_URL']
+    "#{url}/session/sso_login?#{payload(user)}"
+  end
+  
 protected
   
   ## Authentication filters
   #
   # Use in controllers to require various states of authentication.
+  def payload(user)
+    secret = ENV['DISCOURSE_CONNECT_SECRECT']
+    payload = Base64.strict_encode64(unsigned_payload(user))
+    "sso=#{CGI::escape(payload)}&sig=#{sign(payload)}"
+  end
+
+  def sign(payload)
+    secret = ENV['DISCOURSE_CONNECT_SECRECT']
+    OpenSSL::HMAC.hexdigest("sha256", secret, payload)
+  end
+
+  def unsigned_payload(user)
+    decoded = Base64.decode64(params[:sso])
+    decoded_hash = Rack::Utils.parse_query(decoded)
+    nonce = decoded_hash["nonce"]
+    "nonce=#{nonce}&name=#{user.name}&email=#{user.email}&external_id=#{user.id}"
+  end
 
   def require_authenticated_user
     raise DroomClient::AuthRequired, 'require_authenticated_user fails' unless authenticate_user
