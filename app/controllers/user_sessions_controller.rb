@@ -18,13 +18,7 @@ class UserSessionsController < ApplicationController
       if destination.present? && destination =~ /^\//
         redirect_to params[:destination]
       else
-        sso = params[:sso]
-        if sso.present?
-          url = sso_url(user)
-          redirect_to url
-        else
           redirect_to after_sign_in_path_for(user)
-        end
       end
     else
       flash[:error] = t("flash.not_recognised").html_safe
@@ -54,14 +48,6 @@ class UserSessionsController < ApplicationController
     else
       {}
     end
-  end
-
-  def get_sign(app_secret, payload)
-    OpenSSL::HMAC.hexdigest("SHA256", app_secret, payload)
-  end
-
-  def get_encode_to_urlencode(payload)
-    CGI.escape payload
   end
 end
 

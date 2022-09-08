@@ -44,8 +44,14 @@ module DroomAuthentication
   end
 
   def after_sign_in_path_for(user)
-    path = use_stored_location_for(user) || default_location_for(user)
-    path = root_path if path == droom_client.sign_in_path
+    sso = params[:sso]
+    if sso.present?
+      path = sso_url(user)
+    else
+      path = use_stored_location_for(user) || default_location_for(user)
+      path = root_path if path == droom_client.sign_in_path
+    end  
+    
     path
   end
   
