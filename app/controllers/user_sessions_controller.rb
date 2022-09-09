@@ -52,7 +52,7 @@ class UserSessionsController < ApplicationController
   
   def sign_in_params
     if params[:user]
-      params.require(:user).permit(:email, :password, :remember_me, :sso, :sig)
+      params.require(:user).permit(:email, :password, :remember_me)
     else
       {}
     end
