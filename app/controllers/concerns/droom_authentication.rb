@@ -132,7 +132,18 @@ protected
   #
   def authenticate_from_header
     authenticate_with_http_token do |token, options|
-      authenticate_with(token) if token
+      if token
+        authenticate_with(token) if authenticate_with_api_key
+      end
+    end
+  end
+
+  def authenticate_with_api_key
+    api_key = "4d5a49720bb9a4b0be75834d8bcc16b2a86e330b1a3bcaef2f409017749c57ff3e8c0ae4ca6f336c0b1e43c0fc6b59370cd3f560b90dc1ce6d1d8a2452e020bb"
+    if api_key
+      return true
+    else
+      return false
     end
   end
 
