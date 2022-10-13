@@ -13,7 +13,8 @@ class Api::SessionsController < ApplicationController
     if user = User.sign_in(sign_in_params.to_h)
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user)
-      user = {:unique_session_id => user.unique_session_id}
+      cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
+      user = {unique_session_id: user.unique_session_id, "#{cookie_name}": JSON.parse(cookies[:_croucher_dev_auth])}
       render :json => user
     else
       error_msg = {:error_message => "Sign in error!"}
