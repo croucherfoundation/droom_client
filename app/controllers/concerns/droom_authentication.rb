@@ -140,7 +140,7 @@ protected
 
   def authenticate_with_api_key
     api_key = ENV['LOCAL_API_KEY'] || Settings.api.local_api_key
-    if api_key == request.headers["x-api-key"]
+    if api_key == cookies["x-api-key"]
       return true
     else
       return false
