@@ -131,9 +131,14 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    authenticate_with_http_token do |token, options|
-      if token && authenticate_with_api_key
-        authenticate_with(token) 
+    if request.headers["x-api-key"]
+      unique_session_id = JSON.parse(request.headers["x-api-key"])
+      authenticate_with(unique_session_id[1][0])
+    else
+      authenticate_with_http_token do |token, options|
+        if token
+          authenticate_with(token)
+        end
       end
     end
   end
