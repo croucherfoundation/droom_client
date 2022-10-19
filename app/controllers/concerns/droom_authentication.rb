@@ -131,7 +131,7 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    if request.headers["x-api-key"]
+    if request.headers["x-api-key"] && request.headers["x-api-key"].present?
       unique_session_id = JSON.parse(request.headers["x-api-key"])
       authenticate_with(unique_session_id[1][0])
     else
