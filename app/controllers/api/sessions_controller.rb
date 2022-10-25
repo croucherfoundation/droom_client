@@ -14,7 +14,8 @@ class Api::SessionsController < ApplicationController
       RequestStore.store[:current_user] = user
       set_auth_cookie_for(user)
       cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
-      user = {unique_session_id: user.unique_session_id, "#{cookie_name}": JSON.parse(cookies["#{cookie_name}"])}
+      sign_in_cookie = JSON.parse(cookies["#{cookie_name}"])
+      user = {_s: sign_in_cookie[0], _k: sign_in_cookie[1][0], _d: sign_in_cookie[1][1]}
       render :json => user
     else
       error_msg = {:error_message => "Sign in error!"}
