@@ -29,7 +29,7 @@ class Api::SessionsController < ApplicationController
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
-    if request.xhr?
+    if request.xhr? || (request.headers["x-api-key"] && request.headers["x-api-key"].present?)
       head :ok
     else
       flash[:notice] = t("flash.goodbye", name: name).html_safe
