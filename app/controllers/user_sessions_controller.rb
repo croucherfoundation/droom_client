@@ -36,7 +36,11 @@ class UserSessionsController < ApplicationController
       head :ok
     else
       flash[:notice] = t("flash.goodbye", name: name).html_safe
-      redirect_to after_sign_out_path_for(current_user), method: "get"
+      if params[:back_to].present?
+        redirect_to params[:back_to], method: "get"
+      else
+        redirect_to after_sign_out_path_for(current_user), method: "get"
+      end
     end
   end
 
