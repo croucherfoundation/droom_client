@@ -46,7 +46,9 @@ module DroomAuthentication
   def after_sign_in_path_for(user)
     sso = params[:sso]
     if sso.present?
-      path = sso_url(user)
+      if ENV['FEATURE_FLAG_CLASS_NAME'].present?
+        path = ENV['FEATURE_FLAG_CLASS_NAME'].constantize.enabled? ? sso_url(user) || root_path
+      end
     else
       path = use_stored_location_for(user) || default_location_for(user)
       path = root_path if path == droom_client.sign_in_path
