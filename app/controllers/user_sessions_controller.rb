@@ -2,6 +2,7 @@ class UserSessionsController < ApplicationController
   include DroomAuthentication
   before_action :require_no_user!, only: [:new, :create]
   before_action :authenticate_user!, only: [:destroy]
+  skip_before_action :verify_authenticity_token, only: [:destroy]
 
   def new
     render
@@ -18,11 +19,19 @@ class UserSessionsController < ApplicationController
       if destination.present? && destination =~ /^\//
         redirect_to params[:destination]
       else
-        redirect_to after_sign_in_path_for(user)
+          redirect_to after_sign_in_path_for(user)
       end
     else
       flash[:error] = t("flash.not_recognised").html_safe
-      redirect_to droom_client.sign_in_path
+      redirect_to_url = droom_client.sign_in_path
+
+      sso = params[:sso]
+      sig = params[:sig]
+      if sso.present? && sig.present?
+        redirect_to_url = "#{redirect_to_url}?sso=#{sso}&sig=#{sig}"
+      end
+
+      redirect_to redirect_to_url
     end
   end
 
@@ -50,3 +59,4 @@ class UserSessionsController < ApplicationController
     end
   end
 end
+

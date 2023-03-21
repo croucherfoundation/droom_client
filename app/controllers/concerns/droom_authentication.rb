@@ -44,8 +44,16 @@ module DroomAuthentication
   end
 
   def after_sign_in_path_for(user)
-    path = use_stored_location_for(user) || default_location_for(user)
-    path = root_path if path == droom_client.sign_in_path
+    sso = params[:sso]
+    if sso.present?
+      if ENV['FEATURE_FLAG_CLASS_NAME'].present?
+        path = ENV['FEATURE_FLAG_CLASS_NAME'].constantize.enabled?('forum-feature', user) ? sso_url(user) : root_path
+      end
+    else
+      path = use_stored_location_for(user) || default_location_for(user)
+      path = root_path if path == droom_client.sign_in_path
+    end  
+    
     path
   end
   
@@ -65,11 +73,33 @@ module DroomAuthentication
     @request_format ||= request.format.try(:ref)
   end
 
+  def sso_url(user)
+    url = ENV['DISCOURSE_URL']
+    "#{url}/session/sso_login?#{payload(user)}"
+  end
+  
 protected
   
   ## Authentication filters
   #
   # Use in controllers to require various states of authentication.
+  def payload(user)
+    secret = ENV['DISCOURSE_CONNECT_SECRECT']
+    payload = Base64.strict_encode64(unsigned_payload(user))
+    "sso=#{CGI::escape(payload)}&sig=#{sign(payload)}"
+  end
+
+  def sign(payload)
+    secret = ENV['DISCOURSE_CONNECT_SECRECT']
+    OpenSSL::HMAC.hexdigest("sha256", secret, payload)
+  end
+
+  def unsigned_payload(user)
+    decoded = Base64.decode64(params[:sso])
+    decoded_hash = Rack::Utils.parse_query(decoded)
+    nonce = decoded_hash["nonce"]
+    "nonce=#{nonce}&name=#{user.name}&email=#{user.email}&external_id=#{user.id}"
+  end
 
   def require_authenticated_user
     raise DroomClient::AuthRequired, 'require_authenticated_user fails' unless authenticate_user
