@@ -184,6 +184,10 @@ class User
     sysadmin? || permitted?("#{Settings.service_name}.admin")
   end
 
+  def csw_admin?
+    permitted?("csw.login")
+  end
+
   def sysadmin?
     status == "admin"
   end
