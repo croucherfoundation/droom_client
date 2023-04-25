@@ -76,7 +76,8 @@ class User
       defer_confirmation: true,
       status: "",
       preferred_pronoun: "",
-      preferred_professional_name: ""
+      preferred_professional_name: "",
+      preferred_name: ""
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
