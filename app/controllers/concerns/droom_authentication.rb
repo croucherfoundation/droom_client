@@ -100,12 +100,15 @@ protected
     nonce = decoded_hash["nonce"]
     arg = "nonce=#{nonce}&name=#{user.name}&email=#{user.email}&external_id=#{user.id}"
     if user.person.present?
-      award = user.person.awards.first
-      if award
-        name  = award.award_type_name
-        year  = award.year
-        field = award.field
-        arg << "&custom.user_field_2=#{year}&custom.user_field_3=#{name}&custom.user_field_4=#{field}"
+      awards = user.person.awards
+      if awards.present?
+        award = awards.to_a.sort_by(&:year).last
+        if award
+          name  = award.award_type_name
+          year  = award.year
+          field = award.field
+          arg << "&custom.user_field_2=#{year}&custom.user_field_3=#{name}&custom.user_field_4=#{field}"
+        end
       end
     end
     arg
