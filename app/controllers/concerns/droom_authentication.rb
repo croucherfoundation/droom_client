@@ -98,7 +98,17 @@ protected
     decoded = Base64.decode64(params[:sso])
     decoded_hash = Rack::Utils.parse_query(decoded)
     nonce = decoded_hash["nonce"]
-    "nonce=#{nonce}&name=#{user.name}&email=#{user.email}&external_id=#{user.id}"
+    arg = "nonce=#{nonce}&name=#{user.name}&email=#{user.email}&external_id=#{user.id}"
+    if user.person.present?
+      award = user.person.awards.first
+      if award
+        name  = award.award_type_name
+        year  = award.year
+        field = award.field
+        arg << "&custom.user_field_2=#{year}&custom.user_field_3=#{name}&custom.user_field_4=#{field}"
+      end
+    end
+    arg
   end
 
   def require_authenticated_user
