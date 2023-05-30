@@ -104,10 +104,9 @@ protected
       if awards.present?
         award = awards.to_a.sort_by(&:year).last
         if award
-          name  = award.award_type_name
-          year  = award.year
+          name  = "#{award.award_type_name} #{award.year}"
           field = award.field
-          arg << "&custom.user_field_2=#{year}&custom.user_field_3=#{name}&custom.user_field_4=#{field}"
+          arg << "&custom.user_field_3=#{name}&custom.user_field_4=#{field}"
         end
       end
     end
