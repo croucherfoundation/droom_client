@@ -2,7 +2,7 @@ class UserSessionsController < ApplicationController
   include DroomAuthentication
   before_action :require_no_user!, only: [:new, :create]
   before_action :authenticate_user!, only: [:destroy]
-  skip_before_action :verify_authenticity_token, only: [:destroy]
+  skip_before_action :verify_authenticity_token, only: [:destroy], raise: false
 
   def new
     render
