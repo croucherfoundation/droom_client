@@ -52,7 +52,7 @@ module HkNames
   end
   
   def title_ordinary?
-    ['Mr', 'Ms', 'Mrs', 'Miss', '', nil].include?(title)
+    title.nil? || ['Dr', 'Professor'].exclude?(title)
   end
   
   def title_if_it_matters

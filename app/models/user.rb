@@ -76,7 +76,8 @@ class User
       defer_confirmation: true,
       status: "",
       preferred_pronoun: "",
-      preferred_professional_name: ""
+      preferred_professional_name: "",
+      preferred_name: ""
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
@@ -182,6 +183,10 @@ class User
 
   def admin?
     sysadmin? || permitted?("#{Settings.service_name}.admin")
+  end
+
+  def csw_admin?
+    permitted?("csw.login")
   end
 
   def sysadmin?
