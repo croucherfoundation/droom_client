@@ -42,7 +42,7 @@ class User
       phone: phone,
       mobile: mobile,
       address: address,
-      correspondence_address: correspondence_address
+      correspondence_address: try(:correspondence_address)
     }
   end
 
