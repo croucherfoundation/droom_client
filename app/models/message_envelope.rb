@@ -22,7 +22,7 @@ class MessageEnvelope
         "name" => applicant&.name.presence || 'Scholar',
         "email" => email
       }],
-      "subject" => render_subject
+      "subject" => render_subject,
       "bcc_address" => message.bcc.presence || Settings.email.it_support
     }
     # data["attachments"] = message.message_attachments.map(&:for_mandrill) if message.message_attachments.any?
