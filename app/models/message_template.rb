@@ -3,6 +3,7 @@ class MessageTemplate
 
   use_api DROOM
   collection_path "/api/message_templates"
-  root_element :venue
+  include_root_in_json true
+  parse_root_in_json false
   
 end
