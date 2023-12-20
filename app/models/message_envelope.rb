@@ -16,7 +16,7 @@ class MessageEnvelope
     end
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
-      "from_email" => message.from_email.presence || Droom.config.email_from,
+      "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
       "track_opens" => true,
       "to" => [{
         "name" => applicant&.name.presence || 'Scholar',
