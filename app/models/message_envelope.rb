@@ -9,20 +9,12 @@ class MessageEnvelope
   belongs_to :message
 
   def for_mandrill_message(with_html=false)
-    unless Rails.env.production?
-      self.email = Settings.email.sandbox if applicant.present?
-    end
-    
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
       "track_opens" => true,
-      "to" => [{
-        "name" => applicant&.name.presence || 'Applicant',
-        "email" => email
-      }],
-      "subject" => render_subject,
-      "bcc_address" => message.bcc.presence || Settings.email.it_support
+      "to" => send_address,
+      "subject" => render_subject
     }
     data["html"] = render_html if with_html
     data
@@ -50,6 +42,36 @@ class MessageEnvelope
       @summary = self.rendered_summary = message.render_summary_for(applicant)
     end
     @summary
+  end
+
+  def send_address
+    unless Rails.env.production?
+      self.email = Settings.email.sandbox if applicant.present?
+    end
+    email_address = [
+      {
+        "name" => applicant&.name.presence || 'Applicant',
+        "email" => email,
+        "type":"to"
+        }
+    ]
+    if message.bcc.present?
+      bcc_emails = message.bcc.split(',')
+      bcc_emails.each do |bcc_email|
+        email_address << {
+          "name" => applicant&.name.presence || 'Applicant',
+          "email" =>bcc_email,
+          "type" => "bcc"
+        }
+      end
+    else
+      email_address << {
+        "name" => applicant&.name.presence || 'Applicant',
+        "email" =>Settings.email.it_support,
+        "type" => "bcc"
+      }
+    end
+    email_address
   end
 
   def render_body
