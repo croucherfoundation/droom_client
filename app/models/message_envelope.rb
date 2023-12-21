@@ -8,24 +8,22 @@ class MessageEnvelope
 
   belongs_to :message
 
-
-
   def for_mandrill_message(with_html=false)
     unless Rails.env.production?
       self.email = Settings.email.sandbox if applicant.present?
     end
+    
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
       "track_opens" => true,
       "to" => [{
-        "name" => applicant&.name.presence || 'Scholar',
+        "name" => applicant&.name.presence || 'Applicant',
         "email" => email
       }],
       "subject" => render_subject,
       "bcc_address" => message.bcc.presence || Settings.email.it_support
     }
-    # data["attachments"] = message.message_attachments.map(&:for_mandrill) if message.message_attachments.any?
     data["html"] = render_html if with_html
     data
   end

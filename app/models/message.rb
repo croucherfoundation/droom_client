@@ -38,9 +38,9 @@ class Message
 
   def for_email
     {
-      name: 'Scholar',
-      informal_name: 'Scholar',
-      formal_name: 'Scholar'
+      name: 'Applicant',
+      informal_name: 'Applicant',
+      formal_name: 'Applicant'
     }
   end
   
