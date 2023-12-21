@@ -40,7 +40,8 @@ class Message
     {
       name: 'Applicant',
       informal_name: 'Applicant',
-      formal_name: 'Applicant'
+      formal_name: 'Applicant',
+      award_type_name: 'Croucher Scholarship/Fellowship/Research Studentship/Science Communication Studentship'
     }
   end
   
