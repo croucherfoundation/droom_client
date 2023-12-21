@@ -35,7 +35,7 @@ class MessageEnvelope
     layout = message.template.present? ? message.template.layout : 'default'
     ::ApplicationController.renderer.new.render_to_string(
                                         template: "rounds/layouts/#{layout}", 
-                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body},
+                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant},
                                         layout: false)
   end
 
@@ -63,7 +63,7 @@ class MessageEnvelope
 
   def for_view_online
     @envelope = self
-    return render_summary, render_subject, render_body
+    return render_summary, render_subject, render_body, applicant
   end
 
   def applicant
