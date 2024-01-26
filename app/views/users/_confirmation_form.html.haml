@@ -1,8 +1,9 @@
 - user ||= @user
 - destination ||= false
+- unique_session_id = user.unique_session_id.presence || User.for_authentication(@user.id).unique_session_id
 
 = form_for user, url: droom_client.set_password_user_path(user), method: "PUT" do |f|
-  = hidden_field_tag :tok, user.unique_session_id
+  = hidden_field_tag :tok, unique_session_id
   - if destination
     = hidden_field_tag :destination, destination
 
