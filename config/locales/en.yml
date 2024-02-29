@@ -28,8 +28,8 @@ en:
     user:
       title: "Title"
       affiliation: "Affiliation"
-      family_name: "Family name"
-      given_name: "Given name"
+      family_name: "eg, Wong"
+      given_name: "eg, Alice"
       chinese_name: "中文姓名"
       password: "Password"
       email: "Email"
