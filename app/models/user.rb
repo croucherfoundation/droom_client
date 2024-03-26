@@ -189,6 +189,10 @@ class User
     permitted?("csw.login")
   end
 
+  def csw_helper?
+    permitted?("csw.helper")
+  end
+
   def sysadmin?
     status == "admin"
   end
