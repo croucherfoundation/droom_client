@@ -10,16 +10,34 @@ class Api::SessionsController < ApplicationController
   end
 
   def create
-    if user = User.sign_in(sign_in_params.to_h)
-      RequestStore.store[:current_user] = user
-      set_auth_cookie_for(user)
-      cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
-      sign_in_cookie = JSON.parse(cookies["#{cookie_name}"])
-      user = {_s: sign_in_cookie[0], _k: sign_in_cookie[1][0], _d: sign_in_cookie[1][1]}
-      render :json => user
+    if sign_in_params.present?
+      user = User.sign_in(sign_in_params.to_h)
+      
+      if user
+        RequestStore.store[:current_user] = user
+        set_auth_cookie_for(user)
+        cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
+        sign_in_cookie = cookies["#{cookie_name}"]
+        if sign_in_cookie
+          begin
+            parsed_cookie = JSON.parse(sign_in_cookie)
+            user_data = {
+              _s: parsed_cookie[0],
+              _k: parsed_cookie[1][0],
+              _d: parsed_cookie[1][1]
+            }
+            render json: user_data
+          rescue JSON::ParserError, NoMethodError => e
+            render json: { error_message: "Error parsing cookie: #{e.message}" }
+          end
+        else
+          render json: { error_message: "Sign in cookie not found" }
+        end
+      else
+        render json: { error_message: "Sign in error!" }
+      end
     else
-      error_msg = {:error_message => "Sign in error!"}
-      render :json => error_msg
+      render json: { error_message: "Sign in parameters are missing!" }
     end
   end
 
