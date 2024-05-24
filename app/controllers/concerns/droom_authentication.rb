@@ -173,8 +173,24 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    authenticate_with_http_token do |token, options|
-      authenticate_with(token) if token
+    if request.headers["x-api-key"] && request.headers["x-api-key"].present?
+      unique_session_id = JSON.parse(request.headers["x-api-key"])
+      authenticate_with(unique_session_id[1][0])
+    else
+      authenticate_with_http_token do |token, options|
+        if token
+          authenticate_with(token)
+        end
+      end
+    end
+  end
+
+  def authenticate_with_api_key
+    api_key = ENV['LOCAL_API_KEY'] || Settings.api.local_api_key
+    if api_key == request.headers["x-api-key"]
+      return true
+    else
+      return false
     end
   end
 

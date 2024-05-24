@@ -93,6 +93,14 @@ class UsersController < ApplicationController
   end
 
 
+  def check_authenticate
+    if current_user.present?
+      render json: { email: current_user['email'], name: current_user['name']}, status: :ok
+    else
+      render json: { errors: "Token not recognised" }, status: :unauthorized
+    end
+  end
+
 protected
 
   def get_view
