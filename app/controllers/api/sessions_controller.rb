@@ -1,9 +1,8 @@
 class Api::SessionsController < ApplicationController
-  # include Droom::Concerns::LocalApi
   protect_from_forgery except: :sign_in
   respond_to :json
-  # skip_before_action :authenticate_user!, raise: false
   skip_before_action :verify_authenticity_token, raise: false
+  before_action :set_access_control_header
 
   def new
     render
@@ -12,7 +11,7 @@ class Api::SessionsController < ApplicationController
   def create
     if sign_in_params.present?
       user = User.sign_in(sign_in_params.to_h)
-      
+
       if user
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
@@ -56,12 +55,16 @@ class Api::SessionsController < ApplicationController
   end
 
   protected
-  
+
   def sign_in_params
     if params[:user]
       params.require(:user).permit(:email, :password, :remember_me)
     else
       {}
     end
+  end
+
+  def set_access_control_header
+    headers['Access-Control-Allow-Origin'] = '*'
   end
 end
