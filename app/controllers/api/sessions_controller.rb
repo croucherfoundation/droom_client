@@ -2,7 +2,6 @@ class Api::SessionsController < ApplicationController
   protect_from_forgery except: :sign_in
   respond_to :json
   skip_before_action :verify_authenticity_token, raise: false
-  before_action :set_access_control_header
 
   def new
     render
@@ -64,7 +63,4 @@ class Api::SessionsController < ApplicationController
     end
   end
 
-  def set_access_control_header
-    headers['Access-Control-Allow-Origin'] = '*'
-  end
 end
