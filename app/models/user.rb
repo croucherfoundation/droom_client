@@ -147,6 +147,11 @@ class User
     self.save
   end
 
+  def self.update_contacts(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/update_contact", params
+  end
+
   def unconfirmed?
     !self.confirmed?
   end

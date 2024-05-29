@@ -19,10 +19,14 @@ module HasDroomUser
   #
   # Users are associated by uid in the hope of database and device independence. All we do here is go and get the user.
   #
-  def user
+  def user(type=nil)
     begin
       if user_uid?
-        @_user ||= User.find(user_uid)
+        if type.present?
+          @_user = User.find(user_uid, type)
+        else
+          @_user ||= User.find(user_uid)
+        end
       end
       if respond_to?(:email?) && email?
         @_user ||= User.where(email: email).first
