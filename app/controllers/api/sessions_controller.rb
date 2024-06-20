@@ -36,16 +36,16 @@ class Api::SessionsController < ApplicationController
             }
             render json: user_data
           rescue JSON::ParserError, NoMethodError => e
-            render json: { error_message: "Error parsing cookie: #{e.message}" }
+            return sing_in_error
           end
         else
-          render json: { error_message: "Sign in cookie not found" }
+          return sing_in_error
         end
       else
-        render json: { error_message: "Sign in error!" }
+        return sing_in_error
       end
     else
-      render json: { error_message: "Sign in parameters are missing!" }
+      return sing_in_error
     end
   end
 
@@ -71,6 +71,10 @@ class Api::SessionsController < ApplicationController
     else
       {}
     end
+  end
+
+  def sing_in_error
+    render json: { error_message: "Email or password is incorrect." }, status: 400
   end
 
 end
