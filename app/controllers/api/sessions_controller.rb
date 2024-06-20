@@ -12,6 +12,15 @@ class Api::SessionsController < ApplicationController
       user = User.sign_in(sign_in_params.to_h)
 
       if user
+        if params[:module] == 'scholars'
+          @person = user.person
+          @awards = @person.awards
+          award_years = @awards.map(&:year) rescue []
+          unless award_years.include?(2024)
+            return render json: { error_message: 'Your account does not have permission to access the portal.' }, status: 401
+          end
+        end
+
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
         cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
