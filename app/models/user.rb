@@ -152,6 +152,13 @@ class User
     put "/api/users/#{user_uid}/update_contact", params
   end
 
+  def self.reset_password(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/change_password", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def unconfirmed?
     !self.confirmed?
   end
