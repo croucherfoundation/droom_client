@@ -12,10 +12,11 @@ class Api::SessionsController < ApplicationController
       user = User.sign_in(sign_in_params.to_h)
 
       if user
-        if params[:module] == 'scholars'
+        if params[:module] == 'scholar-portal'
           @person = user.person
           @awards = @person.awards
           award_years = @awards.map(&:year) rescue []
+          p "Award years: #{award_years}"
           unless award_years.include?(2024)
             return render json: { error_message: 'Your account does not have permission to access the portal.' }, status: 401
           end
