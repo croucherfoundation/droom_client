@@ -11,6 +11,7 @@ class Message
   def render_body_for(person)
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
+    message_body = transform_body_for_publishing(person, message_body) if person.class.name == 'EventApplication'
 
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
@@ -22,6 +23,18 @@ class Message
       Mustache.render(message_body, attributes)
     end
 
+  end
+
+  def transform_body_for_publishing(person, body)
+    survey_link = <<-HTML
+      <div>
+        <a 
+          href="#{person.survey_url}" 
+          target='_blank'
+          style="text-decoration: none; color: #d34a4a; cursor: pointer;">Take the survey by clicking here.</a>
+      </div>
+    HTML
+    body.gsub('{{survey_url}}', survey_link)
   end
 
   def render_summary_for(person)
