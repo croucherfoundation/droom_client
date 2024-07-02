@@ -24,7 +24,7 @@ class MessageEnvelope
     for_view_online
     layout = message.template.present? ? message.template.layout : 'default'
     ::ApplicationController.renderer.new.render_to_string(
-                                        template: "rounds/layouts/#{layout}", 
+                                        template: system_name == 'publishing' ? "event_applications/layouts/#{layout}" : "rounds/layouts/#{layout}", 
                                         locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant},
                                         layout: false)
   end
@@ -46,7 +46,7 @@ class MessageEnvelope
 
   def send_address
     unless Rails.env.production?
-      self.email = Settings.email.sandbox if applicant.present?
+      self.email = 'yarzarminwai97@gmail.com' if applicant.present?
     end
     email_address = [
       {
@@ -87,7 +87,10 @@ class MessageEnvelope
   end
 
   def applicant
-    @applicant ||= Application.find(application_id) if application_id?
+    @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
+    @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
+
+    @applicant
   end
   
 end
