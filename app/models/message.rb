@@ -8,11 +8,12 @@ class Message
 
   belongs_to :template, class_name: 'MessageTemplate', optional: true
 
-  def render_body_for(person)
+  def render_body_for(person, options={})
+    survey_code = options[:survey_code]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
-    message_body = transform_body_for_publishing(person, message_body) if person.class.name == 'EventApplication'
-
+    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication'
+    message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
@@ -25,11 +26,23 @@ class Message
 
   end
 
-  def transform_body_for_publishing(person, body)
+  def transform_body_for_survey(person, body)
     survey_link = <<-HTML
       <div>
         <a 
           href="#{person.survey_url}" 
+          target='_blank'
+          style="text-decoration: none; color: #d34a4a; cursor: pointer;">Take the survey by clicking here.</a>
+      </div>
+    HTML
+    body.gsub('{{survey_url}}', survey_link)
+  end
+
+  def transform_body_for_test_survey(survey_code, body)
+    survey_link = <<-HTML
+      <div>
+        <a 
+          href="#{ENV['PUB_URL']}/surveys/#{survey_code}/applications/test-survey/response" 
           target='_blank'
           style="text-decoration: none; color: #d34a4a; cursor: pointer;">Take the survey by clicking here.</a>
       </div>

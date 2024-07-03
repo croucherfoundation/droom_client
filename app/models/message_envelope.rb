@@ -8,7 +8,8 @@ class MessageEnvelope
 
   belongs_to :message
 
-  def for_mandrill_message(with_html=false)
+  def for_mandrill_message(with_html=false, survey_code=nil)
+    @survey_code = survey_code
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
@@ -76,7 +77,7 @@ class MessageEnvelope
 
   def render_body
     unless @body
-      @body = self.rendered_body = message.render_body_for(applicant)
+      @body = self.rendered_body = message.render_body_for(applicant, survey_code: @survey_code)
     end
     @body
   end
