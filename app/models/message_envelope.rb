@@ -47,7 +47,7 @@ class MessageEnvelope
 
   def send_address
     unless Rails.env.production?
-      self.email = 'yarzarminwai97@gmail.com' if applicant.present?
+      self.email = Settings.email.sandbox if applicant.present?
     end
     email_address = [
       {
