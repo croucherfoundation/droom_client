@@ -12,7 +12,7 @@
         = f.password_field :password_confirmation, placeholder: "", required: true
 
     %p.buttons{:data => {:role => "meter"}}>
-      = f.submit "Continue"
+      = f.submit "Continue", class: 'croucher-standard-btn'
       %span.meter{data: {role: "gauge"}}
       %span.instructions{data: {role: "warnings"}}
         The strength of your password will be measured as you type.
