@@ -89,9 +89,8 @@ class MessageEnvelope
   end
 
   def applicant
-    @envelope = self
-    @applicant ||= Application.find(@envelope.application_id) if @envelope.application_id? && @envelope.system_name == 'application'
-    @applicant ||= EventApplication.find(@envelope.application_id) if @envelope.application_id? && @envelope.system_name == 'publishing'
+    @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
+    @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
     @applicant
   end
   
