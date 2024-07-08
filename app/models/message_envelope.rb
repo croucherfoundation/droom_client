@@ -94,6 +94,9 @@ class MessageEnvelope
     Rails.logger.info "System name is(droom_client) : ------>  #{system_name}"
     Rails.logger.info "application_id is(droom_client) : ------>  #{application_id}"
     Rails.logger.info "@applicant is(droom_client) : ------>  #{@applicant}"
+    puts "System name is(droom_client) : ------>  #{system_name}"
+    puts "application_id is(droom_client) : ------>  #{application_id}"
+    puts "@applicant is(droom_client) : ------>  #{@applicant}"
     @applicant
   end
   
