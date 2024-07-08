@@ -89,14 +89,9 @@ class MessageEnvelope
   end
 
   def applicant
-    @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
-    @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
-    Rails.logger.info "System name is(droom_client) : ------>  #{system_name}"
-    Rails.logger.info "application_id is(droom_client) : ------>  #{application_id}"
-    Rails.logger.info "@applicant is(droom_client) : ------>  #{@applicant}"
-    puts "System name is(droom_client) : ------>  #{system_name}"
-    puts "application_id is(droom_client) : ------>  #{application_id}"
-    puts "@applicant is(droom_client) : ------>  #{@applicant}"
+    @envelope = self
+    @applicant ||= Application.find(@envelope.application_id) if @envelope.application_id? && @envelope.system_name == 'application'
+    @applicant ||= EventApplication.find(@envelope.application_id) if @envelope.application_id? && @envelope.system_name == 'publishing'
     @applicant
   end
   
