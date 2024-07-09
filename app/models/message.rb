@@ -8,10 +8,12 @@ class Message
 
   belongs_to :template, class_name: 'MessageTemplate', optional: true
 
-  def render_body_for(person)
+  def render_body_for(person, options={})
+    survey_code = options[:survey_code]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
-
+    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication'
+    message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
@@ -22,6 +24,30 @@ class Message
       Mustache.render(message_body, attributes)
     end
 
+  end
+
+  def transform_body_for_survey(person, body)
+    survey_link = <<-HTML
+      <h3>
+        <a 
+          href="#{person.survey_url}" 
+          target='_blank'
+          style="text-decoration: none; color: red; cursor: pointer;">&rarr; Click here to provide your feedback</a>
+      </h3>
+    HTML
+    body.gsub('{{survey_url}}', survey_link)
+  end
+
+  def transform_body_for_test_survey(survey_code, body)
+    survey_link = <<-HTML
+      <h3>
+        <a 
+          href="#{ENV['PUB_URL']}/surveys/#{survey_code}/applications/test-survey/response" 
+          target='_blank'
+          style="text-decoration: none; color: red; cursor: pointer;">&rarr; Click here to provide your feedback</a>
+      </h3>
+    HTML
+    body.gsub('{{survey_url}}', survey_link)
   end
 
   def render_summary_for(person)

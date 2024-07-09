@@ -8,7 +8,8 @@ class MessageEnvelope
 
   belongs_to :message
 
-  def for_mandrill_message(with_html=false)
+  def for_mandrill_message(with_html=false, survey_code=nil)
+    @survey_code = survey_code
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
@@ -24,7 +25,7 @@ class MessageEnvelope
     for_view_online
     layout = message.template.present? ? message.template.layout : 'default'
     ::ApplicationController.renderer.new.render_to_string(
-                                        template: "rounds/layouts/#{layout}", 
+                                        template: system_name == 'publishing' ? "event_applications/layouts/#{layout}" : "rounds/layouts/#{layout}", 
                                         locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant},
                                         layout: false)
   end
@@ -71,12 +72,13 @@ class MessageEnvelope
         "type" => "bcc"
       }
     end
+    Rails.logger.info "Email address is here : ------>  #{email_address}"
     email_address
   end
 
   def render_body
     unless @body
-      @body = self.rendered_body = message.render_body_for(applicant)
+      @body = self.rendered_body = message.render_body_for(applicant, survey_code: @survey_code)
     end
     @body
   end
@@ -87,7 +89,9 @@ class MessageEnvelope
   end
 
   def applicant
-    @applicant ||= Application.find(application_id) if application_id?
+    @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
+    @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
+    @applicant
   end
   
 end
