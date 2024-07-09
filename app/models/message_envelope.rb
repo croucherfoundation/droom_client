@@ -72,7 +72,7 @@ class MessageEnvelope
         "type" => "bcc"
       }
     end
-    Rails.logger.info "Email address is here : ------>  #{email_address}"
+
     email_address
   end
 

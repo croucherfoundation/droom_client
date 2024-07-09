@@ -27,24 +27,28 @@ class Message
   end
 
   def transform_body_for_survey(person, body)
-    survey_link = <<-HTML
-      <h3>
+    survey_link = <<~HTML
+      <h3 style="margin: 0;">
         <a 
           href="#{person.survey_url}" 
-          target='_blank'
-          style="text-decoration: none; color: red; cursor: pointer;">&rarr; Click here to provide your feedback</a>
+          target="_blank" 
+          style="text-decoration: none; color: red; cursor: pointer;">
+          <font color="red">&rarr; Click here to provide your feedback</font>
+        </a>
       </h3>
     HTML
     body.gsub('{{survey_url}}', survey_link)
-  end
+  end  
 
   def transform_body_for_test_survey(survey_code, body)
-    survey_link = <<-HTML
-      <h3>
+    survey_link = <<~HTML
+      <h3 style="margin: 0;">
         <a 
           href="#{ENV['PUB_URL']}/surveys/#{survey_code}/applications/test-survey/response" 
           target='_blank'
-          style="text-decoration: none; color: red; cursor: pointer;">&rarr; Click here to provide your feedback</a>
+          style='text-decoration: none; color: red; cursor: pointer;'>
+          <font color="red">&rarr; Click here to provide your feedback</font>
+          </a>
       </h3>
     HTML
     body.gsub('{{survey_url}}', survey_link)
