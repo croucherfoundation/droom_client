@@ -12,7 +12,7 @@ class Api::SessionsController < ApplicationController
       user = User.sign_in(sign_in_params.to_h)
 
       if user
-        if params[:module] == 'scholar-portal'
+        if params[:module] == 'scholar-portal' && !(user.admin? || (["Staff","Developers"].include? user.user_groups))
           @person = user.person
           @awards = @person.awards
           award_years = @awards.map(&:year) rescue []
