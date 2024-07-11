@@ -51,7 +51,7 @@ class Api::SessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    name = current_user.formal_name
+    name = current_user.given_name
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
