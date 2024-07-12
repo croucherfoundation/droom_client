@@ -27,31 +27,43 @@ class Message
   end
 
   def transform_body_for_survey(person, body)
-    survey_link = <<~HTML
-      <h3 style="margin: 0;">
+    survey_link = <<~HTML.strip
+      <span style='display: inline-block'>
         <a 
           href="#{person.survey_url}" 
           target="_blank" 
-          style="text-decoration: none; color: red; cursor: pointer;">
-          <font color="red">&rarr; Click here to provide your feedback</font>
+          style="text-decoration: none; color: #ee3a43; cursor: pointer;">
+          <font color="#ee3a43">here</font>
         </a>
-      </h3>
+      </span>
     HTML
-    body.gsub('{{survey_url}}', survey_link)
+  
+    name_of_course = <<~HTML.strip
+      <span style='display: inline-block'>
+        #{person.attended_event_name&.strip&.gsub(/\u00A0/, '')}
+      </span>
+    HTML
+  
+    body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course)
   end  
 
   def transform_body_for_test_survey(survey_code, body)
-    survey_link = <<~HTML
-      <h3 style="margin: 0;">
+    survey_link = <<~HTML.strip
+      <span style='display: inline-block'>
         <a 
           href="#{ENV['PUB_URL']}/surveys/#{survey_code}/applications/test-survey/response" 
           target='_blank'
-          style='text-decoration: none; color: red; cursor: pointer;'>
-          <font color="red">&rarr; Click here to provide your feedback</font>
-          </a>
-      </h3>
+          style='text-decoration: none; color: #ee3a43; cursor: pointer; display: inline-block;'>
+          <font color="#ee3a43">here</font>
+        </a>
+      </span>
     HTML
-    body.gsub('{{survey_url}}', survey_link)
+
+    name_of_course = <<~HTML.strip
+      <span style='display: inline-block'>Testing course</span>
+    HTML
+
+    body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course)
   end
 
   def render_summary_for(person)
