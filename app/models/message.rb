@@ -29,29 +29,29 @@ class Message
   def transform_body_for_survey(person, body)
     survey_link = <<~HTML.strip
       <span style='display: inline-block'>
-        <a 
-          href="#{person.survey_url}" 
-          target="_blank" 
+        <a
+          href="#{person.survey_url}"
+          target="_blank"
           style="text-decoration: none; color: #ee3a43; cursor: pointer;">
           <font color="#ee3a43">here</font>
         </a>
       </span>
     HTML
-  
+
     name_of_course = <<~HTML.strip
       <span style='display: inline-block'>
         #{person.attended_event_name&.strip&.gsub(/\u00A0/, '')}
       </span>
     HTML
-  
+
     body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course)
-  end  
+  end
 
   def transform_body_for_test_survey(survey_code, body)
     survey_link = <<~HTML.strip
       <span style='display: inline-block'>
-        <a 
-          href="#{ENV['PUB_URL']}/surveys/#{survey_code}/applications/test-survey/response" 
+        <a
+          href="#{ENV['PUB_URL']}/surveys/#{survey_code}/responses/test-survey"
           target='_blank'
           style='text-decoration: none; color: #ee3a43; cursor: pointer; display: inline-block;'>
           <font color="#ee3a43">here</font>
@@ -86,5 +86,5 @@ class Message
       award_type_name: 'Croucher Scholarship/Fellowship/Research Studentship/Science Communication Studentship'
     }
   end
-  
+
 end
