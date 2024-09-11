@@ -16,8 +16,9 @@ class Api::SessionsController < ApplicationController
           @person = user.person
           @awards = @person.awards
           award_years = @awards.map(&:year) rescue []
-          p "Award years: #{award_years}"
-          unless award_years.include?(2024)
+          allowed_years = [2021, 2022, 2023, 2024]
+
+          unless (award_years & allowed_years).any?
             return render json: { error_message: 'Your account does not have permission to access the portal.' }, status: 401
           end
         end
