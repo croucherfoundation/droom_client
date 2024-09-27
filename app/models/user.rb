@@ -129,6 +129,15 @@ class User
     self.save
   end
 
+  def self.send_otp(uid)
+    user = get "/api/users/#{uid}/send_otp"
+  end
+
+  def self.verify_otp(uid, params)
+    params = params.to_h unless params == {}
+    post "/api/users/#{uid}/verify_otp", params
+  end
+
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
