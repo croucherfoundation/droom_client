@@ -11,7 +11,7 @@ class Api::SessionsController < ApplicationController
     if sign_in_params.present?
       user = User.sign_in(sign_in_params.to_h)
       if user
-        edit_page_url = determine_edit_page_url(user) if params[:module] == 'scholar-portal'
+        # edit_page_url = determine_edit_page_url(user) if params[:module] == 'scholar-portal'
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
         cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
@@ -22,8 +22,7 @@ class Api::SessionsController < ApplicationController
             user_data = {
               _s: parsed_cookie[0],
               _k: parsed_cookie[1][0],
-              _d: parsed_cookie[1][1],
-              edit_page_url: edit_page_url
+              _d: parsed_cookie[1][1]
             }
             render json: user_data
           rescue JSON::ParserError, NoMethodError => e
