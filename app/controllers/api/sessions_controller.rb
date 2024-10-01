@@ -11,7 +11,6 @@ class Api::SessionsController < ApplicationController
     if sign_in_params.present?
       user = User.sign_in(sign_in_params.to_h)
       if user
-        # edit_page_url = determine_edit_page_url(user) if params[:module] == 'scholar-portal'
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
         cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
@@ -65,19 +64,6 @@ class Api::SessionsController < ApplicationController
 
   def sing_in_error
     render json: { error_message: "Email or password is incorrect." }, status: 400
-  end
-
-  def determine_edit_page_url(user)
-    return unless user.person && !user.admin? && !["Staff", "Developers"].include?(user.user_groups)
-  
-    @person = user.person
-    @awards = @person.awards
-    award_years = @awards.map(&:year) rescue []
-    max_award_year = award_years.max
-  
-    if max_award_year && max_award_year < 2021 && @person.person_page&.published?
-      Rails.application.routes.url_helpers.edit_person_page_url(@person.person_page, host: Settings.host)
-    end
   end
 
 end
