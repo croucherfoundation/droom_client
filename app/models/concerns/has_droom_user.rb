@@ -124,9 +124,9 @@ module HasDroomUser
         chinese_name: chinese_name,
         email: email,
         defer_confirmation: confirmation_usually_deferred?,
-        preferred_professional_name: preferred_professional_name,
-        preferred_name: preferred_name,
-        preferred_pronoun: preferred_pronoun
+        preferred_professional_name: defined?(preferred_professional_name) ? preferred_professional_name : nil,
+        preferred_name: defined?(preferred_name) ? preferred_name : nil,
+        preferred_pronoun: defined?(preferred_pronoun) ? preferred_pronoun : nil
       })
       user.save
       self.user = user
