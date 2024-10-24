@@ -147,6 +147,13 @@ class User
     self.save
   end
 
+  def self.account_update(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/account_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def unconfirmed?
     !self.confirmed?
   end
