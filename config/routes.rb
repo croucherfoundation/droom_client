@@ -13,6 +13,8 @@ DroomClient::Engine.routes.draw do
 
   resources :users do
     put :set_password, on: :member
+    resources :emails
+    resources :addresses
   end
 
 end
