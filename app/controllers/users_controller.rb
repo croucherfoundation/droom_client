@@ -25,6 +25,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def sign_up
+    permitted_params = user_params.merge(group: params[:group])
+    @user = User.sign_up(permitted_params)
+    @show_email_confirm_popup = true
+    redirect_to request.referer
+  end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
@@ -137,7 +143,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address)
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
   end
 
 end

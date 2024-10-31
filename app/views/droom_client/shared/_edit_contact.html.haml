@@ -1,0 +1,23 @@
+#editContact.modal
+  .modal-wrapper{role: "document"}
+    .modal-content
+      .croucher_container.my-custom-modal-content
+        = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user', :autocomplete => false} do |f|
+          %h1 Edit your contact information
+          = hidden_field_tag :reload, true
+          .form-fields
+            %section
+              %div Emails
+              .email
+                .email-input
+                  = render "droom_client/shared/contact/emails", f: f, user: @user
+
+              %div Addresses
+              .email
+                .email-input
+                  = render "droom_client/shared/contact/addresses", f: f, user: @user
+            %section.actions
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save{type: "button"}
+                Save

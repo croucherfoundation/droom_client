@@ -5,7 +5,7 @@ class EmailsController < ApplicationController
   def new
     if current_user.present?
       @user = User.find(current_user.id)
-      render :partial => 'shared/account_settings/emails/fields'
+      render :partial => 'droom_client/shared/account_settings/emails/fields'
     end
   end
 

@@ -169,6 +169,13 @@ class User
     nil
   end
 
+  def self.sign_up(params)
+    params = params.to_h unless params == {}
+    user = post "/api/users/sign_up", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def unconfirmed?
     !self.confirmed?
   end

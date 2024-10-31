@@ -1,0 +1,7 @@
+.nested_set
+  #address_modal_fields
+    = render :partial => 'droom_client/shared/contact/addresses/fields', :collection => user.addresses
+
+  = link_to droom_client.new_user_address_url(user, type: 'scholar'), :class => "modal_nested_add", :data => {:action => "append_fields", :affected => '#address_modal_fields'} do
+    %svg.icon>
+      %use{"xlink:href" => "#plus_button_symbol"}

@@ -5,7 +5,7 @@ class AddressesController < ApplicationController
   def new
     if current_user.present?
       @user = User.find(current_user.id)
-      render :partial => 'shared/contact/addresses/fields'
+      render :partial => 'droom_client/shared/contact/addresses/fields'
     end
   end
 
