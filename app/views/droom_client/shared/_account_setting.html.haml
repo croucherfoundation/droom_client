@@ -47,6 +47,7 @@
                   = f.check_box :gatekeeper, class: "fancy"
                   = f.label :gatekeeper, 'Admissions?'
 
+            = hidden_field_tag :reload, true
             %section.actions
               %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
                 Cancel

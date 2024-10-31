@@ -16,6 +16,7 @@
               .email
                 .email-input
                   = render "droom_client/shared/contact/addresses", f: f, user: @user
+            = hidden_field_tag :reload, true
             %section.actions
               %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
                 Cancel

@@ -46,8 +46,8 @@ class UsersController < ApplicationController
     authorize! :update, @user
     @user.assign_attributes(user_params)
     @user.save
-    respond_with @user, location: droom_client.user_url(@user)
-  end
+    respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+  end  
 
 
   ## Confirmation
@@ -143,7 +143,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
   end
 
 end
