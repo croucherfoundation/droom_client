@@ -21,7 +21,7 @@ class UsersController < ApplicationController
         respond_with @user
       end
     else
-      
+
     end
   end
 
@@ -44,10 +44,13 @@ class UsersController < ApplicationController
 
   def update
     authorize! :update, @user
-    @user.assign_attributes(user_params)
+    hashed_params = user_params
+    hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
+    hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
+    @user.assign_attributes(hashed_params.to_h)
     @user.save
     respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
-  end  
+  end
 
 
   ## Confirmation
@@ -147,4 +150,3 @@ protected
   end
 
 end
-

@@ -40,7 +40,7 @@ module DroomClientHelper
       link_to t(:edit), "#", html_options
     end
   end
-  
+
   def action_menu(thing, locals={})
     if can?(:edit, thing)
       type = thing.class.to_s.underscore
@@ -48,6 +48,23 @@ module DroomClientHelper
       locals[classname.to_sym] = thing
       render :partial => "#{type.pluralize}/action_menu", :locals => locals
     end
+  end
+
+  def determine_dataroom_url(user)
+    return ENV['DROOM_URL'] if user.admin? || user.internal?
+
+    if user.user_groups&.include?('Scholars')
+      person = Person.find_by(user_uid: user.uid)
+      if person && (person_page = person.person_page)
+        if person.last_award_year&.to_i >= 2021
+          return "#{Settings.home_url}/dataroom/#{person_page.slug}"
+        else
+          return "#{ENV['YB_URL']}/person_pages/#{person_page.id}/edit"
+        end
+      end
+    end
+
+    nil # Return nil if none of the conditions are met
   end
 
 end

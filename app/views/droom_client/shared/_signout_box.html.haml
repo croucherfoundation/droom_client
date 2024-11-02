@@ -21,3 +21,10 @@
           %div
             = button_to droom_client.sign_out_path, :method => :delete, :class => 'signout', data: {turbo: false} do
               = t('user_profile.sign_out')
+        
+        - if goto = determine_dataroom_url(current_user)
+          .goto_dataroom
+            = link_to goto, class: 'viewall_btn' do
+              Go to data room 
+              %svg.icon
+                %use{"xlink:href" => "#arrow_symbol"}

@@ -19,7 +19,7 @@
         .email-type
           .email-type-selected
             %p 
-              = address['type']
+              = address&.[]('type')
             = f.hidden_field :address_type_id
             %span
               %svg{color: "#ccc", fill: "currentColor", height: "14", stroke: "currentColor", "stroke-width" => "0", style: "color: rgb(204, 204, 204)", viewbox: "0 0 448 512", width: "14", xmlns: "http://www.w3.org/2000/svg"}
