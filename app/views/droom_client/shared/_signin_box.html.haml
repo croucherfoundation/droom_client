@@ -25,10 +25,12 @@
             %img{alt: "open", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}/
 
         .sign_in_btn
-          = f.submit t(:sign_in), class: "croucher-standard-btn"
+          = f.submit t(:sign_in), class: "croucher-standard-btn", data: {turbo: false}
 
       .forgot_password
+        %p
+        = link_to t(:forgot_password), droom_link_url("/users/password/new"), class: 'underline'
         %p.pb-0
           Don't have a Croucher account?
-          %button.underline{data: {'toggle': 'modal', 'target': 'signupModal'}} 
+          %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
             Click here to create one.

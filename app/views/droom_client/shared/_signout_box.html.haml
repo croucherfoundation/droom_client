@@ -19,5 +19,5 @@
             %button{data: {'toggle': 'modal', 'target': 'modal1'}} 
               = t('user_profile.account_settings')
           %div
-            = button_to droom_client.sign_out_path, :method => :delete, :class => 'signout' do
+            = button_to droom_client.sign_out_path, :method => :delete, :class => 'signout', data: {turbo: false} do
               = t('user_profile.sign_out')

@@ -3,7 +3,7 @@
     .modal-content
       .croucher_container.my-custom-modal-content
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user', :autocomplete => false} do |f|
-          %h1 Edit your contact information
+          %h1 Edit profile
           = hidden_field_tag :reload, true
           .form-fields
             %section
@@ -18,7 +18,7 @@
                   = render "droom_client/shared/contact/addresses", f: f, user: @user
             = hidden_field_tag :reload, true
             %section.actions
-              %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
                 Cancel
-              %button.croucher-standard-btn.modal-btn.save{type: "button"}
+              %button.croucher-standard-btn.modal-btn.save{type: "button", data: {turbo: false}}
                 Save

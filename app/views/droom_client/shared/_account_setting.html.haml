@@ -49,7 +49,7 @@
 
             = hidden_field_tag :reload, true
             %section.actions
-              %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
                 Cancel
-              %button.croucher-standard-btn.modal-btn.save{type: "button"}
+              %button.croucher-standard-btn.modal-btn.save{type: "button", data: {turbo: false}}
                 Save
