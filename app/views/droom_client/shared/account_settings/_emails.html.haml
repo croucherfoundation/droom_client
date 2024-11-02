@@ -1,0 +1,7 @@
+.nested_set
+  #email_modal_fields
+    = render :partial => 'droom_client/shared/account_settings/emails/fields', :collection => @user.emails
+
+  = link_to droom_client.new_user_email_url(@user), :class => "modal_nested_add", :data => {:action => "append_fields", :affected => '#email_modal_fields'} do
+    %svg.icon>
+      %use{"xlink:href" => "#plus_button_symbol"}

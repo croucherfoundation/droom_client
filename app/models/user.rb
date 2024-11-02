@@ -129,6 +129,15 @@ class User
     self.save
   end
 
+  def self.send_otp(uid)
+    user = get "/api/users/#{uid}/send_otp"
+  end
+
+  def self.verify_otp(uid, params)
+    params = params.to_h unless params == {}
+    post "/api/users/#{uid}/verify_otp", params
+  end
+
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
@@ -147,9 +156,22 @@ class User
     self.save
   end
 
+  def self.update_contacts(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/update_contact", params
+  end
+
+
   def self.account_update(user_uid, params={})
     params = params.to_h unless params == {}
     put "/api/users/#{user_uid}/account_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.sign_up(params)
+    params = params.to_h unless params == {}
+    user = post "/api/users/sign_up", params
   rescue JSON::ParserError, Her::Errors::ParseError
     nil
   end

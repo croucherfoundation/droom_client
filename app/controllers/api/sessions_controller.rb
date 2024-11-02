@@ -1,8 +1,6 @@
 class Api::SessionsController < ApplicationController
-  # include Droom::Concerns::LocalApi
   protect_from_forgery except: :sign_in
   respond_to :json
-  # skip_before_action :authenticate_user!, raise: false
   skip_before_action :verify_authenticity_token, raise: false
 
   def new
@@ -25,7 +23,7 @@ class Api::SessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    name = current_user.formal_name
+    name = current_user.given_name
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
@@ -38,7 +36,7 @@ class Api::SessionsController < ApplicationController
   end
 
   protected
-  
+
   def sign_in_params
     if params[:user]
       params.require(:user).permit(:email, :password, :remember_me)
@@ -46,4 +44,9 @@ class Api::SessionsController < ApplicationController
       {}
     end
   end
+
+  def sing_in_error
+    render json: { error_message: "Email or password is incorrect." }, status: 400
+  end
+
 end

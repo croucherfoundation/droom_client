@@ -21,10 +21,16 @@ class UsersController < ApplicationController
         respond_with @user
       end
     else
-      
+
     end
   end
 
+  def sign_up
+    permitted_params = user_params.merge(group: params[:group])
+    @user = User.sign_up(permitted_params)
+    @show_email_confirm_popup = true
+    redirect_to request.referer
+  end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
@@ -38,9 +44,12 @@ class UsersController < ApplicationController
 
   def update
     authorize! :update, @user
-    @user.assign_attributes(user_params)
+    hashed_params = user_params
+    hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
+    hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
+    @user.assign_attributes(hashed_params.to_h)
     @user.save
-    respond_with @user, location: droom_client.user_url(@user)
+    respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
   end
 
 
@@ -101,6 +110,14 @@ class UsersController < ApplicationController
   end
 
 
+  def check_authenticate
+    if current_user.present?
+      render json: { email: current_user['email'], name: current_user['name']}, status: :ok
+    else
+      render json: { errors: "Token not recognised" }, status: :unauthorized
+    end
+  end
+
 protected
 
   def get_view
@@ -137,8 +154,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address)
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
   end
 
 end
-
