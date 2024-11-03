@@ -4,7 +4,7 @@
     .search_container.croucher_container
       %h3.text-subtitle.mb_subtitle Search
       .search_input
-        %form.search_form{:action => search_url}
+        %form.search_form{:action => croucher_search_url}
           %input{:name => "q", :placeholder => "What are you looking for? ", :type => "text"}/
           %button.search_btn{type: 'submit'}
             %svg{:fill => "black", :viewbox => "0 0 15 15", :xmlns => "http://www.w3.org/2000/svg"}
