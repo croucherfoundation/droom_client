@@ -36,10 +36,10 @@
           = f.submit t(:sign_in), class: "croucher-standard-btn", data: {turbo: false}
 
       .forgot_password
-        -# %p.mb-2
-        -#   Forgot your password?
-        -#   %button.underline{data: {turbo: false}} 
-        -#     Click here to reset it.
+        %p.mb-2
+          Forgot your password?
+          %button.underline{data: {'toggle': 'modal', 'target': 'passwordModal', turbo: false}} 
+            Click here to reset it.
         
         
         %p.pb-0
