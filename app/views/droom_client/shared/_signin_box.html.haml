@@ -5,6 +5,8 @@
   - backto = URI.join(local_host, stored_location).to_s if stored_location
 
 - is_signin_page = controller_name == 'user_sessions' && action_name == 'new'
+- unless is_signin_page 
+  - is_signin_page = !user_signed_in? && controller_name == 'wiki'
 
 %section#signin-box.auth_container{class: ('auth_container_open' if is_signin_page)}
   .auth_container_wrapper
@@ -34,10 +36,10 @@
           = f.submit t(:sign_in), class: "croucher-standard-btn", data: {turbo: false}
 
       .forgot_password
-        %p.mb-2
-          Forgot your password?
-          %button.underline{data: {turbo: false}} 
-            Click here to reset it.
+        -# %p.mb-2
+        -#   Forgot your password?
+        -#   %button.underline{data: {turbo: false}} 
+        -#     Click here to reset it.
         
         
         %p.pb-0
