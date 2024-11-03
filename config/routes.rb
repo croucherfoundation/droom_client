@@ -9,6 +9,7 @@ DroomClient::Engine.routes.draw do
 
   post '/api/users/sign_in' => 'api/sessions#create', as: :api_sign_in
   delete '/api/users/sign_out' => 'api/sessions#destroy', as: :api_sign_out
+  post '/users/reset_password' => "passwords#create", as: "reset_password"
   get 'check_authenticate' => 'users#check_authenticate'
 
   resources :users do

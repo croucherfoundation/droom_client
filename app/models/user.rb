@@ -176,6 +176,13 @@ class User
     nil
   end
 
+  def self.reset_password_request(params)
+    params = params.to_h unless params == {}
+    user = post "/api/users/passwords", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def unconfirmed?
     !self.confirmed?
   end
