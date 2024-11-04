@@ -3,7 +3,8 @@
 - address ||= fields || @address
 - user = @user
 - unless address.is_a?(Address)
-  - address = Address.new(address)
+  - address = Address.new_with_defaults
+  
 = fields_for user do |uf|
   = uf.fields_for :addresses, address, child_index: fields_counter || 'field_counter' do |f|
 
