@@ -4,7 +4,7 @@
 - user = @user
 
 = fields_for user do |uf|
-  = uf.fields_for :addresses, address.respond_to?(:persisted?) ? address : Address.new(address), child_index: fields_counter || 'field_counter' do |f|
+  = uf.fields_for :addresses, address.respond_to?(:persisted?) ? address : Address.new_with_defaults, child_index: fields_counter || 'field_counter' do |f|
 
     %fieldset.repeating
       .email

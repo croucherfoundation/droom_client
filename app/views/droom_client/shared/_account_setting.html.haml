@@ -18,7 +18,7 @@
                 .email-input
                   = render "droom_client/shared/account_settings/emails", f: f, user: @user
               
-              - if !@user.confirmed? && (admin? || @user.organisation && organisation_admin?(@user.organisation))
+              - if !@user.confirmed? && (admin? || @user.organisation_admin?)
                 %p
                   = f.check_box :send_confirmation, class: "fancy"
                   = f.label :send_confirmation
