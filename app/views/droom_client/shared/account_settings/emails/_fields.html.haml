@@ -2,9 +2,11 @@
 - fields_counter ||= nil
 - email ||= fields || @email
 - user = @user
+- unless email.is_a?(Email)
+  - email = Email.new(email)
 
 = fields_for user do |uf|
-  = uf.fields_for :emails, email.respond_to?(:persisted?) ? email : Email.new(email), child_index: fields_counter || 'field_counter' do |f|
+  = uf.fields_for :emails, email, child_index: fields_counter || 'field_counter' do |f|
     %fieldset.repeating
       .email
         .email-input
