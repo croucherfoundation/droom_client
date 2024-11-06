@@ -12,7 +12,7 @@
       .email
         .email-input
           = f.text_area :address, :placeholder => t("placeholders.address")
-          - unless user.new_record? || fields_counter == 0
+          - unless user&.new_record? || fields_counter == 0
             = link_to '#', :class => "modal_nested_remove", :data => {:action => "remove_fields", :holder => "fieldset"} do
               %svg
                 %use{"xlink:href" => "#cross_button_symbol"}

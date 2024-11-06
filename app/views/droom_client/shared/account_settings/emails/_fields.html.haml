@@ -11,7 +11,7 @@
       .email
         .email-input
           = f.email_field :email,  :placeholder => t("placeholders.email"), :required => true, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path}, class: "required"
-          = f.hidden_field :current_email, value: user.id.present? ? user.email : nil
+          = f.hidden_field :current_email, value: user&.uid.present? ? user.email : nil
           %span.warning.hidden.email_error
             This email already exists! Please try with a different email address.
             %br
