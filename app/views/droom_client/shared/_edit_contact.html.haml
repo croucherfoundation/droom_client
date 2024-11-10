@@ -10,13 +10,13 @@
           .form-fields
             %section
               %div Emails
-              .email
+              .email-fields
                 .email-input
                   = render "droom_client/shared/contact/emails", f: f, user: @user
 
               %div Addresses
-              .email
-                .email-input
+              .address-fields
+                .address-input
                   = render "droom_client/shared/contact/addresses", f: f, user: @user
             = hidden_field_tag :reload, true
             %section.actions
