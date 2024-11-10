@@ -24,11 +24,11 @@
         
         .input_group
           %label{for: "email"} Email
-          = f.email_field :email, name: 'user_email_temp', class: 'rounded-b-5 mb-1 outline-none border-none', placeholder: t("placeholders.signin.email"), autocomplete: 'off'
+          = f.email_field :email, name: 'user_email_temp', class: 'rounded-b-5 mb-1 outline-none border-none', placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: 'u_s_e_a'
         
         .input_group
           %label{for: "password"} Password
-          = f.password_field :password, name: 'user_password_temp', class: 'rounded-b-5 mb-1 outline-none border-none sign_in_password', placeholder: t("placeholders.signin.password"), autocomplete: 'off'
+          = f.password_field :password, name: 'user_password_temp', class: 'rounded-b-5 mb-1 outline-none border-none sign_in_password', placeholder: t("placeholders.signin.password"), autocomplete: 'new-password', id: 'u_s_p_f'
           %button.eye{type: "button"}
             %img{alt: "open", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}/
 
