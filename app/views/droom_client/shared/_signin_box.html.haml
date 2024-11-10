@@ -28,7 +28,7 @@
         
         .input_group
           %label{for: "password"} Password
-          = f.password_field :password, class: 'rounded-b-5 mb-1 outline-none border-none sign_in_password', placeholder: t("placeholders.signin.password")
+          = f.password_field :password, class: 'rounded-b-5 mb-1 outline-none border-none sign_in_password', placeholder: t("placeholders.signin.password"), autocomplete: 'new-password'
           %button.eye{type: "button"}
             %img{alt: "open", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}/
 
@@ -37,10 +37,8 @@
 
       .forgot_password
         %p.mb-2
-          Forgot your password?
           %button.underline{data: {'toggle': 'modal', 'target': 'passwordModal', turbo: false}} 
-            Click here to reset it.
-        
+            Forgot password?
         
         %p.pb-0
           Don't have a Croucher account?
