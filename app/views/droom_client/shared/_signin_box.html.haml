@@ -19,7 +19,7 @@
     .croucher_container
       %h2.text-subtitle Sign in
 
-      = form_for(user, url: droom_client.sign_in_path, method: 'post', html: { class: 'sign_in_form' }) do |f|
+      = form_for(user, url: droom_client.sign_in_path, method: 'post', html: { class: 'sign_in_form', autocomplete: 'off' }) do |f|
         = hidden_field_tag :destination, params[:destination]
         
         .input_group
