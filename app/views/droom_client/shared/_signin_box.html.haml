@@ -44,8 +44,7 @@
         %p.pb-0
           Don't have a Croucher account?
           - if params[:destination].present? && params[:begin_application].present?
-            %a.underline{href: "#{params[:destination]}?sign_up=true", style: "color: ##000000;text-decoration: underline;", data: {turbo: false}}
-              Click here to create one.
+            = link_to "Click here to create one.", "#{params[:destination]}?sign_up=true", class: "underline", style: "color: #000000;text-decoration: underline;", data: { turbo: false }
           - else
             %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
               Click here to create one.
