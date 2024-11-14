@@ -21,6 +21,7 @@
 
       = form_for(user, url: droom_client.sign_in_path, method: 'post', html: { class: 'sign_in_form', autocomplete: 'off' }) do |f|
         = hidden_field_tag :destination, params[:destination]
+        = hidden_field_tag :begin_application, params[:begin_application]
         
         .input_group
           %label{for: "email"} Email
@@ -42,5 +43,8 @@
         
         %p.pb-0
           Don't have a Croucher account?
-          %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
-            Click here to create one.
+          - if params[:destination].present? && params[:begin_application].present?
+            = link_to "Click here to create one.", "#{params[:destination]}?sign_up=true", class: "underline", style: "color: #000000;text-decoration: underline;", data: { turbo: false }
+          - else
+            %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
+              Click here to create one.
