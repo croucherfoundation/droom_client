@@ -26,15 +26,15 @@ class UserSessionsController < ApplicationController
     else
       flash[:error] = t("flash.not_recognised").html_safe
       redirect_to_url = droom_client.sign_in_path
+      sso = params[:sso]
+      sig = params[:sig]
 
       if params[:destination].present? && params[:begin_application]
         redirect_to_url = "#{redirect_to_url}?destination=#{params[:destination]}&begin_application=true"
-      end
-
-      sso = params[:sso]
-      sig = params[:sig]
-      if sso.present? && sig.present?
+      elsif sso.present? && sig.present?
         redirect_to_url = "#{redirect_to_url}?sso=#{sso}&sig=#{sig}"
+      else
+        redirect_to_url = "#{request.referrer.presence || redirect_to_url}?failed=true"
       end
 
       redirect_to redirect_to_url

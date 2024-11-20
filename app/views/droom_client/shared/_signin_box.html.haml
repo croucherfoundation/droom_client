@@ -8,7 +8,7 @@
 - unless is_signin_page 
   - is_signin_page = !user_signed_in? && controller_name == 'wiki'
 
-%section#signin-box.auth_container{class: ('auth_container_open' if is_signin_page)}
+%section#signin-box.auth_container{class: ('auth_container_open' if is_signin_page || params[:failed].present?)}
   .auth_container_wrapper
     .croucher_container
       .cross_icon_container
@@ -16,6 +16,7 @@
           %svg{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
             %line{stroke: (is_signin_page ? "#F8F8F6" : "#D3D3D3"), "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
             %line{stroke: (is_signin_page ? "#F8F8F6" : "#D3D3D3"), "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 0.694719 -0.669051 0.743216 0 1.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
+    
     .croucher_container
       %h2.text-subtitle Sign in
 
@@ -25,11 +26,15 @@
         
         .input_group
           %label{for: "email"} Email
-          = f.text_field :email, class: 'rounded-b-5 mb-1 outline-none border-none', placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: 'u_s_e_a'
+          = f.text_field :email, class: ("has-error" if params[:failed].present?), placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: ('u_s_e_a' unless params[:failed].present?)
+          
+          - if params[:failed].present?
+            %p.error_message 
+              Incorrect email or password.
         
         .input_group
           %label{for: "password"} Password
-          = f.password_field :password, class: 'rounded-b-5 mb-1 outline-none border-none sign_in_password', placeholder: t("placeholders.signin.password"), autocomplete: 'new-password', id: 'u_s_p_f'
+          = f.password_field :password, class: "sign_in_password #{'has-error' if params[:failed].present?}", placeholder: t("placeholders.signin.password"), autocomplete: 'new-password', id: ('u_s_p_f' unless params[:failed].present?)
           %button.eye{type: "button"}
             %img{alt: "open", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}/
 
