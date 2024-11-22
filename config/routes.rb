@@ -13,6 +13,8 @@ DroomClient::Engine.routes.draw do
   post '/users/reset_password' => "passwords#create", as: "reset_password"
   get 'check_authenticate' => 'users#check_authenticate'
 
+  get '/users/remove_profile/:id' => 'users#remove_profile', as: 'remove_profile'
+
   resources :users do
     put :set_password, on: :member
     resources :emails

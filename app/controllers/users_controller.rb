@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   respond_to :html, :json
 
   skip_before_action :authenticate_user!, raise: false
-  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
+  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile]
   before_action :get_users, only: [:index]
-  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome]
+  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
@@ -47,9 +47,14 @@ class UsersController < ApplicationController
     hashed_params = user_params
     hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
     hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
+    hashed_params[:image] = convert_image_to_base64(hashed_params[:image].tempfile.path) if hashed_params[:image].present?
     @user.assign_attributes(hashed_params.to_h)
     @user.save
     respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+  end
+
+  def remove_profile
+    @user.remove_profile(@user.uid)
   end
 
 
@@ -146,7 +151,25 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+  end
+
+  def convert_image_to_base64(image_path)
+    # Read the image file
+    file = File.open(image_path, 'rb')
+    image_data = file.read
+  
+    # Get MIME type (e.g., "image/png" or "image/jpeg")
+    mime_type = Marcel::MimeType.for(image_path)
+  
+    # Encode to Base64
+    base64_image = Base64.encode64(image_data)
+  
+    # Combine with MIME type
+    "data:#{mime_type};base64,#{base64_image}"
+  ensure
+    # Close the file to free resources
+    file.close if file
   end
 
 end
