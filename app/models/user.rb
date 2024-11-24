@@ -77,7 +77,8 @@ class User
       status: "",
       preferred_pronoun: "",
       preferred_professional_name: "",
-      preferred_name: ""
+      preferred_name: "",
+      image: nil,
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
@@ -165,6 +166,19 @@ class User
   def self.account_update(user_uid, params={})
     params = params.to_h unless params == {}
     put "/api/users/#{user_uid}/account_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.sync_profile_image(user_uid, params={})
+    params = params.to_h unless params == {}
+    get "/api/users/#{user_uid}/sync_profile_image", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def remove_profile(user_uid)
+    self.class.get "/api/users/#{user_uid}/remove_profile"
   rescue JSON::ParserError, Her::Errors::ParseError
     nil
   end
