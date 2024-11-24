@@ -14,6 +14,7 @@
         reader.onload = function(e) {
           $('#profile-avatar').attr('src', e.target.result);
           $('.profile-remove-button').css('display', 'block'); // Show remove button
+          $('#remove_image').val('false');
         }
 
         reader.readAsDataURL(input.files[0]);
@@ -22,14 +23,10 @@
 
     $('.profile-remove-button').on('click', function(e) {
       e.preventDefault();
-      let user_uid = $(this).data('user-uid');
-      $.ajax({
-        url: "/d/users/remove_profile/" + user_uid,
-        type: 'GET',
-        success: function(response) {
-          window.location.reload();
-        }
-      });
+      $('#remove_image').val('true');
+      $('.profile-remove-button').css('display', 'none');
+      $('#profile-upload').val('');
+      $('#profile-avatar').attr('src', 'https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png');
     });
 
     // Password reset form

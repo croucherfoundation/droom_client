@@ -28,6 +28,7 @@
               %span.profile-upload-text
                 Upload photo
               = f.file_field :image, id: "profile-upload", accept: "image/*"
+              = hidden_field_tag :remove_image, false, id: "remove_image"
 
             = hidden_field_tag :reload, true
 

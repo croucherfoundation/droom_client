@@ -48,6 +48,7 @@ class UsersController < ApplicationController
     hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
     hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
     hashed_params[:image] = convert_image_to_base64(hashed_params[:image].tempfile.path) if hashed_params[:image].present?
+    hashed_params[:remove_image] = true if params[:remove_image] == "true" ||  params[:remove_image] == true
     @user.assign_attributes(hashed_params.to_h)
     @user.save
     respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
