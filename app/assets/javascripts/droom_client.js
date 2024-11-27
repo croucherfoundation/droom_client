@@ -1,5 +1,35 @@
 (function() {
   jQuery(function($) {
+
+    $('.profile-upload-text, #profile-avatar').on('click', function() {
+      $('#profile-upload').click();
+    });
+    // Preview the selected image
+    $('#profile-upload').on('change', function(event) {
+      var input = event.target;
+
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          $('#profile-avatar').attr('src', e.target.result);
+          $('.profile-remove-button').css('display', 'block'); // Show remove button
+          $('#remove_image').val('false');
+        }
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    });
+
+    $('.profile-remove-button').on('click', function(e) {
+      e.preventDefault();
+      $('#remove_image').val('true');
+      $('.profile-remove-button').css('display', 'none');
+      $('#profile-upload').val('');
+      $('#profile-avatar').attr('src', 'https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png');
+    });
+
+    // Password reset form
     $('.password-reset-btn').on('click', function() {
       var $form = $(this).closest('form');
       var url = $form.attr('action');

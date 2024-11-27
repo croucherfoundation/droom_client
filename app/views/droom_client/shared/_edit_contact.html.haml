@@ -1,10 +1,10 @@
 - @user ||= User.new_with_defaults 
-
+- profile_image = @user.profile_image.present? ? @user.profile_image : "https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png"
 #editContact.modal
   .modal-wrapper{role: "document"}
     .modal-content
       .croucher_container.my-custom-modal-content
-        = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user', :autocomplete => false} do |f|
+        = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user',  :multipart => true, :autocomplete => false} do |f|
           %h1 Edit profile
           = hidden_field_tag :reload, true
           .form-fields
@@ -18,7 +18,20 @@
               .address-fields
                 .address-input
                   = render "droom_client/shared/contact/addresses", f: f, user: @user
+
+            %div.profile-image
+              .profile-avatar-container
+                %img{src: profile_image, alt: "Profile picture", class: "profile-avatar", id: "profile-avatar"}
+                %button.profile-remove-button{type: "button", style: "display: #{@user.show_initial_image ? 'none' : 'block'}", data: {'user-uid' => @user.uid}}
+                  %svg{stroke: "currentColor", fill: "currentColor", "stroke-width": "0", viewBox: "0 0 384 512", height: "1em", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
+                    %path{d: "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"}
+              %span.profile-upload-text
+                Upload photo
+              = f.file_field :image, id: "profile-upload", accept: "image/*"
+              = hidden_field_tag :remove_image, false, id: "remove_image"
+
             = hidden_field_tag :reload, true
+
             %section.actions
               %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
                 Cancel
