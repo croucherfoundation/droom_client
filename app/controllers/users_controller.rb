@@ -26,7 +26,7 @@ class UsersController < ApplicationController
   end
 
   def sign_up
-    permitted_params = user_params.merge(group: params[:group])
+    permitted_params = user_params.merge(ip_address: request.ip, browser_agent: request.user_agent)
     @user = User.sign_up(permitted_params)
     @show_email_confirm_popup = true
     redirect_to request.referer
