@@ -57,9 +57,8 @@ module DroomClientHelper
   def determine_dataroom_url(user)
     return ENV['DROOM_URL'] if user.admin?
 
-    if user.user_groups&.include?('Scholars')
-      person = Person.find_by(user_uid: user.uid)
-      return scholar_dataroom_or_funding_url(person) if person
+    if person = Person.find_by(user_uid: user.uid)
+      return scholar_dataroom_or_funding_url(person)
     end
 
     return "#{Settings.home_url}/funding-application" if user.user_groups&.include?('Applicants')
