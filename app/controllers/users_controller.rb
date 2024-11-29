@@ -26,10 +26,20 @@ class UsersController < ApplicationController
   end
 
   def sign_up
-    permitted_params = user_params.merge(ip_address: request.ip, browser_agent: request.user_agent)
+    referer_url = request.referer
+    uri = URI.parse(referer_url)
+    referer_params = Rack::Utils.parse_query(uri.query || '')
+    destination = referer_params['destination'].present? ? referer_params['destination'] : root_url
+    permitted_params = user_params.merge(ip_address: request.ip, browser_agent: request.user_agent, after_confirmed_url: destination)
     @user = User.sign_up(permitted_params)
     @show_email_confirm_popup = true
-    redirect_to request.referer
+    referer_url = request.referer
+    uri = URI.parse(referer_url)
+    referer_params = Rack::Utils.parse_query(uri.query || '')
+    referer_params['show_email_confirm_popup'] = true
+    uri.query = referer_params.to_query
+
+    redirect_to uri.to_s
   end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
