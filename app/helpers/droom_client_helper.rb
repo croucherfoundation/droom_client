@@ -57,26 +57,12 @@ module DroomClientHelper
   def determine_dataroom_url(user)
     return ENV['DROOM_URL'] if user.admin?
 
-    if person = Person.find_by(user_uid: user.uid)
-      return scholar_dataroom_or_funding_url(person)
-    end
+    person = Person.find_by(user_uid: user.uid)
 
-    return "#{Settings.home_url}/funding-application" if user.user_groups&.include?('Applicants')
+    if person.present? || user.user_groups&.include?('Applicants')
+      return "#{Settings.home_url}/funding-application"
+    end
 
     nil
   end
-
-  private
-
-  def scholar_dataroom_or_funding_url(person)
-    person_page = PersonPage.find_by(person_uid: person.id)
-    return nil unless person_page
-
-    if person.last_award_year.to_i >= 2021
-      "#{Settings.home_url}/dataroom/#{person_page.slug}"
-    else
-      "#{Settings.home_url}/funding-application"
-    end
-  end
-
 end
