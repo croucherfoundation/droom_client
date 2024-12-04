@@ -12,7 +12,7 @@ class Message
     survey_code = options[:survey_code]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
-    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication'
+    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication' || person.class.name == 'User'
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
@@ -27,10 +27,11 @@ class Message
   end
 
   def transform_body_for_survey(person, body)
+    survey_url = person.class.name == 'EventApplication' ? person.survey_url : person.symposium_survey_url
     survey_link = <<~HTML.strip
       <span style='display: inline-block'>
         <a
-          href="#{person.survey_url}"
+          href="#{survey_url}"
           target="_blank"
           style="text-decoration: none; color: #ee3a43; cursor: pointer;">
           <font color="#ee3a43">here</font>
