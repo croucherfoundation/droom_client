@@ -8,13 +8,13 @@ class MessageEnvelope
 
   belongs_to :message
 
-  def for_mandrill_message(with_html=false, survey_code=nil)
+  def for_mandrill_message(with_html=false, survey_code=nil, test_email=false)
     @survey_code = survey_code
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
       "track_opens" => true,
-      "to" => send_address,
+      "to" => send_address(test_email),
       "subject" => render_subject
     }
     data["html"] = render_html if with_html
@@ -45,8 +45,8 @@ class MessageEnvelope
     @summary
   end
 
-  def send_address
-    unless Rails.env.production?
+  def send_address(test_email=false)
+    unless Rails.env.production? || test_email
       self.email = Settings.email.sandbox if applicant.present?
     end
     email_address = [
