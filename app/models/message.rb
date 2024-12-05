@@ -41,36 +41,27 @@ class Message
 
     survey_link_button = <<~HTML.strip
       <table border="0" cellspacing="0" cellpadding="0">
-  <tr>
-    <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
-      <!--[if mso]>
-      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#{survey_url}" style="height:40px;v-text-anchor:middle;width:200px;" arcsize="60%" stroke="f" fillcolor="#ee3a43">
-        <w:anchorlock/>
-        <center>
-      <![endif]-->
-      <a href="#{survey_url}"
-         target="_blank"
-         style="background-color: #ee3a43;
-                border-radius: 30px;
-                display: inline-block;
-                color: #ffffff;
-                font-family: Arial, sans-serif;
-                font-size: 16px;
-                font-weight: bold;
-                line-height: 40px;
-                text-align: center;
-                text-decoration: none;
-                width: 200px;
-                -webkit-text-size-adjust: none;">
-        <span style="color: #ffffff !important">Go to survey form &rarr;</span>
-      </a>
-      <!--[if mso]>
-        </center>
-      </v:roundrect>
-      <![endif]-->
-    </td>
-  </tr>
-</table>
+        <tr>
+          <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
+            <a href="#{survey_url}"
+              target="_blank"
+              style="background-color: #ee3a43;
+                      border-radius: 30px;
+                      display: inline-block;
+                      color: #ffffff;
+                      font-family: Arial, sans-serif;
+                      font-size: 16px;
+                      font-weight: bold;
+                      line-height: 40px;
+                      text-align: center;
+                      text-decoration: none;
+                      width: 200px;
+                      -webkit-text-size-adjust: none;">
+              <span style="color: #ffffff !important">Go to survey form &rarr;</span>
+            </a>
+          </td>
+        </tr>
+      </table>
     HTML
 
     name_of_course = <<~HTML.strip
