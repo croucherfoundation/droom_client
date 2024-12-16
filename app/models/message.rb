@@ -26,6 +26,73 @@ class Message
 
   end
 
+  def render_body_for_reviewer(person, options={})
+    review_id = options[:review_id]
+    message_body = template.present? ? template.body : body
+    attributes = person.present? ? person.for_email : for_email
+    message_body = transform_body_for_review(person, message_body, review_id) if person.class.name == 'User'
+    if template.present? && template&.layout == 'message'
+      html = Nokogiri::HTML.parse(message_body)
+      html.css('a[href]').each do |a|
+        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+      end
+      Mustache.render(html.to_html, attributes)
+    else
+      Mustache.render(message_body, attributes)
+    end
+
+  end
+
+  def transform_body_for_review(person, body, review_id)
+    review = Review.find(review_id)
+    if review.present?
+      invitation_url = review.invitation_url
+      invitation_link = <<~HTML.strip
+        <span style='display: inline-block'>
+          <a
+            href="#{invitation_url}"
+            target="_blank"
+            style="text-decoration: none; color: #ee3a43; cursor: pointer;">
+            <font color="#ee3a43">here</font>
+          </a>
+        </span>
+      HTML
+
+      invitation_link_button = <<~HTML.strip
+        <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
+              <a href="#{invitation_url}"
+                target="_blank"
+                style="background-color: #ee3a43;
+                        border-radius: 30px;
+                        display: inline-block;
+                        color: #ffffff;
+                        font-family: Arial, sans-serif;
+                        font-size: 16px;
+                        font-weight: bold;
+                        line-height: 40px;
+                        text-align: center;
+                        text-decoration: none;
+                        width: 200px;
+                        -webkit-text-size-adjust: none;">
+                <span style="color: #ffffff !important">Online application and reviewing toolkit &rarr;</span>
+              </a>
+            </td>
+          </tr>
+        </table>
+      HTML
+
+      round_name = <<~HTML.strip
+        <span style='display: inline-block'>
+          #{review.round_name}
+        </span>
+      HTML
+
+      body.gsub('{{reviewer_invitation_url}}', invitation_link).gsub('{{round_name}}', round_name).gsub('{{reviewer_invitation_button}}', invitation_link_button)
+    end
+  end
+
   def transform_body_for_survey(person, body)
     survey_url = person.class.name == 'EventApplication' ? person.survey_url : person.symposium_survey_url
     survey_link = <<~HTML.strip
