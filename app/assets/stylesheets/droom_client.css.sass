@@ -130,6 +130,7 @@ form.user_chooser
   opacity: 0
   &.s0, &.s1, &.s2, &.s3, &.s4
     opacity: 1
+    padding-top: 10px
   &.s0
     color: #ed1c24
   &.s1
@@ -142,6 +143,14 @@ form.user_chooser
     color: #74b87a
   &.acceptable
     opacity: 0
+
+.password_instructions
+  margin-top: 1em
+
+fieldset[data-role="password"] p.actions input[type="submit"]
+  padding: 3px 25px 0 25px
+  font-size: 18px
+  border-color: unset
 
 .confirmation
   opacity: 0.25
