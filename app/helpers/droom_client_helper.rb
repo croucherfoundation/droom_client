@@ -57,10 +57,12 @@ module DroomClientHelper
   def determine_dataroom_url(user)
     return ENV['DROOM_URL'] if user.admin?
 
-    person = Person.find_by(user_uid: user.uid)
-
-    if person.present? || user.user_groups&.include?('Applicants')
-      return "#{Settings.home_url}/funding-application"
+    if defined?(Person)
+      person = Person.find_by(user_uid: user.uid)
+  
+      if person.present? || user.user_groups&.include?('Applicants')
+        return "#{Settings.home_url}/funding-application"
+      end
     end
 
     nil
