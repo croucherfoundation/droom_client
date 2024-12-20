@@ -118,7 +118,7 @@ module HasDroomUser
       end
       user.user_group = user_group_value if user_group_value.present?
       user.save if user.changed? || user_group_value.present?
-      self.user = user
+      self.user = user unless self.user.present?
     else
       user = User.new_with_defaults({
         title: title,
