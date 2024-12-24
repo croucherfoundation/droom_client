@@ -62,6 +62,11 @@ module DroomClientHelper
   
       if person.present? || user.user_groups&.include?('Applicants')
         return "#{Settings.home_url}/funding-application"
+      else
+        committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
+        if user.user_groups&.any? { |group| committees.include?(group) }
+          return ENV['DROOM_URL']
+        end
       end
     end
 
