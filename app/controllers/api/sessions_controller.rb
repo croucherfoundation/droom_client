@@ -17,6 +17,9 @@ class Api::SessionsController < ApplicationController
           cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
           sign_in_cookie = cookies["#{cookie_name}"]
         else
+          RequestStore.store.delete :current_user
+          unset_auth_cookie
+          reset_session
           message = "We haven't received your confirmation. Please check your email."
           return render json: { error_message: message }, status: 400
         end
