@@ -116,7 +116,9 @@ module HasDroomUser
           end
         end
       end
-      user.save if user.changed?
+      user.user_group = user_group_value if user_group_value.present?
+      user.save if user.changed? || user_group_value.present?
+      self.user = user unless self.user.present?
     else
       user = User.new_with_defaults({
         title: title,
@@ -130,7 +132,7 @@ module HasDroomUser
         preferred_name: defined?(preferred_name) ? preferred_name : nil,
         preferred_pronoun: defined?(preferred_pronoun) ? preferred_pronoun : nil
       })
-      user.save
+      user.save 
       self.user = user
     end
   end

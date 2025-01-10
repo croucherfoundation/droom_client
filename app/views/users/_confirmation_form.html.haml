@@ -22,9 +22,10 @@
         %svg
           %use{"xlink:href" => "#warning_symbol"}
     
-    = f.submit "Continue", class: 'croucher-standard-btn'
+    %p.actions
+      = f.submit "Continue", class: 'croucher-standard-btn'
     
-    %p
+    %p.password_instructions
       %span.notes{data: {role: "notes"}}
         When the password is strong enough, the 'confirmation' box will become available, and when the two passwords match the 'continue' button will go green and become clickable.
         Dictionary words, repetition and common passwords are likely to be rejected. Please add complication, either in the form of punctuation and strange characters or just by adding more words.
