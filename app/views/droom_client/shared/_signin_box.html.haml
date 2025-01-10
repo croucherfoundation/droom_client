@@ -8,7 +8,7 @@
 - unless is_signin_page 
   - is_signin_page = !user_signed_in? && controller_name == 'wiki'
 
-%section#signin-box.auth_container{class: ('auth_container_open' if is_signin_page || params[:failed].present?)}
+%section#signin-box.auth_container{class: ('auth_container_open' if is_signin_page || params[:failed].present? || params[:not_confirmed].present?)}
   .auth_container_wrapper
     .croucher_container
       .cross_icon_container
@@ -26,7 +26,7 @@
         
         .input_group
           %label{for: "email"} Email
-          = f.text_field :email, class: ("has-error" if params[:failed].present?), placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: ('u_s_e_a' unless params[:failed].present?)
+          = f.text_field :email, class: ("has-error" if params[:failed].present? || params[:not_confirmed].present?), placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: ('u_s_e_a' unless params[:failed].present? || params[:not_confirmed].present?)
           
           - if params[:failed].present?
             %p.error_message 
@@ -34,12 +34,16 @@
         
         .input_group
           %label{for: "password"} Password
-          = f.password_field :password, class: "sign_in_password #{'has-error' if params[:failed].present?}", placeholder: t("placeholders.signin.password"), autocomplete: 'new-password', id: ('u_s_p_f' unless params[:failed].present?)
+          = f.password_field :password, class: "sign_in_password #{'has-error' if params[:failed].present? || params[:not_confirmed].present?}", placeholder: t("placeholders.signin.password"), autocomplete: 'new-password', id: ('u_s_p_f' unless params[:failed].present? || params[:not_confirmed].present?)
           %button.eye{type: "button"}
             %img{alt: "open", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}/
 
         .sign_in_btn
           = f.submit t(:sign_in), class: "croucher-standard-btn", data: {turbo: false}
+
+      - if params[:not_confirmed].present?
+        %p.error_message 
+          We haven't received your confirmation. Please check your email.
 
       .forgot_password
         %p.mb-2

@@ -9,11 +9,19 @@ class Api::SessionsController < ApplicationController
 
   def create
     if user = User.sign_in(sign_in_params.to_h)
-      RequestStore.store[:current_user] = user
-      set_auth_cookie_for(user)
-      cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
-      sign_in_cookie = JSON.parse(cookies["#{cookie_name}"])
-      user = {_s: sign_in_cookie[0], _k: sign_in_cookie[1][0], _d: sign_in_cookie[1][1]}
+      if user.confirmed?
+        RequestStore.store[:current_user] = user
+        set_auth_cookie_for(user)
+        cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
+        sign_in_cookie = JSON.parse(cookies["#{cookie_name}"])
+        user = {_s: sign_in_cookie[0], _k: sign_in_cookie[1][0], _d: sign_in_cookie[1][1]}
+      else
+        RequestStore.store.delete :current_user
+        unset_auth_cookie
+        reset_session
+        message = "We haven't received your confirmation. Please check your email."
+        return render :json => {error_message: message}, status: 400
+      end
       render :json => user
     else
       error_msg = {:error_message => "Sign in error!"}
