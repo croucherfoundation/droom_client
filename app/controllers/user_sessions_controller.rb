@@ -5,9 +5,6 @@ class UserSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:destroy], raise: false
 
   def new
-    if params[:unconfirmed_user]
-      @unconfirmed_message = "We haven't received your confirmation. Please check your email."
-    end
     render
   end
 
@@ -17,7 +14,10 @@ class UserSessionsController < ApplicationController
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
       else
-        redirect_to_url = "#{request.referrer.presence || redirect_to_url}?unconfirmed_user=true"
+        RequestStore.store.delete :current_user
+        unset_auth_cookie
+        reset_session
+        redirect_to_url = "#{request.referrer.presence || droom_client.sign_in_path}?not_confirmed=true"
         redirect_to redirect_to_url and return
       end
       unless request.xhr?
