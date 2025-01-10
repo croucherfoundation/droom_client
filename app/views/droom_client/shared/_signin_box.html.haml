@@ -31,6 +31,9 @@
           - if params[:failed].present?
             %p.error_message 
               Incorrect email or password.
+          - if @unconfirmed_message.present?
+            %p.error_message 
+              = @unconfirmed_message
         
         .input_group
           %label{for: "password"} Password

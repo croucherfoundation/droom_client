@@ -5,13 +5,21 @@ class UserSessionsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:destroy], raise: false
 
   def new
+    if params[:unconfirmed_user]
+      @unconfirmed_message = "We haven't received your confirmation. Please check your email."
+    end
     render
   end
 
   def create
     if user = User.sign_in(sign_in_params.to_h)
-      RequestStore.store[:current_user] = user
-      set_auth_cookie_for(user)
+      if user.confirmed?
+        RequestStore.store[:current_user] = user
+        set_auth_cookie_for(user)
+      else
+        redirect_to_url = "#{request.referrer.presence || redirect_to_url}?unconfirmed_user=true"
+        redirect_to redirect_to_url and return
+      end
       unless request.xhr?
         flash[:notice] = t("flash.greeting", name: user.given_name).html_safe
       end
