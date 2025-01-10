@@ -18,7 +18,7 @@ class UserSessionsController < ApplicationController
         RequestStore.store.delete :current_user
         unset_auth_cookie
         reset_session
-        redirect_to_url = "#{request.referrer.presence || droom_client.sign_in_path }??not_confirmed=true"
+        redirect_to_url = "#{request.referrer.presence || droom_client.sign_in_path }?not_confirmed=true"
         redirect_to redirect_to_url and return
       end
 
