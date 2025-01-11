@@ -18,7 +18,11 @@ class UserSessionsController < ApplicationController
         RequestStore.store.delete :current_user
         unset_auth_cookie
         reset_session
-        redirect_to_url = "#{request.referrer.presence || droom_client.sign_in_path }?not_confirmed=true"
+        if request.referer.present?
+          redirect_to_url = redirect_url(request.referer, { not_confirmed: true })
+        else
+          redirect_to_url = redirect_url(droom_client.sign_in_path, { not_confirmed: true })
+        end
         redirect_to redirect_to_url and return
       end
 
@@ -44,9 +48,10 @@ class UserSessionsController < ApplicationController
       elsif sso.present? && sig.present?
         redirect_to_url = "#{redirect_to_url}?sso=#{sso}&sig=#{sig}"
       else
-        redirect_to_url = "#{request.referrer.presence || redirect_to_url}?failed=true"
+        redirect_to_url = "#{request.referrer.presence || redirect_to_url}"
       end
 
+      redirect_to_url = redirect_url(redirect_to_url, { failed: true })
       redirect_to redirect_to_url
     end
   end
@@ -77,5 +82,21 @@ class UserSessionsController < ApplicationController
     else
       {}
     end
+  end
+
+  def redirect_url(redirect_to_url, additional_params = {})
+    uri = URI.parse(redirect_to_url)
+    query_params = Rack::Utils.parse_query(uri.query || '')
+  
+    # Remove unwanted or conflicting parameters
+    query_params.delete('failed')
+    query_params.delete('not_confirmed')
+  
+    # Merge additional parameters
+    query_params.merge!(additional_params)
+  
+    # Reconstruct the URL
+    uri.query = query_params.to_query
+    uri.query.present? ? uri.to_s : uri.to_s.chomp('?')
   end
 end
