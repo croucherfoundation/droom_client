@@ -55,21 +55,25 @@ module DroomClientHelper
   end
 
   def determine_dataroom_url(user)
-    return ENV['DROOM_URL'] if user.admin?
-
+    whitelist_subdomains = ['wiki', 'wikis', 'projectss', 'project', 'scholars', 'scholarss', 'search', 'searchs']
+    url = whitelist_subdomains.include?(request.subdomain) ? ENV['DROOM_URL'] : Settings.home_url
+    url_name = whitelist_subdomains.include?(request.subdomain) ? 'Go to data room' : 'Go to public site'
+  
+    return { url: url, text: url_name } if user.admin?
+  
     committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
     if user.user_groups&.any? { |group| committees.include?(group) }
-      return ENV['DROOM_URL']
+      return { url: url, text: url_name }
     end
-
+  
     if defined?(Person)
       person = Person.find_by(user_uid: user.uid)
   
       if person.present? || user.user_groups&.include?('Applicants')
-        return "#{Settings.home_url}/funding-application"
+        return { url: "#{Settings.home_url}/funding-application", text: 'Go to data room' }
       end
     end
-
-    nil
-  end
+  
+    { url: nil, text: nil }
+  end  
 end
