@@ -55,22 +55,26 @@ module DroomClientHelper
   end
 
   def determine_dataroom_url(user)
-    return ENV['DROOM_URL'] if user.admin? || (user.internal? && !scholar?)
-
-    if user.user_groups&.include?('Scholars')
-      person = Person.where(user_uid: user.uid).first
-      if person
-        person_page = PersonPage.where(person_uid: person.id).first
-
-        if person_page && person.last_award_year.to_i >= 2021
-          return "#{Settings.home_url}/dataroom/#{person_page.slug}"
-        else
-          return "#{ENV['YB_URL']}/person_pages/#{person_page.id}/edit"
-        end
+    whitelist_subdomains = ['projectss', 'project', 'scholars', 'scholarss', 'search', 'searchs']
+    url = whitelist_subdomains.include?(request.subdomain) ? ENV['DROOM_URL'] : Settings.home_url
+    url_name = whitelist_subdomains.include?(request.subdomain) ? 'Go to data room' : 'Go to public site'
+  
+    return { url: url, text: url_name } if user.admin?
+  
+    committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
+    if user.user_groups&.any? { |group| committees.include?(group) }
+      return { url: url, text: url_name }
+    end
+  
+    if defined?(Person)
+      person = Person.find_by(user_uid: user.uid)
+  
+      if person.present? || user.user_groups&.include?('Applicants')
+        return { url: "#{Settings.home_url}/funding-application", text: 'Go to data room' }
       end
     end
-
-    nil # Return nil if none of the conditions are met
+  
+    { url: nil, text: nil }
   end
 
 end
