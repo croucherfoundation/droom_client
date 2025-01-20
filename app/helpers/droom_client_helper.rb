@@ -55,7 +55,7 @@ module DroomClientHelper
   end
 
   def determine_dataroom_url(user)
-    whitelist_subdomains = ['projectss', 'project', 'scholars', 'scholarss', 'search', 'searchs']
+    whitelist_subdomains = ['projectss', 'projects', 'scholars', 'scholarss', 'search', 'searchs']
     url = whitelist_subdomains.include?(request.subdomain) ? ENV['DROOM_URL'] : Settings.home_url
     url_name = whitelist_subdomains.include?(request.subdomain) ? 'Go to data room' : 'Go to public site'
   
