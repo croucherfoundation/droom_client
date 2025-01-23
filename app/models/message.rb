@@ -89,7 +89,7 @@ class Message
         </span>
       HTML
 
-      body.gsub('{{reviewer_invitation_url}}', invitation_link).gsub('{{round_name}}', round_name).gsub('{{reviewer_invitation_button}}', invitation_link_button)
+      body.gsub('{{reviewer_invitation_url}}', invitation_link).gsub('{{round_name}}', round_name).gsub('{{reviewer_invitation_button}}', invitation_link_button).gsub('{{applicant_formal_name}}', review.application_formal_name).gsub('{{university_name}}', review.application_university_name).gsub('{{working_days}}', review.application_working_days).gsub('{{course_title}}', review.application_course_title)
     end
   end
 
