@@ -55,12 +55,12 @@ module DroomClientHelper
   end
 
   def determine_dataroom_url(user)
-    whitelist_subdomains = %w[projectss projects scholars scholarss search searchs]
+    public_systems = %w[pub yearbook search]
     committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
 
     # Determine base URL and text based on subdomain
-    base_url = whitelist_subdomains.include?(request.subdomain) ? ENV['DROOM_URL'] : Settings.home_url
-    base_text = whitelist_subdomains.include?(request.subdomain) ? 'Go to data room' : 'Go to public site'
+    base_url = public_systems.include?(Settings.service_name) ? ENV['DROOM_URL'] : Settings.home_url
+    base_text = public_systems.include?(Settings.service_name) ? 'Go to data room' : 'Go to public site'
 
     # Admin users or committee members
     if user.admin? || user.user_groups&.any? { |group| committees.include?(group) }
