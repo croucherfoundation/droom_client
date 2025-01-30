@@ -46,6 +46,8 @@ class Message
   def transform_body_for_review(person, body, review_id)
     review = Review.find(review_id)
     if review.present?
+      application = review.application
+      short_description = ActionController::Base.helpers.sanitize(application.short_description.to_s, tags: ['a', 'b', 'i', 'ol', 'ul', 'li', 'h2', 'h3'])
       invitation_url = review.invitation_url
       invitation_link = <<~HTML.strip
         <span style='display: inline-block'>
@@ -85,11 +87,18 @@ class Message
 
       round_name = <<~HTML.strip
         <span style='display: inline-block'>
-          #{review.round_name}
+          {review.round_name}
         </span>
       HTML
 
-      body.gsub('{{reviewer_invitation_url}}', invitation_link).gsub('{{round_name}}', round_name).gsub('{{reviewer_invitation_button}}', invitation_link_button).gsub('{{applicant_formal_name}}', review.application_formal_name).gsub('{{university_name}}', review.application_university_name).gsub('{{working_days}}', review.application_working_days).gsub('{{course_title}}', review.application_course_title)
+      body.gsub('{{reviewer_invitation_url}}', invitation_link)
+          .gsub('{{round_name}}', round_name)
+          .gsub('{{reviewer_invitation_button}}', invitation_link_button)
+          .gsub('{{applicant_formal_name}}', review.application_formal_name)
+          .gsub('{{university_name}}', review.application_university_name)
+          .gsub('{{working_days}}', review.application_working_days)
+          .gsub('{{course_title}}', review.application_course_title)
+          .gsub('{{short_description}}', short_description)
     end
   end
 
