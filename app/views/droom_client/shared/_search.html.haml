@@ -3,14 +3,16 @@
 %section.croucher_search_container
   %section.croucher_search
     .search_container.croucher_container
-      %h3.text-subtitle.mb_subtitle Search
+      %h3.text-subtitle.mb_subtitle 
+        Search for grants, awards and documents
       .search_input
         - unless search_system
           %form.search_form{:action => croucher_search_url}
             %input{:name => "q", :placeholder => "What are you looking for? ", :type => "text"}/
             %button.search_btn{type: 'submit'}
-              %svg{:fill => "black", :viewbox => "0 0 15 15", :xmlns => "http://www.w3.org/2000/svg"}
-                %path{:d => "M14.6918 13.1956L10.8149 9.31872C10.7877 9.29152 10.7544 9.27037 10.7272 9.2462C12.3227 6.94966 12.1021 3.76775 10.0564 1.72505C7.75685 -0.574511 4.01894 -0.574511 1.7224 1.72202C-0.574134 4.01856 -0.574134 7.75647 1.7224 10.053C3.76511 12.0957 6.95004 12.3163 9.24355 10.7238C9.26773 10.7541 9.28888 10.7843 9.31608 10.8115L13.193 14.6884C13.607 15.1024 14.2748 15.1024 14.6888 14.6884C15.1027 14.2744 15.1027 13.6066 14.6888 13.1926L14.6918 13.1956ZM2.92204 8.85639C1.28727 7.22162 1.28727 4.55945 2.92204 2.92166C4.55681 1.28387 7.21898 1.28689 8.85677 2.92166C10.4915 4.55643 10.4915 7.2186 8.85677 8.85639C7.222 10.4912 4.55983 10.4912 2.92204 8.85639Z"}
+              %svg{width: "24", height: "24", viewBox: "0 0 24 24", :xmlns => "http://www.w3.org/2000/svg"}
+                %path{d: "M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z", fill: "#fff", stroke: "#6b7280", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round"}
+        
         - else
           %form.search_form{:action => main_app.documents_url}
             = hidden_field_tag :page, params[:page]
@@ -18,8 +20,9 @@
             = hidden_field_tag :sort, params[:sort]
             = text_field_tag :q, params[:q], name: 'q', class: 'search', placeholder: "What are you looking for? ", data: {slow: true}
             %button.search_btn{type: 'submit'}
-              %svg{:fill => "black", :viewbox => "0 0 15 15", :xmlns => "http://www.w3.org/2000/svg"}
-                %path{:d => "M14.6918 13.1956L10.8149 9.31872C10.7877 9.29152 10.7544 9.27037 10.7272 9.2462C12.3227 6.94966 12.1021 3.76775 10.0564 1.72505C7.75685 -0.574511 4.01894 -0.574511 1.7224 1.72202C-0.574134 4.01856 -0.574134 7.75647 1.7224 10.053C3.76511 12.0957 6.95004 12.3163 9.24355 10.7238C9.26773 10.7541 9.28888 10.7843 9.31608 10.8115L13.193 14.6884C13.607 15.1024 14.2748 15.1024 14.6888 14.6884C15.1027 14.2744 15.1027 13.6066 14.6888 13.1926L14.6918 13.1956ZM2.92204 8.85639C1.28727 7.22162 1.28727 4.55945 2.92204 2.92166C4.55681 1.28387 7.21898 1.28689 8.85677 2.92166C10.4915 4.55643 10.4915 7.2186 8.85677 8.85639C7.222 10.4912 4.55983 10.4912 2.92204 8.85639Z"}
+              %svg{width: "24", height: "24", viewBox: "0 0 24 24", :xmlns => "http://www.w3.org/2000/svg"}
+                %path{d: "M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z", fill: "#fff", stroke: "#6b7280", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round"}
+
   .cross_container
     .cross_icon
       %svg{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
