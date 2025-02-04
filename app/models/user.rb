@@ -47,11 +47,7 @@ class User
   end
 
   def email_name
-    unless title.present?
-      given_name
-    else
-      [title, family_name].join(' ')
-    end
+    given_name || family_name
   end
 
   def self.new_with_defaults(atts={})

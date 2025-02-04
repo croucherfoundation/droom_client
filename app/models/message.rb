@@ -12,7 +12,7 @@ class Message
     survey_code = options[:survey_code]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
-    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication'
+    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication' || person.class.name == 'User'
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
@@ -26,16 +26,118 @@ class Message
 
   end
 
+  def render_body_for_reviewer(person, options={})
+    review_id = options[:review_id]
+    message_body = template.present? ? template.body : body
+    attributes = person.present? ? person.for_email : for_email
+    message_body = transform_body_for_review(person, message_body, review_id) if person.class.name == 'User'
+    if template.present? && template&.layout == 'message'
+      html = Nokogiri::HTML.parse(message_body)
+      html.css('a[href]').each do |a|
+        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+      end
+      Mustache.render(html.to_html, attributes)
+    else
+      Mustache.render(message_body, attributes)
+    end
+
+  end
+
+  def transform_body_for_review(person, body, review_id)
+    review = Review.find(review_id)
+    if review.present?
+      application = review.application
+      short_description = ActionController::Base.helpers.sanitize(application.short_description.to_s, tags: ['a', 'b', 'i', 'ol', 'ul', 'li', 'h2', 'h3'])
+      invitation_url = review.invitation_url
+      invitation_link = <<~HTML.strip
+        <span style='display: inline-block'>
+          <a
+            href="#{invitation_url}"
+            target="_blank"
+            style="text-decoration: none; color: #ee3a43; cursor: pointer;">
+            <font color="#ee3a43">here</font>
+          </a>
+        </span>
+      HTML
+
+      invitation_link_button = <<~HTML.strip
+        <table border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
+              <a href="#{invitation_url}"
+                target="_blank"
+                style="background-color: #ee3a43;
+                        border-radius: 30px;
+                        display: inline-block;
+                        color: #ffffff;
+                        font-family: Arial, sans-serif;
+                        font-size: 16px;
+                        font-weight: bold;
+                        line-height: 40px;
+                        text-align: center;
+                        text-decoration: none;
+                        width: 200px;
+                        -webkit-text-size-adjust: none;">
+                <span style="color: #ffffff !important">Online application and reviewing toolkit &rarr;</span>
+              </a>
+            </td>
+          </tr>
+        </table>
+      HTML
+
+      round_name = <<~HTML.strip
+        <span style='display: inline-block'>
+          {review.round_name}
+        </span>
+      HTML
+
+      body.gsub('{{reviewer_invitation_url}}', invitation_link)
+          .gsub('{{round_name}}', round_name)
+          .gsub('{{reviewer_invitation_button}}', invitation_link_button)
+          .gsub('{{applicant_formal_name}}', review.application_formal_name)
+          .gsub('{{university_name}}', review.application_university_name)
+          .gsub('{{working_days}}', review.application_working_days)
+          .gsub('{{course_title}}', review.application_course_title)
+          .gsub('{{short_description}}', short_description)
+    end
+  end
+
   def transform_body_for_survey(person, body)
+    survey_url = person.class.name == 'EventApplication' ? person.survey_url : person.symposium_survey_url
     survey_link = <<~HTML.strip
       <span style='display: inline-block'>
         <a
-          href="#{person.survey_url}"
+          href="#{survey_url}"
           target="_blank"
           style="text-decoration: none; color: #ee3a43; cursor: pointer;">
           <font color="#ee3a43">here</font>
         </a>
       </span>
+    HTML
+
+    survey_link_button = <<~HTML.strip
+      <table border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
+            <a href="#{survey_url}"
+              target="_blank"
+              style="background-color: #ee3a43;
+                      border-radius: 30px;
+                      display: inline-block;
+                      color: #ffffff;
+                      font-family: Arial, sans-serif;
+                      font-size: 16px;
+                      font-weight: bold;
+                      line-height: 40px;
+                      text-align: center;
+                      text-decoration: none;
+                      width: 200px;
+                      -webkit-text-size-adjust: none;">
+              <span style="color: #ffffff !important">Go to survey form &rarr;</span>
+            </a>
+          </td>
+        </tr>
+      </table>
     HTML
 
     name_of_course = <<~HTML.strip
@@ -44,7 +146,7 @@ class Message
       </span>
     HTML
 
-    body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course)
+    body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course).gsub('{{survey_url_button}}', survey_link_button)
   end
 
   def transform_body_for_test_survey(survey_code, body)

@@ -27,7 +27,12 @@
               Email
               .email
                 .email-input
-                  = f.email_field :email,  :placeholder => t("placeholders.email"), :required => true, data: {role: "email", users_path: droom_client.users_path}, class: "required"
+                  = f.email_field :email,  :placeholder => t("placeholders.email"), :required => true, data: {role: "email", check_url: droom_client.check_email_path}, class: "required"
+                  %span.warning.hidden
+                    There is a problem in either the format or email address. For the existing user, please
+                    %strong.chrome-font-bold
+                      = link_to "sign in", droom_client.sign_in_url(destination: request.path) 
+                    to apply.
               Password
               .password 
                 .croucher_input.passwords-input.passwords-input-primary

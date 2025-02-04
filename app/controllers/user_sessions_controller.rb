@@ -10,7 +10,6 @@ class UserSessionsController < ApplicationController
 
   def create
     if user = User.sign_in(sign_in_params.to_h)
-      
       if user.confirmed?
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
@@ -25,7 +24,6 @@ class UserSessionsController < ApplicationController
         end
         redirect_to redirect_to_url and return
       end
-
       unless request.xhr?
         flash[:notice] = t("flash.greeting", name: user.given_name).html_safe
       end
@@ -48,9 +46,8 @@ class UserSessionsController < ApplicationController
       elsif sso.present? && sig.present?
         redirect_to_url = "#{redirect_to_url}?sso=#{sso}&sig=#{sig}"
       else
-        redirect_to_url = "#{request.referrer.presence || redirect_to_url}"
+        redirect_to_url = "#{request.referer || redirect_to_url}"
       end
-
       redirect_to_url = redirect_url(redirect_to_url, { failed: true })
       redirect_to redirect_to_url
     end
@@ -87,14 +84,14 @@ class UserSessionsController < ApplicationController
   def redirect_url(redirect_to_url, additional_params = {})
     uri = URI.parse(redirect_to_url)
     query_params = Rack::Utils.parse_query(uri.query || '')
-  
+
     # Remove unwanted or conflicting parameters
     query_params.delete('failed')
     query_params.delete('not_confirmed')
-  
+
     # Merge additional parameters
     query_params.merge!(additional_params)
-  
+
     # Reconstruct the URL
     uri.query = query_params.to_query
     uri.query.present? ? uri.to_s : uri.to_s.chomp('?')

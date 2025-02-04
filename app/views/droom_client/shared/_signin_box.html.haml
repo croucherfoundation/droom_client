@@ -26,11 +26,7 @@
         
         .input_group
           %label{for: "email"} Email
-          = f.text_field :email, class: ("has-error" if params[:failed].present? || params[:not_confirmed].present?), placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: ('u_s_e_a' unless params[:failed].present? || params[:not_confirmed].present?)
-          
-          - if params[:failed].present?
-            %p.error_message 
-              Incorrect email or password.
+          = f.text_field :email, class: ("has-error" if params[:failed].present? || params[:not_confirmed].present? ), placeholder: t("placeholders.signin.email"), autocomplete: 'off', id: ('u_s_e_a' unless params[:failed].present? || params[:not_confirmed].present?)
         
         .input_group
           %label{for: "password"} Password
@@ -40,6 +36,10 @@
 
         .sign_in_btn
           = f.submit t(:sign_in), class: "croucher-standard-btn", data: {turbo: false}
+
+      - if params[:failed].present?
+        %p.error_message 
+          Incorrect email or password.
 
       - if params[:not_confirmed].present?
         %p.error_message 
@@ -52,8 +52,5 @@
         
         %p.pb-0
           Don't have a Croucher account?
-          - if params[:destination].present? && params[:begin_application].present?
-            = link_to "Click here to create one.", "#{params[:destination]}?sign_up=true", class: "underline", style: "color: #000000;text-decoration: underline;", data: { turbo: false }
-          - else
-            %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
-              Click here to create one.
+          %button.underline{data: {'toggle': 'modal', 'target': 'signupModal', turbo: false}} 
+            Click here to create one.

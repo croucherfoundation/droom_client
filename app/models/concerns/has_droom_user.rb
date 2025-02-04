@@ -105,6 +105,7 @@ module HasDroomUser
   # always have a user, even if it is not active, and delegate to that user.
   #
   def synchronise_with_user
+    user_group_value = self.respond_to?(:user_group) ? self.user_group : nil
     if user
       [:title, :given_name, :family_name, :chinese_name, :email, :emai, :preferred_professional_name, :preferred_name, :preferred_pronoun].each do |col|
         if has_attribute?(col)
@@ -115,7 +116,9 @@ module HasDroomUser
           end
         end
       end
-      user.save if user.changed?
+      user.user_group = user_group_value if user_group_value.present?
+      user.save if user.changed? || user_group_value.present?
+      self.user = user unless self.user.present?
     else
       user = User.new_with_defaults({
         title: title,
@@ -123,12 +126,13 @@ module HasDroomUser
         family_name: family_name,
         chinese_name: chinese_name,
         email: email,
+        user_group: user_group_value.presence || nil,
         defer_confirmation: confirmation_usually_deferred?,
         preferred_professional_name: defined?(preferred_professional_name) ? preferred_professional_name : nil,
         preferred_name: defined?(preferred_name) ? preferred_name : nil,
         preferred_pronoun: defined?(preferred_pronoun) ? preferred_pronoun : nil
       })
-      user.save
+      user.save 
       self.user = user
     end
   end
