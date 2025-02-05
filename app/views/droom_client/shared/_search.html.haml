@@ -4,7 +4,10 @@
   %section.croucher_search
     .search_container.croucher_container
       %h3.search-title.mb_search_title
-        Search for grants, awards and documents
+        - if current_user&.admin? || current_user&.staff? || current_user&.developer?
+          Search for grants, awards and documents
+        - else
+          Search our stories, awards, events and funding
       .search_input
         - unless search_system
           %form.search_form{:action => croucher_search_url}
