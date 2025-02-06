@@ -74,6 +74,11 @@ module DroomClientHelper
       end
     end
 
+    # Reviewer users
+    if user.user_groups&.include?('Reviewer')
+      return { url: "#{ENV['APPL_URL']}/reviewers/user/#{user.uid}/profile", text: 'Go to data room' }
+    end
+
     # Funding applicants or persons linked to the user
     if defined?(Person)
       person = Person.find_by(user_uid: user.uid)

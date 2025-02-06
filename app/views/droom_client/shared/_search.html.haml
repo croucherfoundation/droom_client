@@ -1,13 +1,18 @@
 - search_system ||= false
+- params[:backurl] ||= "/"
 / Start: Search
 %section.croucher_search_container
   %section.croucher_search
     .search_container.croucher_container
       %h3.search-title.mb_search_title
-        Search for grants, awards and documents
+        - if current_user&.admin? || current_user&.staff? || current_user&.developer?
+          Search for grants, awards and documents
+        - else
+          Search our stories, awards, events and funding
       .search_input
         - unless search_system
           %form.search_form{:action => croucher_search_url}
+            = hidden_field_tag :backurl, request.original_url
             %input{:name => "q", :placeholder => "What are you looking for? ", :type => "text"}/
             %button.search_btn{type: 'submit'}
               %svg{width: "24", height: "24", viewBox: "0 0 24 24", :xmlns => "http://www.w3.org/2000/svg"}
@@ -18,13 +23,14 @@
             = hidden_field_tag :page, params[:page]
             = hidden_field_tag :show, params[:show]
             = hidden_field_tag :sort, params[:sort]
+            = hidden_field_tag :backurl, params[:backurl]
             = text_field_tag :q, params[:q], name: 'q', class: 'search', placeholder: "What are you looking for? ", data: {slow: true}
             %button.search_btn{type: 'submit'}
               %svg{width: "24", height: "24", viewBox: "0 0 24 24", :xmlns => "http://www.w3.org/2000/svg"}
                 %path{d: "M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z", fill: "#fff", stroke: "#6b7280", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round"}
 
-      .cross_icon
+      = link_to "#{params[:backurl]}", class: "cross_icon" do
         %svg{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
-          %line{stroke: "#D3D3D3 ", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
+          %line{stroke: "#D3D3D3", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
           %line{stroke: "#D3D3D3", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 0.694719 -0.669051 0.743216 0 1.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
 / End: Search
