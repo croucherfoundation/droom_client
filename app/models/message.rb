@@ -10,10 +10,13 @@ class Message
 
   def render_body_for(person, options={})
     survey_code = options[:survey_code]
+    reminder = options[:reminder]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
     message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication' || person.class.name == 'User'
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
+    message_body = transform_body_for_reminder(person, message_body) if reminder.present?
+
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
@@ -166,6 +169,29 @@ class Message
     HTML
 
     body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course)
+  end
+
+  def transform_body_for_reminder(person, body)
+    resume_link = person.reminder_resume_applicaiton_link
+    
+    reminder_resume_link = <<~HTML.strip
+      <span style='display: inline-block'>
+        <a
+          href="#{resume_link}"
+          target="_blank"
+          style="text-decoration: none; color: #ee3a43; cursor: pointer;">
+          <font color="#ee3a43">Resume application</font>
+        </a>
+      </span>
+    HTML
+
+    round_deadline = <<~HTML.strip
+      <span style='display: inline-block'>
+        #{person.round_deadline}
+      </span>
+    HTML
+
+    body.gsub('{{resume_application}}', reminder_resume_link).gsub('{{round_deadline}}', round_deadline)
   end
 
   def render_summary_for(person)
