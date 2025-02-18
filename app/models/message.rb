@@ -11,11 +11,13 @@ class Message
   def render_body_for(person, options={})
     survey_code = options[:survey_code]
     reminder = options[:reminder]
+    award_id = options[:award_id]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
     message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication' || person.class.name == 'User'
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     message_body = transform_body_for_reminder(person, message_body) if reminder.present?
+    message_body = transform_body_for_notify(person, message_body, award_id) if award_id.present?
 
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
@@ -192,6 +194,29 @@ class Message
     HTML
 
     body.gsub('{{resume_application}}', reminder_resume_link).gsub('{{round_deadline}}', round_deadline)
+  end
+
+  def transform_body_for_notify(person, body, award_id)
+    award = Award.find_by(id: award_id)
+    return body unless award
+  
+    award_type_name = award.award_type&.name || " "
+  
+    issue_date = award.issued_at&.strftime('%-d %B %Y at%l%P') || " "
+  
+    award_type_name = <<~HTML.strip
+      <span style='display: inline-block'>
+        #{award_type_name}
+      </span>
+    HTML
+  
+    issue_date = <<~HTML.strip
+      <span style='display: inline-block'>
+        #{issue_date}
+      </span>
+    HTML
+  
+    body.gsub('{{award_type_name}}', award_type_name).gsub('{{issued_at}}', issue_date)
   end
 
   def render_summary_for(person)
