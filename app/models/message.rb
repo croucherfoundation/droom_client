@@ -92,7 +92,13 @@ class Message
 
       round_name = <<~HTML.strip
         <span style='display: inline-block'>
-          {review.round_name}
+          #{review.round_name}
+        </span>
+      HTML
+
+      reviewer_deadline = <<~HTML.strip
+        <span style='display: inline-block'>
+          #{review.reviewer_deadline}
         </span>
       HTML
 
@@ -104,6 +110,7 @@ class Message
           .gsub('{{working_days}}', review.application_working_days)
           .gsub('{{course_title}}', review.application_course_title)
           .gsub('{{short_description}}', short_description)
+          .gsub('{{reviewer_deadline}}', reviewer_deadline)
     end
   end
 
