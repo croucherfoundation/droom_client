@@ -12,6 +12,13 @@ class MessageEnvelope
     if options[:review_id].present?
       @review_id = options[:review_id]
     end
+    if options[:reminder].present?
+      @reminder = options[:reminder]
+    end
+    if options[:award_id].present?
+      @award_id = options[:award_id]
+    end
+
     @survey_code = survey_code
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
@@ -27,9 +34,19 @@ class MessageEnvelope
   def render_html
     for_view_online
     layout = message.template.present? ? message.template.layout : 'default'
+
+    template_path =
+      if system_name == 'core_notify'
+        "layouts/#{layout}"
+      elsif system_name == 'publishing' || system_name == 'publishing_symposium'
+        "event_applications/layouts/#{layout}"
+      else
+        "rounds/layouts/#{layout}"
+      end
+
     ::ApplicationController.renderer.new.render_to_string(
-                                        template: (system_name == 'publishing' || system_name == 'publishing_symposium') ? "event_applications/layouts/#{layout}" : "rounds/layouts/#{layout}", 
-                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant, system_name: system_name},
+                                        template: template_path, 
+                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant, system_name: system_name, reminder: @reminder},
                                         layout: false)
   end
 
@@ -80,10 +97,19 @@ class MessageEnvelope
   end
 
   def render_body
-    unless @body
-      @body = self.rendered_body = @review_id.present? ? message.render_body_for_reviewer(applicant, review_id: @review_id) : message.render_body_for(applicant, survey_code: @survey_code)
-    end
-    @body
+    return @body if @body
+  
+    @body = if @reminder
+              message.render_body_for(applicant, reminder: @reminder)
+            elsif @award_id
+              message.render_body_for(applicant, award_id: @award_id)
+            elsif @review_id.present?
+              message.render_body_for_reviewer(applicant, review_id: @review_id)
+            else
+              message.render_body_for(applicant, survey_code: @survey_code)
+            end
+  
+    self.rendered_body = @body
   end
 
   def for_view_online
@@ -95,6 +121,7 @@ class MessageEnvelope
     @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
     @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
     @applicant ||= User.find(user_uid) if user_uid && (system_name == 'publishing_symposium' || system_name == 'application_reviewer')
+    @applicant ||= Person.find_by_uid(person_uid) if person_uid.present? && system_name == 'core_notify'
     @applicant
   end
   
