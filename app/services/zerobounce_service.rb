@@ -6,22 +6,22 @@ class ZerobounceService
   def initialize
   end
 
-  def self.valid_email?(email)
+  def valid_email?(email)
     validate_email(email)['status'] == 'valid'
   end
 
-  def self.validate_email(email)
+  def validate_email(email)
     raise ArgumentError, "Email is required" if email.to_s.strip.empty?
     Zerobounce.validate(email)
   end
 
-  def self.valid_emails?(emails)
+  def valid_emails?(emails)
     return false unless valid_batch_response?(emails)
 
     emails_status_valid?(emails)
   end
 
-  def self.validate_batch(emails)
+  def validate_batch(emails)
     raise ArgumentError, "Emails array is required" unless emails.is_a?(Array) && emails.any?
     Zerobounce.validate_batch(emails)
   end
