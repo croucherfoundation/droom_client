@@ -20,7 +20,12 @@ class ZerobounceService
   def call
     return false if email.to_s.strip.empty?
     return false unless record
-    return true if recent_check? && !record.send("#{column}_changed?")
+
+    # skip model callbacks
+    unless record.send("#{column}_changed?")
+      return true if recent_check?
+      return false if record.send(valid_column) == false
+    end
 
     validate_email
   rescue => e
