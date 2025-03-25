@@ -5,7 +5,9 @@ class ZerobounceService
 
   attr_reader :record, :column, :email, :valid_column, :checked_at_column, :save_immediate
 
-  def initialize(record:, column: :email, save_immediate: false)
+  def initialize(record:, column: :email, save_immediate: true)
+    raise ArgumentError, "Record cannot be nil" if record.nil?
+
     @record = record
     @save_immediate = save_immediate
     @column = column
