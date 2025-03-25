@@ -3,38 +3,51 @@ require 'zerobounce'
 class ZerobounceService
   Zerobounce.config.apikey = ENV.fetch('ZEROBOUNCE_API_KEY', nil)
 
-  def initialize
+  attr_reader :record, :column, :email, :valid_column, :checked_at_column, :save_immediate
+
+  def initialize(record:, column: :email, save_immediate: true)
+    raise ArgumentError, "Record cannot be nil" if record.nil?
+
+    @record = record
+    @save_immediate = save_immediate
+    @column = column
+
+    @valid_column = "#{column}_valid"
+    @checked_at_column = "#{column}_checked_at"
+    @email = record.send(column)
   end
 
-  def self.valid_email?(email)
-    validate_email(email)['status'] == 'valid'
-  end
+  def call
+    return false if email.to_s.strip.empty?
+    return false unless record
 
-  def self.validate_email(email)
-    raise ArgumentError, "Email is required" if email.to_s.strip.empty?
-    Zerobounce.validate(email)
-  end
+    # skip model callbacks
+    unless record.send("#{column}_changed?")
+      return true if recent_check?
+      return false if record.send(valid_column) == false
+    end
 
-  def self.valid_emails?(emails)
-    return false unless valid_batch_response?(emails)
-
-    emails_status_valid?(emails)
-  end
-
-  def self.validate_batch(emails)
-    raise ArgumentError, "Emails array is required" unless emails.is_a?(Array) && emails.any?
-    Zerobounce.validate_batch(emails)
+    validate_email
+  rescue => e
+    Rails.logger.error("ZerobounceService error: #{e.message}")
+    false
   end
 
   private
 
-  def valid_batch_response?(emails)
-    response = validate_batch(emails)
-    response.all? { |r| r.is_a?(Hash) && r.key?('status') }
+  def recent_check?
+    checked_at = record.send(checked_at_column)
+    record.send(valid_column) && checked_at.present? && checked_at >= 30.days.ago
   end
 
-  def emails_status_valid?(emails)
-    response = validate_batch(emails)
-    response.all? { |r| r['status'] == 'valid' }
+  def validate_email
+    status = Zerobounce.validate(email)['status'] == 'valid'
+    update_status(status)
+    status
+  end
+
+  def update_status(status)
+    record.assign_attributes(valid_column => status, checked_at_column => Time.current)
+    record.save if save_immediate
   end
 end
