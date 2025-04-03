@@ -1,3 +1,5 @@
+require 'rake'
+Rake.application.init
 module EcsSafelist
   def self.get_all_public_ips
     # Skip Redis initialization for Rake tasks
