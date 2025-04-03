@@ -9,7 +9,7 @@ module EcsSafelist
     end
 
     begin
-      redis = Redis.new
+      redis = Redis.new(url: "#{ENV['REDIS_URL']}/0")
       keys = redis.keys("ecs_safelist:#{Rails.env}:*")
       public_ips = []
       keys.each do |key|
