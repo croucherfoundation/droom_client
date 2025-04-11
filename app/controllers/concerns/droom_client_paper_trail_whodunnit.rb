@@ -7,11 +7,14 @@ module DroomClientPaperTrailWhodunnit
 
   included do
     before_action :set_paper_trail_whodunnit
+    before_action :set_paper_trail_info
   end
 
   def set_paper_trail_whodunnit
     PaperTrail.request.whodunnit = user_signed_in? ? current_user&.uid : nil
   end
 
-
+  def set_paper_trail_info
+    { ip: request.remote_ip, user_agent: request.user_agent }
+  end
 end
