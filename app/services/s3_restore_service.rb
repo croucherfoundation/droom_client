@@ -1,7 +1,7 @@
 class S3RestoreService
   attr_reader :s3, :bucket
 
-  def initialize(bucket_name)
+  def initialize(bucket_name = ENV['S3_BUCKET'])
     @bucket = bucket_name
     @s3 = initialize_s3_client
   end
