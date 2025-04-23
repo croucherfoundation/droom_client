@@ -15,6 +15,9 @@ module DroomClientPaperTrailWhodunnit
   end
 
   def set_paper_trail_info
-    { ip: request.remote_ip, user_agent: request.user_agent }
+    PaperTrail.request.controller_info = {
+      ip: request.remote_ip,
+      user_agent: request.user_agent
+  }
   end
 end
