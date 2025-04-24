@@ -12,9 +12,11 @@ class Message
     survey_code = options[:survey_code]
     reminder = options[:reminder]
     award_id = options[:award_id]
+    event_application = options[:event_application]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
-    message_body = transform_body_for_survey(person, message_body) if person.class.name == 'EventApplication' || person.class.name == 'User'
+    message_body = transform_body_for_event_application(person, message_body) if event_application.present?
+    message_body = transform_body_for_survey(person, message_body) if !event_application && (person.class.name == 'EventApplication' || person.class.name == 'User')
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     message_body = transform_body_for_reminder(person, message_body) if reminder.present?
     message_body = transform_body_for_notify(person, message_body, award_id) if award_id.present?
@@ -159,6 +161,53 @@ class Message
     HTML
 
     body.gsub('{{survey_url}}', survey_link).gsub('{{name_of_course}}', name_of_course).gsub('{{survey_url_button}}', survey_link_button)
+  end
+
+  def transform_body_for_event_application(application, body)
+    payment_url = application.event_payment_url
+    payment_link = <<~HTML.strip
+      <span style='display: inline-block'>
+        <a
+          href="#{payment_url}"
+          target="_blank"
+          style="text-decoration: none; color: #ee3a43; cursor: pointer;">
+          <font color="#ee3a43">here</font>
+        </a>
+      </span>
+    HTML
+
+    payment_link_button = <<~HTML.strip
+      <table border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center" style="border-radius: 30px;padding: 10px 25px 10px 25px;" bgcolor="#ee3a43">
+            <a href="#{payment_url}"
+              target="_blank"
+              style="background-color: #ee3a43;
+                      border-radius: 30px;
+                      display: inline-block;
+                      color: #ffffff;
+                      font-family: Arial, sans-serif;
+                      font-size: 16px;
+                      font-weight: bold;
+                      line-height: 40px;
+                      text-align: center;
+                      text-decoration: none;
+                      width: 200px;
+                      -webkit-text-size-adjust: none;">
+              <span style="color: #ffffff !important">Checkout payment &rarr;</span>
+            </a>
+          </td>
+        </tr>
+      </table>
+    HTML
+
+    name_of_course = <<~HTML.strip
+      <span style='display: inline-block'>
+        #{application.attended_event_name&.strip&.gsub(/\u00A0/, '')}
+      </span>
+    HTML
+
+    body.gsub('{{payment_url}}', payment_link).gsub('{{name_of_course}}', name_of_course).gsub('{{payment_url_button}}', payment_link_button)
   end
 
   def transform_body_for_test_survey(survey_code, body)
