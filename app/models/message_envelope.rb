@@ -21,6 +21,9 @@ class MessageEnvelope
     if options[:event_application].present?
       @event_application = options[:event_application]
     end
+    if options[:event_id].present?
+      @event_id = options[:event_id]
+    end
 
     @survey_code = survey_code
     data = {
@@ -108,8 +111,8 @@ class MessageEnvelope
               message.render_body_for(applicant, award_id: @award_id)
             elsif @review_id.present?
               message.render_body_for_reviewer(applicant, review_id: @review_id)
-            elsif @event_application.present?
-              message.render_body_for(applicant, event_application: @event_application)
+            elsif @event_application.present? || @event_id.present?
+              message.render_body_for(applicant, event_application: @event_application, event_id: @event_id)
             else
               message.render_body_for(applicant, survey_code: @survey_code)
             end
