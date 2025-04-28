@@ -41,9 +41,13 @@ class ZerobounceService
   end
 
   def validate_email
-    status = Zerobounce.validate(email)['status'] == 'valid'
-    update_status(status)
-    status
+    result = Zerobounce.validate(email)
+    status = result['status']
+
+    is_valid = %w[valid catch-all unknown].include?(status)
+
+    update_status(is_valid)
+    is_valid
   end
 
   def update_status(status)
