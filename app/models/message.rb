@@ -227,7 +227,7 @@ class Message
 
   def transform_body_for_reminder(person, body)
     resume_link = person.reminder_resume_applicaiton_link
-    
+
     reminder_resume_link = <<~HTML.strip
       <span style='display: inline-block'>
         <a
@@ -251,23 +251,23 @@ class Message
   def transform_body_for_notify(person, body, award_id)
     award = Award.find_by(id: award_id)
     return body unless award
-  
+
     award_type_name = award.award_type&.name || " "
-  
+
     issue_date = award.issued_at&.strftime('%-d %B %Y at%l%P') || " "
-  
+
     award_type_name = <<~HTML.strip
       <span style='display: inline-block'>
         #{award_type_name}
       </span>
     HTML
-  
+
     issue_date = <<~HTML.strip
       <span style='display: inline-block'>
         #{issue_date}
       </span>
     HTML
-  
+
     body.gsub('{{award_type_name}}', award_type_name).gsub('{{issued_at}}', issue_date)
   end
 
@@ -285,6 +285,7 @@ class Message
 
   def for_email
     {
+      first_name: 'Applicant',
       name: 'Applicant',
       informal_name: 'Applicant',
       formal_name: 'Applicant',
