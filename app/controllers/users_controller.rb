@@ -29,17 +29,31 @@ class UsersController < ApplicationController
     referer_url = request.referer
     uri = URI.parse(referer_url)
     referer_params = Rack::Utils.parse_query(uri.query || '')
-    destination = referer_params['destination'].present? ? referer_params['destination'] : root_url
-    permitted_params = user_params.merge(ip_address: request.ip, browser_agent: request.user_agent, after_confirmed_url: destination)
+    destination = referer_params['destination'].presence || root_url
+  
+    permitted_params = user_params.merge(
+      ip_address: request.ip,
+      browser_agent: request.user_agent,
+      after_confirmed_url: destination
+    )
+  
     @user = User.sign_up(permitted_params)
+    error_message = @user.try(:metadata).try(:[], :error_message)
+  
     @show_email_confirm_popup = true
-    referer_url = request.referer
-    uri = URI.parse(referer_url)
-    referer_params = Rack::Utils.parse_query(uri.query || '')
     referer_params['show_email_confirm_popup'] = true
     uri.query = referer_params.to_query
+    redirect_url = uri.to_s
 
-    redirect_to uri.to_s
+    if error_message.present?
+      render json: { error_message: error_message }, status: 422
+    else
+      if request.xhr? || request.format.json?
+        render json: { redirect_url: redirect_url }
+      else
+        redirect_to redirect_url
+      end
+    end
   end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges

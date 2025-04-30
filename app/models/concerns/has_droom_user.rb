@@ -91,7 +91,7 @@ module HasDroomUser
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
         user = User.new_with_defaults(attributes)
         user.save
-        self.user = user
+        self.user = user if user.persisted?
       end
     end
   end
