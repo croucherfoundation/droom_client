@@ -75,7 +75,15 @@ class UsersController < ApplicationController
     hashed_params[:remove_image] = true if params[:remove_image] == "true" ||  params[:remove_image] == true
     @user.assign_attributes(hashed_params.to_h)
     @user.save
-    respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+    error_message = @user.metadata&.[](:error)
+    if error_message.present?
+      validate_email = error_message.is_a?(Array) ? error_message.include?("Email address provided is invalid") : (error_message == "Email address provided is invalid")
+      render json: { error_message: error_message, validate_email: validate_email }, status: 422
+
+    else
+      respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+    end
+    
   end
 
   def remove_profile
