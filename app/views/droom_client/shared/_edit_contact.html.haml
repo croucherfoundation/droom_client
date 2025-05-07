@@ -9,7 +9,7 @@
     -#   .croucher_container.my-custom-modal-content
     .standard-modal-overlay.active
       .standard-modal-container.active
-        %svg.pl-96
+        %svg.logo.ml-56
           %use{"xlink:href" => "#croucher_logo"}
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user',  :multipart => true, :autocomplete => false} do |f|
           .container
