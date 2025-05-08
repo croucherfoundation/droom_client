@@ -58,7 +58,7 @@
                 = render "droom_client/shared/account_settings/timezones", f: f, user: @user
 
               - if admin?
-                %section.organisation_admin
+                %section.organisation_admin.std-input-mb
                   = f.check_box :organisation_admin, class: 'radio'
                   = f.label :organisation_admin, 'Organisation admin?', class: 'radio_label pr-10'
                   = f.check_box :admin, class: 'radio'

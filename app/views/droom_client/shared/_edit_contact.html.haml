@@ -35,10 +35,22 @@
                           = email_fields.hidden_field :address_type_id, value: email_count < 1 ? 1 : 4
                         - email_count += 1
 
-                  -# %div Addresses
-                  -# .address-fields
-                  -#   .address-input
-                  -#     = render "droom_client/shared/contact/addresses", f: f, user: @user
+                  %div Addresses
+                  .address-fields
+                    .address-input
+                      -# = render "droom_client/shared/contact/addresses", f: f, user: @user
+                      - address_count = 0
+                      - @user.addresses = @user.addresses.map { |e| e.is_a?(Hash) ? Address.new(e) : e }
+                      - @user.addresses.each_with_index do |address, index|
+                        = f.fields_for :addresses, address, child_index: index do |address_fields|
+                          = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: index)
+                          = address_fields.hidden_field :address_type_id
+                        - address_count+=1
+                      - while address_count < 2
+                        = f.fields_for :addresses, Address.new, child_index: address_count do |address_fields|
+                          = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: address_count)
+                          = address_fields.hidden_field :address_type_id, value: address_count < 1 ? 1 : 4
+                        - email_count += 1
 
                 %div.profile-image
                   .profile-avatar-container
