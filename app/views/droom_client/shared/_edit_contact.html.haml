@@ -47,7 +47,7 @@
                           = address_fields.hidden_field :address_type_id
                         - address_count+=1
                       - while address_count < 2
-                        = f.fields_for :addresses, Address.new, child_index: address_count do |address_fields|
+                        = f.fields_for :addresses, Address.new_with_defaults, child_index: address_count do |address_fields|
                           = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: address_count)
                           = address_fields.hidden_field :address_type_id, value: address_count < 1 ? 1 : 4
                         - address_count += 1
