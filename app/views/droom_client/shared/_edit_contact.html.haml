@@ -50,7 +50,7 @@
                         = f.fields_for :addresses, Address.new, child_index: address_count do |address_fields|
                           = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: address_count)
                           = address_fields.hidden_field :address_type_id, value: address_count < 1 ? 1 : 4
-                        - email_count += 1
+                        - address_count += 1
 
                 %div.profile-image
                   .profile-avatar-container
