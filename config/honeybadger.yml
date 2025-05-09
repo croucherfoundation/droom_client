@@ -1,0 +1,101 @@
+---
+# For more options, see https://docs.honeybadger.io/lib/ruby/gem-reference/configuration
+
+defaults: &defaults
+  api_key: "<%= ENV['HONEYBADGER_API_KEY'] %>"
+  env: "<%= Rails.env %>"
+  root: "<%= Rails.root.to_s %>"
+
+  # Breadcrumbs configuration
+  breadcrumbs:
+    enabled: true
+
+  # Performance monitoring
+  performance:
+    enabled: true
+    stats_interval: 60 # seconds
+
+  # Insights configuration
+  insights:
+    enabled: true
+
+  # Logging configuration
+  logging:
+    level: error
+
+  # Feedback settings
+  feedback:
+    enabled: false
+
+  # Environments where Honeybadger should not report
+  development_environments:
+    - test
+    - development
+    - staging
+    - cucumber
+
+  # Exception handling
+  exceptions:
+    ignore:
+      - ActionController::RoutingError
+      - ActiveRecord::RecordNotFound
+      - ActiveRecord::RecordNotUnique
+
+  # Request filtering
+  request:
+    disable_session: true
+    filter_keys:
+      - password
+      - password_confirmation
+      - tok
+      - token
+      - secret
+      - secret_key
+      - api_key
+      - access_token
+      - hkid
+      #bank information
+      - bank_account
+      - beneficiary_name
+      - beneficiary_bank
+      - bank_code
+      - account_no_iban
+      - bank_address
+      #cookie information
+      - _croucher_auth
+      - _croucher_session
+      - _cdr_session
+      - _gap_session
+      - _search_session
+      - _yearbook_session
+      - _main2_session
+
+  # Rails-specific configurations
+  rails:
+    insights:
+      metrics: true
+    sidekiq:
+      insights:
+        metrics: true
+    puma:
+      insights:
+        metrics: true
+
+# Environment-specific configurations
+development:
+  <<: *defaults
+  env: development
+  report_data: false
+  debug: false
+
+staging:
+  <<: *defaults
+  env: staging
+  report_data: false
+  debug: false
+
+production:
+  <<: *defaults
+  env: production
+  report_data: true
+  debug: true
