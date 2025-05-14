@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   respond_to :html, :json
 
   skip_before_action :authenticate_user!, raise: false
-  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest]
+  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile]
   before_action :get_users, only: [:index]
-  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome]
+  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
@@ -21,10 +21,40 @@ class UsersController < ApplicationController
         respond_with @user
       end
     else
-      
+
     end
   end
 
+  def sign_up
+    referer_url = request.referer
+    uri = URI.parse(referer_url)
+    referer_params = Rack::Utils.parse_query(uri.query || '')
+    destination = referer_params['destination'].presence || root_url
+  
+    permitted_params = user_params.merge(
+      ip_address: request.ip,
+      browser_agent: request.user_agent,
+      after_confirmed_url: destination
+    )
+  
+    @user = User.sign_up(permitted_params)
+    error_message = @user.try(:metadata).try(:[], :error_message)
+  
+    @show_email_confirm_popup = true
+    referer_params['show_email_confirm_popup'] = true
+    uri.query = referer_params.to_query
+    redirect_url = uri.to_s
+
+    if error_message.present?
+      render json: { error_message: error_message }, status: 422
+    else
+      if request.xhr? || request.format.json?
+        render json: { redirect_url: redirect_url }
+      else
+        redirect_to redirect_url
+      end
+    end
+  end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
   #
@@ -38,9 +68,26 @@ class UsersController < ApplicationController
 
   def update
     authorize! :update, @user
-    @user.assign_attributes(user_params)
+    hashed_params = user_params
+    hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
+    hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
+    hashed_params[:image] = convert_image_to_base64(hashed_params[:image].tempfile.path) if hashed_params[:image].present?
+    hashed_params[:remove_image] = true if params[:remove_image] == "true" ||  params[:remove_image] == true
+    @user.assign_attributes(hashed_params.to_h)
     @user.save
-    respond_with @user, location: droom_client.user_url(@user)
+    error_message = @user.metadata&.[](:error)
+    if error_message.present?
+      validate_email = error_message.is_a?(Array) ? error_message.include?("Email address provided is invalid") : (error_message == "Email address provided is invalid")
+      render json: { error_message: error_message, validate_email: validate_email }, status: 422
+
+    else
+      respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+    end
+    
+  end
+
+  def remove_profile
+    @user.remove_profile(@user.uid)
   end
 
 
@@ -93,6 +140,14 @@ class UsersController < ApplicationController
   end
 
 
+  def check_authenticate
+    if current_user.present?
+      render json: { email: current_user['email'], name: current_user['name']}, status: :ok
+    else
+      render json: { errors: "Token not recognised" }, status: :unauthorized
+    end
+  end
+
 protected
 
   def get_view
@@ -129,8 +184,25 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :correspondence_address)
+    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+  end
+
+  def convert_image_to_base64(image_path)
+    # Read the image file
+    file = File.open(image_path, 'rb')
+    image_data = file.read
+  
+    # Get MIME type (e.g., "image/png" or "image/jpeg")
+    mime_type = Marcel::MimeType.for(image_path)
+  
+    # Encode to Base64
+    base64_image = Base64.encode64(image_data)
+  
+    # Combine with MIME type
+    "data:#{mime_type};base64,#{base64_image}"
+  ensure
+    # Close the file to free resources
+    file.close if file
   end
 
 end
-

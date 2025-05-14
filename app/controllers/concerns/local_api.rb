@@ -6,7 +6,7 @@ module LocalApi
   end
 
   def assert_local_request!
-    unless local_request?
+    unless local_request? || params[:category] == 'FUNDING_APPLICATION'
       Rails.logger.warn "⚠️ API REQUEST NOT LOCAL: #{request.ip} is not in #{ENV['LOCAL_SUBNET']}"
       raise CanCan::AccessDenied unless local_request?
     end

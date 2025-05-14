@@ -1,0 +1,31 @@
+%section#signout-box.auth_container
+  .auth_container_wrapper
+    .croucher_container
+      .cross_icon_container
+        %button
+          %svg{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
+            %line{stroke: "#D3D3D3 ", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
+            %line{stroke: "#D3D3D3", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 0.694719 -0.669051 0.743216 0 1.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
+    .croucher_container
+      .account
+        .account_title
+          %h2.text-subtitle 
+            = t('user_profile.your_account')
+        .account_settings
+          %div
+            %button{data: {'toggle': 'modal', 'target': 'editContact'}} 
+              = t('user_profile.edit_contact_info')
+          %div
+            %button{data: {'toggle': 'modal', 'target': 'modal1'}} 
+              = t('user_profile.account_settings')
+          %div
+            = button_to droom_client.sign_out_path, :method => :delete, :class => 'signout', data: {turbo: false} do
+              = t('user_profile.sign_out')
+        
+        - dataroom = determine_dataroom_url(current_user)
+        - if dataroom[:url]
+          .goto_dataroom
+            = link_to dataroom[:url], class: 'viewall_btn' do
+              = dataroom[:text]
+              %svg.icon.arrow_symbol
+                %use{"xlink:href" => "#arrow_symbol"}

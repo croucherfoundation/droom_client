@@ -1,0 +1,15 @@
+- search_system ||= false
+
+.navbar_actions
+  = render 'droom_client/shared/signin_box'
+  = render 'droom_client/shared/password_reset_box'
+  = render 'droom_client/shared/search', search_system: search_system
+
+  - if user_signed_in?
+    - if @user = User.find(current_user.uid)
+      = render 'droom_client/shared/signout_box'
+      = render 'droom_client/shared/edit_contact'
+      = render 'droom_client/shared/account_setting'
+  - else 
+    = render 'droom_client/shared/signup_box'
+    = render 'droom_client/shared/email_confirm'

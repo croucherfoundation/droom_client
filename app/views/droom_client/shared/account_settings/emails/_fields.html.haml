@@ -1,0 +1,44 @@
+- fields ||= nil
+- fields_counter ||= nil
+- email ||= fields || @email
+- user = @user
+- unless email.is_a?(Email)
+  - email = Email.new(email)
+
+= fields_for user do |uf|
+  = uf.fields_for :emails, email, child_index: fields_counter || 'field_counter' do |f|
+    %fieldset.repeating{class: "#{email.new_record? ? 'new-email' : ''}"}
+      .email
+        .email-input
+          = f.email_field :email,  :placeholder => t("placeholders.email"), :required => true, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path}, class: "required"
+          = f.hidden_field :current_email, value: user&.uid.present? ? user.email : nil
+          %span.warning.hidden.email_error
+            This email already exists! Please try with a different email address.
+            %br
+            %strong
+          - unless user.new_record? || fields_counter == 0
+            = link_to '#', :class => "modal_nested_remove", :data => {:action => "remove_fields", :holder => "fieldset"} do
+              %svg
+                %use{"xlink:href" => "#cross_button_symbol"}
+            - if email.present?
+              = f.hidden_field :_destroy, data: {role: "destroy"}
+        
+        .email-type
+          .email-type-selected
+            %p
+              = email.present? ? Email.find(email['id'])&.address_type : 'Work'
+            = f.hidden_field :address_type_id
+            %span
+              %svg{color: "#ccc", fill: "currentColor", height: "14", stroke: "currentColor", "stroke-width" => "0", style: "color: rgb(204, 204, 204)", viewbox: "0 0 448 512", width: "14", xmlns: "http://www.w3.org/2000/svg"}
+                %path{d: "M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"}
+          .email-type-list.hidden-list
+            %div
+              - Email.all_address_types.each do |at|
+                %button{type: "button", data: {value: at[:id]}}
+                  %svg.check{fill: "currentColor", height: "1em", stroke: "currentColor", "stroke-width" => "0", viewbox: "0 0 512 512", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
+                    %path{d: "M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"}
+                  %svg.circle{fill: "currentColor", height: "1em", stroke: "currentColor", "stroke-width" => "0", viewbox: "0 0 512 512", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
+                    %path{d: "M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 448c-110.5 0-200-89.5-200-200S145.5 56 256 56s200 89.5 200 200-89.5 200-200 200z"}
+                  %span
+                    = at[:name]
+       

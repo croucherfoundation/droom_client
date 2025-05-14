@@ -18,7 +18,7 @@ en:
     not_recognised: "<strong>Not recognised</strong><br>Sorry: this email / password combination is not correct."
   forgot_password: "Forgotten your password?"
   or_sign_up: "or create a new account"
-  password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."
+  # password_reset_instructions: "Please enter your email address below. A message will be sent containing a link that will let you reset your password."
   password_strength: "Strength"
   placeholders:
     signin:
@@ -47,3 +47,7 @@ en:
   existing_user_instructions: "If the person you are adding already has a Croucher account, we will notice when you type in the email address and fill in the rest of the form for you. Suggestions will also appear, so you may be able to save some time by typing the email first."
   cannot_invite: "Cannot invite"
   password_set: "Thank you. Your account is now fully active."
+  forgot_password_title: "Enter the email address associated with your Croucher account."
+  password_reset_instructions: "We will send you a message with instructions."
+  send_reset_instructions: "Send"
+  password_reset_sent: "If the email exists, a password reset email has been sent."

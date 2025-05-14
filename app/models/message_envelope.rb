@@ -8,12 +8,29 @@ class MessageEnvelope
 
   belongs_to :message
 
-  def for_mandrill_message(with_html=false)
+  def for_mandrill_message(with_html=false, survey_code=nil, test_email=false, options={})
+    if options[:review_id].present?
+      @review_id = options[:review_id]
+    end
+    if options[:reminder].present?
+      @reminder = options[:reminder]
+    end
+    if options[:award_id].present?
+      @award_id = options[:award_id]
+    end
+    if options[:event_application].present?
+      @event_application = options[:event_application]
+    end
+    if options[:event_id].present?
+      @event_id = options[:event_id]
+    end
+
+    @survey_code = survey_code
     data = {
       "from_name" => message.from_name.presence || ENV['EMAIL_FROM_NAME'],
       "from_email" => message.from_email.presence || ENV['EMAIL_FROM'],
       "track_opens" => true,
-      "to" => send_address,
+      "to" => send_address(test_email),
       "subject" => render_subject
     }
     data["html"] = render_html if with_html
@@ -23,9 +40,19 @@ class MessageEnvelope
   def render_html
     for_view_online
     layout = message.template.present? ? message.template.layout : 'default'
+
+    template_path =
+      if system_name == 'core_notify'
+        "layouts/#{layout}"
+      elsif system_name == 'publishing' || system_name == 'publishing_symposium'
+        "event_applications/layouts/#{layout}"
+      else
+        "rounds/layouts/#{layout}"
+      end
+
     ::ApplicationController.renderer.new.render_to_string(
-                                        template: "rounds/layouts/#{layout}", 
-                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant},
+                                        template: template_path, 
+                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant, system_name: system_name, reminder: @reminder},
                                         layout: false)
   end
 
@@ -44,8 +71,8 @@ class MessageEnvelope
     @summary
   end
 
-  def send_address
-    unless Rails.env.production?
+  def send_address(test_email=false)
+    unless Rails.env.production? || test_email
       self.email = Settings.email.sandbox if applicant.present?
     end
     email_address = [
@@ -71,14 +98,26 @@ class MessageEnvelope
         "type" => "bcc"
       }
     end
+
     email_address
   end
 
   def render_body
-    unless @body
-      @body = self.rendered_body = message.render_body_for(applicant)
-    end
-    @body
+    return @body if @body
+  
+    @body = if @reminder
+              message.render_body_for(applicant, reminder: @reminder)
+            elsif @award_id
+              message.render_body_for(applicant, award_id: @award_id)
+            elsif @review_id.present?
+              message.render_body_for_reviewer(applicant, review_id: @review_id)
+            elsif @event_application.present? || @event_id.present?
+              message.render_body_for(applicant, event_application: @event_application, event_id: @event_id)
+            else
+              message.render_body_for(applicant, survey_code: @survey_code)
+            end
+  
+    self.rendered_body = @body
   end
 
   def for_view_online
@@ -87,7 +126,11 @@ class MessageEnvelope
   end
 
   def applicant
-    @applicant ||= Application.find(application_id) if application_id?
+    @applicant ||= Application.find(application_id) if application_id? && system_name == 'application'
+    @applicant ||= EventApplication.find(application_id) if application_id? && system_name == 'publishing'
+    @applicant ||= User.find(user_uid) if user_uid && (system_name == 'publishing_symposium' || system_name == 'application_reviewer')
+    @applicant ||= Person.find_by_uid(person_uid) if person_uid.present? && system_name == 'core_notify'
+    @applicant
   end
   
 end

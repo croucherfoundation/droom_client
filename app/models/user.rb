@@ -47,11 +47,7 @@ class User
   end
 
   def email_name
-    unless title.present?
-      given_name
-    else
-      [title, family_name].join(' ')
-    end
+    given_name || family_name
   end
 
   def self.new_with_defaults(atts={})
@@ -77,7 +73,8 @@ class User
       status: "",
       preferred_pronoun: "",
       preferred_professional_name: "",
-      preferred_name: ""
+      preferred_name: "",
+      image: nil,
     }.with_indifferent_access.merge(atts)
     self.new(attributes)
   end
@@ -89,6 +86,22 @@ class User
   #
   # Present token (usually from auth_cookie), get user object back with authentication attributes.
   #
+  def validate_email?
+    response = self.class.get "/api/users/#{self.uid}/validate_email"
+    valid = response&.persisted? && response&.metadata&.[](:valid)
+    !!valid
+  rescue JSON::ParserError, Her::Errors::ParseError => e
+    # Log the error for debugging purposes
+    Rails.logger.error "[droom_client] Error parsing validation response for user #{uid}: #{e.message}"
+    false
+  rescue Faraday::Error => e # Catch potential network/connection errors
+    Rails.logger.error "[droom_client] Network error validating email for user #{uid}: #{e.message}"
+    false
+  rescue StandardError => e # Catch other unexpected errors
+    Rails.logger.error "[droom_client] Unexpected error validating email for user #{uid}: #{e.class} - #{e.message}"
+    false
+  end
+
   def self.authenticate(token)
     user = get "/api/authenticate/#{token}"
     if user && user.persisted?
@@ -129,6 +142,15 @@ class User
     self.save
   end
 
+  def self.send_otp(uid)
+    user = get "/api/users/#{uid}/send_otp"
+  end
+
+  def self.verify_otp(uid, params)
+    params = params.to_h unless params == {}
+    post "/api/users/#{uid}/verify_otp", params
+  end
+
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
@@ -145,6 +167,46 @@ class User
   def update_last_request_at!
     self.last_request_at=Time.now
     self.save
+  end
+
+  def self.update_contacts(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/update_contact", params
+  end
+
+
+  def self.account_update(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/account_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.sync_profile_image(user_uid, params={})
+    params = params.to_h unless params == {}
+    get "/api/users/#{user_uid}/sync_profile_image", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def remove_profile(user_uid)
+    self.class.get "/api/users/#{user_uid}/remove_profile"
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.sign_up(params)
+    params = params.to_h unless params == {}
+    user = post "/api/users/sign_up", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.reset_password_request(params)
+    params = params.to_h unless params == {}
+    user = post "/api/users/passwords", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
   end
 
   def unconfirmed?

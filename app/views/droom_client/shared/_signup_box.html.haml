@@ -1,0 +1,47 @@
+- user ||= User.new_with_defaults
+
+#signupModal.modal{"data-turbo" => "false"}
+  .modal-wrapper{role: "document"}
+    .modal-content
+      .croucher_container.my-custom-modal-content
+        = form_for user, url: droom_client.sign_up_users_path(user), :html => {:class => 'edit user password', :autocomplete => false} do |f|
+          %h1 Sign up for a Croucher account
+          .form-fields
+            %section
+              %p.mb-3
+                With a Croucher account, you'll be able to:
+              %ul.mb-3
+                %li Book tickets, register for events, and apply for funding opportunities
+                %li Stay informed with our monthly newsletter featuring the latest updates about Croucher and Hong Kong science
+              %p.mb-3
+                To set up your account, fill in the details below. We will send you an email with a confirmation link.
+              .user-name
+                .given-name
+                  First name
+                  .given-name-input
+                    = f.text_field :given_name, placeholder: t("placeholders.given_name")
+                .family-name
+                  Last name
+                  .family-name-input
+                    = f.text_field :family_name, placeholder: t("placeholders.family_name")
+              Email
+              .email
+                .email-input
+                  = f.email_field :email,  :placeholder => t("placeholders.email"), :required => true, data: {role: "email", check_url: droom_client.check_email_path}, class: "required"
+                  %span.warning.hidden
+                    There is a problem in either the format or email address. For the existing user, please
+                    %strong.chrome-font-bold
+                      = link_to "sign in", droom_client.sign_in_url(destination: request.path) 
+                    to apply.
+              Password
+              .password 
+                .croucher_input.passwords-input.passwords-input-primary
+                  = f.password_field :password, placeholder: t("placeholders.password"), data: {role: "password"}, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
+                  %span
+                    %img.passwords-eye{alt: "Eye", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}
+              = hidden_field_tag :group, 'applicants'
+            %section.actions
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save{type: "button"}
+                Sign up

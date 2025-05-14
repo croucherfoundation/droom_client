@@ -1,0 +1,55 @@
+#modal1.modal
+  .modal-wrapper{role: "document"}
+    .modal-content
+      .croucher_container.my-custom-modal-content
+        = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user password', :autocomplete => false} do |f|
+          %h1 Edit your account
+          = hidden_field_tag :reload, true
+          .form-fields
+            %section
+              %p
+                These are administrative settings like your password and
+                preferred email address.
+              %p
+                You can sign in or request a password reset with any email
+                address that we have on record.
+              
+              .email-fields
+                .email-input
+                  = render "droom_client/shared/account_settings/emails", f: f, user: @user
+              
+              - if !@user.confirmed? && (admin? || @user.organisation_admin?)
+                %p
+                  = f.check_box :send_confirmation, class: "fancy"
+                  = f.label :send_confirmation
+              
+            %section.passwords
+              %h2.font-bold Forgot your password?
+              %p
+                To set a new password please enter it twice in the fields
+                below.
+              = render "droom_client/shared/account_settings/passwords", f: f, user: @user
+              
+            %section.timezones
+              %h2.font-bold Timezones
+              %p
+                Select your timezone from the list below. This will convert
+                and display event times according to your selected timezone.
+              = render "droom_client/shared/account_settings/timezones", f: f, user: @user
+
+            - if admin?
+              %section.organisation_admin
+                = f.check_box :organisation_admin, class: "fancy"
+                = f.label :organisation_admin, 'Organisation admin?'
+                = f.check_box :admin, class: "fancy"
+                = f.label :admin, 'Site admin?'
+                %span.subordinate{data: {dependent: "#user_admin"}}
+                  = f.check_box :gatekeeper, class: "fancy"
+                  = f.label :gatekeeper, 'Admissions?'
+
+            = hidden_field_tag :reload, true
+            %section.actions
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save{type: "button", data: {turbo: false}}
+                Save
