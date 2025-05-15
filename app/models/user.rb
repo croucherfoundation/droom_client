@@ -86,6 +86,22 @@ class User
   #
   # Present token (usually from auth_cookie), get user object back with authentication attributes.
   #
+  def validate_email?
+    response = self.class.get "/api/users/#{self.uid}/validate_email"
+    valid = response&.persisted? && response&.metadata&.[](:valid)
+    !!valid
+  rescue JSON::ParserError, Her::Errors::ParseError => e
+    # Log the error for debugging purposes
+    Rails.logger.error "[droom_client] Error parsing validation response for user #{uid}: #{e.message}"
+    false
+  rescue Faraday::Error => e # Catch potential network/connection errors
+    Rails.logger.error "[droom_client] Network error validating email for user #{uid}: #{e.message}"
+    false
+  rescue StandardError => e # Catch other unexpected errors
+    Rails.logger.error "[droom_client] Unexpected error validating email for user #{uid}: #{e.class} - #{e.message}"
+    false
+  end
+
   def self.authenticate(token)
     user = get "/api/authenticate/#{token}"
     if user && user.persisted?
