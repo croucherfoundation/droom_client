@@ -35,6 +35,19 @@ en:
       email: "Email"
       phone: "Phone"
       preferred_professional_name: "Professtional name"
+    standard_modal:
+      email:
+        zero: "Email address"
+        one: "Alternative email address"
+        other: "Alternative email address"
+      phone:
+        zero: "Phone number"
+        one: "Alternative phone number"
+        other: "Alternative phone number"
+      address:
+        zero: "Postal address"
+        one: "Alternative postal address"
+        other: "Alternative postal address"
   leave_password: "If you don't want to change your password, leave both boxes empty."
   notes:
     user_email: "This is the email that you use to sign in, and to which we send reminders and administrative messages."

@@ -97,7 +97,7 @@ module UserAdministration
     if Settings.mailer && defined?(Settings.mailer.constantize)
       mailer = Settings.mailer.constantize
       if mailer.respond_to? "#{message}_to_#{self.class.to_s.underscore}".to_sym
-        if ensure_invitation_token && ensure_user
+        if ensure_invitation_token && ensure_user && ensure_email_validate
           m = mailer.send("#{message}_to_#{self.class.to_s.underscore}".to_sym, self)
           m.deliver
         end
@@ -145,6 +145,10 @@ module UserAdministration
       token = self.invitation_token # positive response allows mailing to continue
     end
     token
+  end
+
+  def ensure_email_validate
+    user&.validate_email?
   end
 
   def generate_token(length=12)

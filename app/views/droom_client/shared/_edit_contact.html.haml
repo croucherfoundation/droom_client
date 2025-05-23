@@ -1,39 +1,72 @@
 - @user ||= User.new_with_defaults 
 - profile_image = @user.profile_image.present? ? @user.profile_image : "https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png"
+- check_email_path ||= nil
+- users_path ||= nil
+
 #editContact.modal
   .modal-wrapper{role: "document"}
-    .modal-content
-      .croucher_container.my-custom-modal-content
+    -# .modal-content
+    -#   .croucher_container.my-custom-modal-content
+    .standard-modal-overlay.active
+      .standard-modal-container.active
+        %svg.logo.ml-56
+          %use{"xlink:href" => "#croucher_logo"}
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user',  :multipart => true, :autocomplete => false} do |f|
-          %h1 Edit profile
-          = hidden_field_tag :reload, true
-          .form-fields
-            %section
-              %div Emails
-              .email-fields
-                .email-input
-                  = render "droom_client/shared/contact/emails", f: f, user: @user
+          .container
+            %h2 Edit profile
+            .inputs
+              = hidden_field_tag :reload, true
+              .form-fields
+                %section
+                  %div Emails
+                  .email-fields
+                    .email-input
+                      -# = render "droom_client/shared/contact/emails", f: f, user: @user
+                      - email_count = 0
+                      - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
+                      - @user.emails.each_with_index do |email, index|
+                        = f.fields_for :emails, email, child_index: index do |email_fields|
+                          = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: index), required: index<1 ? true : false, data: {role: "email", check_url: check_email_path, users_path: users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                          = email_fields.hidden_field :address_type_id
+                        - email_count+=1
+                      - while email_count < 2
+                        = f.fields_for :emails, Email.new, child_index: email_count do |email_fields|
+                          = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: email_count), required: email_count<1 ? true : false, data: {role: "email", check_url: check_email_path, users_path: users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                          = email_fields.hidden_field :address_type_id, value: email_count < 1 ? 1 : 4
+                        - email_count += 1
 
-              %div Addresses
-              .address-fields
-                .address-input
-                  = render "droom_client/shared/contact/addresses", f: f, user: @user
+                  %div Addresses
+                  .address-fields
+                    .address-input
+                      -# = render "droom_client/shared/contact/addresses", f: f, user: @user
+                      - address_count = 0
+                      - @user.addresses = @user.addresses.map { |e| e.is_a?(Hash) ? Address.new(e) : e }
+                      - @user.addresses.each_with_index do |address, index|
+                        = f.fields_for :addresses, address, child_index: index do |address_fields|
+                          = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: index)
+                          = address_fields.hidden_field :address_type_id
+                        - address_count+=1
+                      - while address_count < 2
+                        = f.fields_for :addresses, Address.new_with_defaults, child_index: address_count do |address_fields|
+                          = address_fields.text_area :address, placeholder: t("placeholders.standard_modal.address", count: address_count)
+                          = address_fields.hidden_field :address_type_id, value: address_count < 1 ? 1 : 4
+                        - address_count += 1
 
-            %div.profile-image
-              .profile-avatar-container
-                %img{src: profile_image, alt: "Profile picture", class: "profile-avatar", id: "profile-avatar"}
-                %button.profile-remove-button{type: "button", style: "display: #{@user.show_initial_image ? 'none' : 'block'}", data: {'user-uid' => @user.uid}}
-                  %svg{stroke: "currentColor", fill: "currentColor", "stroke-width": "0", viewBox: "0 0 384 512", height: "1em", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
-                    %path{d: "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"}
-              %span.profile-upload-text
-                Upload photo
-              = f.file_field :image, id: "profile-upload", accept: "image/*"
-              = hidden_field_tag :remove_image, false, id: "remove_image"
+                %div.profile-image
+                  .profile-avatar-container
+                    %img{src: profile_image, alt: "Profile picture", class: "profile-avatar", id: "profile-avatar"}
+                    %button.profile-remove-button{type: "button", style: "display: #{@user.show_initial_image ? 'none' : 'block'}", data: {'user-uid' => @user.uid}}
+                      %svg{stroke: "currentColor", fill: "currentColor", "stroke-width": "0", viewBox: "0 0 384 512", height: "1em", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
+                        %path{d: "M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"}
+                  %span.profile-upload-text
+                    Upload photo
+                  = f.file_field :image, id: "profile-upload", accept: "image/*"
+                  = hidden_field_tag :remove_image, false, id: "remove_image"
 
-            = hidden_field_tag :reload, true
+                = hidden_field_tag :reload, true
 
-            %section.actions
-              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
-                Cancel
-              %button.croucher-standard-btn.modal-btn.save{type: "button", data: {turbo: false}}
-                Save
+          %section.actions.buttons
+            %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
+              Cancel
+            %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
+              Save

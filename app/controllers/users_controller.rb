@@ -29,17 +29,40 @@ class UsersController < ApplicationController
     referer_url = request.referer
     uri = URI.parse(referer_url)
     referer_params = Rack::Utils.parse_query(uri.query || '')
-    destination = referer_params['destination'].present? ? referer_params['destination'] : root_url
-    permitted_params = user_params.merge(ip_address: request.ip, browser_agent: request.user_agent, after_confirmed_url: destination)
+    destination = referer_params['destination'].presence || root_url
+  
+    permitted_params = user_params.merge(
+      ip_address: request.ip,
+      browser_agent: request.user_agent,
+      after_confirmed_url: destination
+    )
+  
     @user = User.sign_up(permitted_params)
+    error_messages = @user&.metadata&.[](:error_message)
+
     @show_email_confirm_popup = true
     referer_url = request.referer
     uri = URI.parse(referer_url)
     referer_params = Rack::Utils.parse_query(uri.query || '')
     referer_params['show_email_confirm_popup'] = true
     uri.query = referer_params.to_query
+    redirect_url = uri.to_s
 
-    redirect_to uri.to_s
+    if error_messages.present?
+      error_message = Array(error_messages).first.to_s
+
+      if error_message.end_with?("Email address provided is invalid")
+        error_message = "Email address provided is invalid"
+      end
+
+      render json: { error_message: error_message }, status: :unprocessable_entity
+    else
+      if request.xhr? || request.format.json?
+        render json: { redirect_url: redirect_url }
+      else
+        redirect_to redirect_url
+      end
+    end
   end
 
   # Our usual purpose here is to list suggestions for the administrator choosing interviewers or screening judges
@@ -61,7 +84,15 @@ class UsersController < ApplicationController
     hashed_params[:remove_image] = true if params[:remove_image] == "true" ||  params[:remove_image] == true
     @user.assign_attributes(hashed_params.to_h)
     @user.save
-    respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+    error_message = @user.metadata&.[](:error)
+    if error_message.present?
+      validate_email = error_message.is_a?(Array) ? error_message.include?("Email address provided is invalid") : (error_message == "Email address provided is invalid")
+      render json: { error_message: error_message, validate_email: validate_email }, status: 422
+
+    else
+      respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
+    end
+    
   end
 
   def remove_profile
