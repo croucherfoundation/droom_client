@@ -79,8 +79,8 @@ class User
     self.new(attributes)
   end
 
-  def self.group_users(group_ids=[])
-    get "/api/users/group_users", {group_ids: group_ids}
+  def self.accounts(group_ids: [], user_uids: [])
+    get "/api/users/accounts", {group_ids: group_ids, user_uids: user_uids}
   rescue => e
     Rails.logger.error "[droom_client] Error getting group users: #{e.message}"
     nil
