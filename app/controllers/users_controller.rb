@@ -41,6 +41,9 @@ class UsersController < ApplicationController
     error_messages = @user&.metadata&.[](:error_message)
 
     @show_email_confirm_popup = true
+    referer_url = request.referer
+    uri = URI.parse(referer_url)
+    referer_params = Rack::Utils.parse_query(uri.query || '')
     referer_params['show_email_confirm_popup'] = true
     uri.query = referer_params.to_query
     redirect_url = uri.to_s

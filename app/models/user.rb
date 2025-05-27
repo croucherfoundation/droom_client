@@ -79,6 +79,13 @@ class User
     self.new(attributes)
   end
 
+  def self.accounts(group_ids: [], user_uids: [])
+    get "/api/users/accounts", {group_ids: group_ids, user_uids: user_uids}
+  rescue => e
+    Rails.logger.error "[droom_client] Error getting group users: #{e.message}"
+    nil
+  end
+
   ## Retrieval
   #
   # User#find returns a user data object suitable for management or display but without auth information.
