@@ -1,6 +1,3 @@
-- check_email_path ||= nil
-- users_path ||= nil
-
 #modal1.modal
   .modal-wrapper{role: "document"}
     -# .modal-content
@@ -29,13 +26,21 @@
                     - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
                     - @user.emails.each_with_index do |email, index|
                       = f.fields_for :emails, email, child_index: index do |email_fields|
-                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: index), required: index<1 ? true : false, data: {role: "email", check_url: check_email_path, users_path: users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: index), required: index<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
                         = email_fields.hidden_field :address_type_id
+                        %span.warning.hidden.email_error
+                          This email already exists! Please try with a different email address.
+                          %br
+                          %strong
                       - email_count+=1
                     - while email_count < 2
                       = f.fields_for :emails, Email.new, child_index: email_count do |email_fields|
-                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: email_count), required: email_count<1 ? true : false, data: {role: "email", check_url: check_email_path, users_path: users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: email_count), required: email_count<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
                         = email_fields.hidden_field :address_type_id, value: email_count < 1 ? 1 : 4
+                        %span.warning.hidden.email_error
+                          This email already exists! Please try with a different email address.
+                          %br
+                          %strong
                       - email_count += 1
                 
                 - if !@user.confirmed? && (admin? || @user.organisation_admin?)
