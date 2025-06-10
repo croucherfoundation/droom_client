@@ -9,6 +9,15 @@
       var input = event.target;
 
       if (input.files && input.files[0]) {
+        var file = input.files[0];
+        
+        // Check if the file is an image
+        if (!file.type.match('image.*')) {
+          alert('Please select an image file only.');
+          $(this).val(''); // Clear the input
+          return;
+        }
+
         var reader = new FileReader();
 
         reader.onload = function(e) {
@@ -17,7 +26,7 @@
           $('#remove_image').val('false');
         }
 
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
       }
     });
 
