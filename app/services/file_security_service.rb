@@ -37,6 +37,11 @@ class FileSecurityService
       ALLOWED_IMAGE_MIME_TYPES.include?(normalize_mime_type(mime_type))
     end
 
+    def allowed_pdf?(mime_type)
+      return false if mime_type.blank?
+      normalize_mime_type(mime_type) == 'application/pdf'
+    end
+
     # Validation with exceptions
     def validate_file!(file_path, mime_type = nil)
       return if allowed_file?(file_path, mime_type)
