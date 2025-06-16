@@ -36,6 +36,13 @@ class FileSecurityService
       'video/3gpp2',
       'video/x-ms-wmv' # .wmv
     ]).freeze
+
+  ALLOWED_SPREADSHEET_MIME_TYPES = [
+    'application/vnd.ms-excel', # .xls
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # .xlsx
+    'text/csv' # .csv
+  ].freeze
+
   class << self
     # Main validation methods
     def allowed_file?(file_path, mime_type = nil)
@@ -53,6 +60,11 @@ class FileSecurityService
     def allowed_video?(mime_type)
       return false if mime_type.blank?
       ALLOWED_VIDEO_MIME_TYPES.include?(normalize_mime_type(mime_type))
+    end
+
+    def allowed_spreadsheet?(mime_type)
+      return false if mime_type.blank?
+      ALLOWED_SPREADSHEET_MIME_TYPES.include?(normalize_mime_type(mime_type))
     end
 
     # Validation with exceptions
