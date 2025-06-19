@@ -80,7 +80,13 @@ class UsersController < ApplicationController
     hashed_params = user_params
     hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
     hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
-    hashed_params[:image] = convert_image_to_base64(hashed_params[:image].tempfile.path) if hashed_params[:image].present?
+    if hashed_params[:image].present?
+      unless is_valid_image?(hashed_params[:image])
+        error_message = "Image must be a valid image file (JPEG, PNG, GIF, etc.)"
+        return render json: { error_message: error_message }, status: 422
+      end
+      hashed_params[:image] = convert_image_to_base64(hashed_params[:image].tempfile.path)
+    end
     hashed_params[:remove_image] = true if params[:remove_image] == "true" ||  params[:remove_image] == true
     @user.assign_attributes(hashed_params.to_h)
     @user.save
@@ -212,6 +218,10 @@ protected
   ensure
     # Close the file to free resources
     file.close if file
+  end
+
+  def is_valid_image?(image)
+    FileSecurityService.allowed_image?(image.content_type)
   end
 
 end
