@@ -1,12 +1,37 @@
 class FileSecurityService
   # Security configuration constants
   BLOCKED_MIME_TYPES = [
+    # JavaScript and scripting languages
     %r{\Aapplication/(x-javascript|javascript|x-msdownload|x-sh|x-exe|x-dosexec|x-bat|x-csh|x-python|x-perl|x-php|x-ruby|x-shellscript)\z}i,
     %r{\Atext/(javascript|x-python|x-perl|x-php|x-ruby|x-shellscript)\z}i,
-    %r{\Aapplication/octet-stream\z}i
+    
+    # Generic binary/executable types
+    %r{\Aapplication/octet-stream\z}i,
+    
+    # Windows executables and installers
+    %r{\Aapplication/(x-msdos-program|x-msdownload|x-winexe|x-msi|vnd\.microsoft\.portable-executable)\z}i,
+    
+    # Unix/Linux executables and scripts
+    %r{\Aapplication/(x-executable|x-sharedlib|x-object|x-archive)\z}i,
+    
+    # Shell scripts and command files
+    %r{\Atext/(x-sh|x-shellscript|x-script\.sh|x-script\.csh|x-script\.ksh|x-script\.zsh)\z}i,
+    
+    # Mac executables
+    %r{\Aapplication/(x-mach-binary|x-apple-diskimage)\z}i,
+    
+    # Java executables
+    %r{\Aapplication/(java|x-java-archive|x-java-jnlp-file)\z}i,
+    
+    # Other potentially dangerous formats
+    %r{\Aapplication/(x-deb|x-rpm|x-tar|x-gtar|x-compress|x-gzip)\z}i,
+    
+    # Script engines
+    %r{\Atext/(x-python|x-python3|x-script\.python)\z}i,
+    %r{\Aapplication/(x-powershell|x-ps1)\z}i
   ].freeze
 
-  BLOCKED_EXTENSIONS = /\.(js|exe|sh|bat|py|pl|php|rb|c|cpp|h|java|class|jar|msi|vb|vbs|cmd|scr|ps1)\z/i.freeze
+  BLOCKED_EXTENSIONS = /\.(js|exe|sh|bat|py|pl|php|rb|c|cpp|h|java|class|jar|msi|vb|vbs|cmd|scr|ps1|ps2|psc1|psc2|msh|msh1|msh2|mshxml|msh1xml|msh2xml|scf|lnk|inf|reg|app|deb|rpm|dmg|pkg|run|bin|bash|zsh|fish|csh|ksh|com|pif|vbe|jse|wsf|wsh|war|lua)\z/i.freeze
 
   ALLOWED_IMAGE_MIME_TYPES = Set.new([
     'image/jpeg',
