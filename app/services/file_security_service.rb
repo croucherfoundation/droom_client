@@ -6,6 +6,11 @@ class FileSecurityService
     # Word documents
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/x-tika-ooxml',
+    'application/vnd.oasis.opendocument.text',
+    'application/vnd.oasis.opendocument.text-template',
+    'application/vnd.oasis.opendocument.text-web',
+    'application/vnd.oasis.opendocument.text-master',
     
     # PowerPoint presentations
     'application/vnd.ms-powerpoint',
@@ -45,6 +50,12 @@ class FileSecurityService
     '.pdf',
     '.doc',
     '.docx',
+    '.odt',
+    '.ott',
+    '.docm',
+    '.dot',
+    '.dotx',
+    '.dotm',
     '.ppt',
     '.pptx',
     '.xls',
