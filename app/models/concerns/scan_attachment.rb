@@ -12,7 +12,7 @@ module ScanAttachment
 
         attachable = attachment_change.attachable
         file_to_scan = nil
-
+       
         case attachable
         when ActionDispatch::Http::UploadedFile
           # Standard form uploads - tempfile has a path
@@ -54,10 +54,13 @@ module ScanAttachment
   end
 
   def scan_file_from_io(name, io_object, filename = nil)
-    temp_file = Tempfile.new(['scan', File.extname(filename.to_s)])
+    temp_file = Tempfile.new(['scan', File.extname(filename.to_s)], binmode: true)
     begin
       io_object.rewind if io_object.respond_to?(:rewind)
-      temp_file.write(io_object.read)
+      # Read and write in binary mode to handle all file types
+      content = io_object.read
+      content = content.force_encoding('BINARY') if content.respond_to?(:force_encoding)
+      temp_file.write(content)
       temp_file.flush
       temp_file.close
 
