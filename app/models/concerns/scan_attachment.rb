@@ -59,6 +59,7 @@ module ScanAttachment
       io_object.rewind if io_object.respond_to?(:rewind)
       # Read and write in binary mode to handle all file types
       content = io_object.read
+      io_object.rewind if io_object.respond_to?(:rewind)
       content = content.force_encoding('BINARY') if content.respond_to?(:force_encoding)
       temp_file.write(content)
       temp_file.flush
