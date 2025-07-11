@@ -5,7 +5,7 @@ module ScanAttachment
 
   class_methods do
     def scan_attachment(name)
-      before_save do
+      validate do
         attachment_change = attachment_changes[name.to_s]
         # Exit if there are no changes to the attachment
         next unless attachment_change&.attachable
