@@ -1,7 +1,6 @@
-require 'net/http'
-require 'uri'
+require 'faraday'
 require 'json'
-require 'openssl'
+require 'stringio'
 
 class ClamavServices
   BASE_URL = if Rails.env.production? || Rails.env.staging?
@@ -28,51 +27,44 @@ class ClamavServices
   private
 
   def self.upload_and_scan(file_path)
-    uri = URI.parse("#{BASE_URL}/scan-file")
-    
-    # Configure SSL/HTTP based on environment
-    ssl_options = if Rails.env.production? || Rails.env.staging?
-                    # Use HTTP (no SSL) for production/staging internal IP
-                    { use_ssl: false }
-                  else
-                    # Use HTTPS for development with external domain
-                    { use_ssl: true }
-                  end
-    
-    Net::HTTP.start(uri.host, uri.port, **ssl_options) do |http|
-      request = Net::HTTP::Post.new(uri)
-      
-      # Only include API key in development environment
-      if Rails.env.development?
-        request['X-API-Key'] = API_KEY
-      end
-      
-      # Create multipart form data
-      boundary = "----WebKitFormBoundary#{SecureRandom.hex(16)}"
-      request['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
-      
-      # Read file content
-      file_content = File.read(file_path)
-      filename = File.basename(file_path)
-      
-      # Build multipart body
-      body = []
-      body << "--#{boundary}"
-      body << "Content-Disposition: form-data; name=\"file\"; filename=\"#{filename}\""
-      body << "Content-Type: application/octet-stream"
-      body << ""
-      body << file_content
-      body << "--#{boundary}--"
-      
-      request.body = body.join("\r\n")
-      
-      http.request(request)
-    end
+    # Configure connection based on environment
+    connection = if Rails.env.production? || Rails.env.staging?
+                   # Use HTTP for production/staging internal IP
+                   Faraday.new(url: BASE_URL) do |f|
+                     f.request :multipart
+                     f.adapter :net_http
+                     f.options.timeout = 240
+                     f.options.open_timeout = 69
+                   end
+                 else
+                   # Use HTTPS for development with external domain
+                   Faraday.new(url: BASE_URL, ssl: { verify: true }) do |f|
+                     f.request :multipart
+                     f.adapter :net_http
+                     f.options.timeout = 240
+                     f.options.open_timeout = 69
+                   end
+                 end
+
+    # Read file content
+    file_content = File.read(file_path)
+    filename = File.basename(file_path)
+
+    # Prepare headers
+    headers = {}
+    headers['X-API-Key'] = API_KEY if Rails.env.development?
+
+    # Create the multipart payload
+    payload = {
+      file: Faraday::UploadIO.new(StringIO.new(file_content), nil, filename)
+    }
+
+    connection.post('scan-file', payload, headers)
   end
 
   def self.parse_response(response)
-    case response.code
-    when '200'
+    case response.status
+    when 200
       result = JSON.parse(response.body)
       scan_result = result['scan_result']
       
@@ -96,20 +88,20 @@ class ClamavServices
           file_size_bytes: scan_result['file_size_bytes']
         }
       end
-    when '400'
+    when 400
       error_msg = "Bad request: #{response.body}"
       puts error_msg
       { status: :error, message: error_msg }
-    when '401'
+    when 401
       error_msg = "Unauthorized: Invalid API key"
       puts error_msg
       { status: :error, message: error_msg }
-    when '413'
+    when 413
       error_msg = "File too large"
       puts error_msg
       { status: :error, message: error_msg }
     else
-      error_msg = "HTTP #{response.code}: #{response.body}"
+      error_msg = "HTTP #{response.status}: #{response.body}"
       puts error_msg
       { status: :error, message: error_msg }
     end
