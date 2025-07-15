@@ -3,11 +3,7 @@ require 'json'
 require 'stringio'
 
 class ClamavServices
-  BASE_URL = if Rails.env.production? || Rails.env.staging?
-                'http://172.31.35.113/api/'.freeze
-              else
-                'https://scan.croucher.org.hk/api/'.freeze
-              end
+  BASE_URL = ENV['CLAMAV_API_URL'] || 'https://scan.croucher.org.hk/api'.freeze
   API_KEY = ENV['CLAMAV_API_KEY'] || ''
 
   def self.scan_file(file_path)
