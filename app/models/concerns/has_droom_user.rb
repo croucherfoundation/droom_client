@@ -132,7 +132,7 @@ module HasDroomUser
         preferred_name: defined?(preferred_name) ? preferred_name : nil,
         preferred_pronoun: defined?(preferred_pronoun) ? preferred_pronoun : nil
       })
-      user.save 
+      user.save
       self.user = user
     end
   end
@@ -166,6 +166,14 @@ module HasDroomUser
 
   def user?
     user_uid? && user.present?
+  end
+
+  def email?
+    read_attribute(:email).present?
+  end
+
+  def user_uid?
+    read_attribute(:user_uid).present?
   end
 
   def confirmed?
