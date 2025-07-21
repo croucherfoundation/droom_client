@@ -6,7 +6,6 @@ PATH
       rails (~> 4.0.2)
       request_store
       request_store
-      settingslogic
       signed_json
 
 GEM
@@ -93,7 +92,6 @@ GEM
       rspec-core (~> 2.12.0)
       rspec-expectations (~> 2.12.0)
       rspec-mocks (~> 2.12.0)
-    settingslogic (2.0.9)
     shoulda-matchers (2.4.0)
       activesupport (>= 3.0.0)
     signed_json (0.0.3)
