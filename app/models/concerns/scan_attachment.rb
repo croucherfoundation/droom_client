@@ -5,7 +5,7 @@ module ScanAttachment
 
   class_methods do
     def scan_attachment(name)
-      before_validation do
+      validate do
         attachment_change = attachment_changes[name.to_s]
         # Exit if there are no changes to the attachment
         next unless attachment_change&.attachable
@@ -54,10 +54,14 @@ module ScanAttachment
   end
 
   def scan_file_from_io(name, io_object, filename = nil)
-    temp_file = Tempfile.new(['scan', File.extname(filename.to_s)])
+    temp_file = Tempfile.new(['scan', File.extname(filename.to_s)], binmode: true)
     begin
       io_object.rewind if io_object.respond_to?(:rewind)
-      temp_file.write(io_object.read)
+      # Read and write in binary mode to handle all file types
+      content = io_object.read
+      io_object.rewind if io_object.respond_to?(:rewind)
+      content = content.force_encoding('BINARY') if content.respond_to?(:force_encoding)
+      temp_file.write(content)
       temp_file.flush
       temp_file.close
 
