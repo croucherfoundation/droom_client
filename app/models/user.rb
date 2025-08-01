@@ -158,6 +158,10 @@ class User
     post "/api/users/#{uid}/verify_otp", params
   end
 
+  def self.remove_reviewer_group(uid)
+    delete "/api/users/#{uid}/remove_reviewer_group"
+  end
+
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
