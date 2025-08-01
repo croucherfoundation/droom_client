@@ -158,10 +158,6 @@ class User
     post "/api/users/#{uid}/verify_otp", params
   end
 
-  def self.remove_reviewer_group(uid)
-    delete "/api/users/#{uid}/remove_reviewer_group"
-  end
-
   def self.reindex_user(user_uid)
     begin
       post "/api/users/#{user_uid}/reindex"
@@ -204,6 +200,10 @@ class User
     self.class.get "/api/users/#{user_uid}/remove_profile"
   rescue JSON::ParserError, Her::Errors::ParseError
     nil
+  end
+
+  def remove_reviewer_group(user_uid)
+    self.class.delete "/api/users/#{user_uid}/remove_reviewer_group"
   end
 
   def self.sign_up(params)

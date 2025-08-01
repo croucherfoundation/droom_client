@@ -137,10 +137,6 @@ module HasDroomUser
     end
   end
 
-  def remove_reviewer_group
-    User.remove_reviewer_group(user.uid) if user.uid?
-  end
-
   # In the case of very thin local user-linking models like the Screener or Interviewer in the
   # application system, we can avoid a lot of API work by keeping a local copy of name,
   # email and other values that tend to appear in lists. Names are pulled from the remote
