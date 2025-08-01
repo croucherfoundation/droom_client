@@ -1,3 +1,4 @@
+require 'open-uri'
 module DroomClient
   class SynchroniseProfileJob < ActiveJob::Base
     queue_as :default
