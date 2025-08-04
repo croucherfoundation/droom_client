@@ -94,6 +94,26 @@ class FileSecurityService
     'image/heif'
   ]).freeze
 
+  ALLOWED_VIDEO_MIME_TYPES = Set.new([
+      'video/mp4',
+      'video/mpeg',
+      'video/ogg',
+      'video/webm',
+      'video/quicktime', # .mov
+      'video/x-msvideo', # .avi
+      'video/x-flv',
+      'video/x-matroska', # .mkv
+      'video/3gpp',
+      'video/3gpp2',
+      'video/x-ms-wmv' # .wmv
+    ]).freeze
+
+  ALLOWED_SPREADSHEET_MIME_TYPES = [
+    'application/vnd.ms-excel', # .xls
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # .xlsx
+    'text/csv' # .csv
+  ].freeze
+
   class << self
     # Main validation methods
     def allowed_file?(file_path, mime_type = nil)
@@ -121,19 +141,37 @@ class FileSecurityService
       normalize_mime_type(mime_type) == 'application/pdf'
     end
 
+    def allowed_video?(mime_type)
+      return false if mime_type.blank?
+      ALLOWED_VIDEO_MIME_TYPES.include?(normalize_mime_type(mime_type))
+    end
+
+    def allowed_spreadsheet?(mime_type)
+      return false if mime_type.blank?
+      ALLOWED_SPREADSHEET_MIME_TYPES.include?(normalize_mime_type(mime_type))
+    end
+
+    # Validation with exceptions
+    def validate_file!(file_path, mime_type = nil)
+      return if allowed_file?(file_path, mime_type)
+      
+      error_message = security_error_message(file_path, mime_type)
+      raise SecurityError, error_message
+    end
+
     # Error message generation
     def security_error_message(file_path, mime_type = nil)
       extension = extract_extension(file_path)
       
       case
       when file_path.blank?
-        "File path is required"
-      when extension.present? && !ALLOWED_FILE_EXTENSIONS.include?(extension.downcase)
-        "File extension '#{extension}' is not allowed."
+        "path is required"
+      when extension.present? && ALLOWED_FILE_EXTENSIONS.include?(extension.downcase)
+        "extension '#{extension}' is not allowed."
       when mime_type.present? && !ALLOWED_FILE_MIME_TYPES.include?(normalize_mime_type(mime_type))
-        "File type '#{mime_type}' is not allowed"
+        "type '#{mime_type}' is not allowed"
       else
-        "File upload is not permitted"
+        "upload is not permitted"
       end
     end
 

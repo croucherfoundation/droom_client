@@ -39,10 +39,16 @@ class Api::SessionsController < ApplicationController
           return sing_in_error
         end
       else
-        return sing_in_error
+        RequestStore.store.delete :current_user
+        unset_auth_cookie
+        reset_session
+        message = "We haven't received your confirmation. Please check your email."
+        return render :json => {error_message: message}, status: 400
       end
+      render :json => user
     else
-      return sing_in_error
+      error_msg = {:error_message => "Sign in error!"}
+      render :json => error_msg
     end
   end
 

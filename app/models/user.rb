@@ -42,7 +42,7 @@ class User
       phone: phone,
       mobile: mobile,
       address: address,
-      correspondence_address: correspondence_address
+      correspondence_address: try(:correspondence_address)
     }
   end
 
@@ -256,6 +256,10 @@ class User
 
   def csw_admin?
     permitted?("csw.login")
+  end
+
+  def csw_helper?
+    permitted?("csw.helper")
   end
 
   def sysadmin?
