@@ -16,6 +16,22 @@ class Api::SessionsController < ApplicationController
           set_auth_cookie_for(user)
           cookie_name = ENV['DROOM_AUTH_COOKIE'] || Settings.auth.cookie_name
           sign_in_cookie = cookies["#{cookie_name}"]
+
+          if sign_in_cookie
+            begin
+              parsed_cookie = JSON.parse(sign_in_cookie)
+              user_data = {
+                _s: parsed_cookie[0],
+                _k: parsed_cookie[1][0],
+                _d: parsed_cookie[1][1]
+              }
+              return render json: user_data
+            rescue JSON::ParserError, NoMethodError => e
+              return sing_in_error
+            end
+          else
+            return sing_in_error
+          end
         else
           RequestStore.store.delete :current_user
           unset_auth_cookie
@@ -23,32 +39,15 @@ class Api::SessionsController < ApplicationController
           message = "We haven't received your confirmation. Please check your email."
           return render json: { error_message: message }, status: 400
         end
-        if sign_in_cookie
-          begin
-            parsed_cookie = JSON.parse(sign_in_cookie)
-            user_data = {
-              _s: parsed_cookie[0],
-              _k: parsed_cookie[1][0],
-              _d: parsed_cookie[1][1]
-            }
-            render json: user_data
-          rescue JSON::ParserError, NoMethodError => e
-            return sing_in_error
-          end
-        else
-          return sing_in_error
-        end
       else
         RequestStore.store.delete :current_user
         unset_auth_cookie
         reset_session
         message = "We haven't received your confirmation. Please check your email."
-        return render :json => {error_message: message}, status: 400
+        return render json: { error_message: message }, status: 400
       end
-      render :json => user
     else
-      error_msg = {:error_message => "Sign in error!"}
-      render :json => error_msg
+      return render json: { error_message: "Sign in error!" }, status: 400
     end
   end
 
