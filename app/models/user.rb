@@ -202,6 +202,10 @@ class User
     nil
   end
 
+  def remove_reviewer_group(user_uid)
+    self.class.delete "/api/users/#{user_uid}/remove_reviewer_group"
+  end
+
   def self.sign_up(params)
     params = params.to_h unless params == {}
     user = post "/api/users/sign_up", params
