@@ -30,6 +30,15 @@ class FileSecurityService
     'application/vnd.ms-outlook',
     'application/x-msg',
     'text/x-eml',
+
+    #Archive & Storage Files
+    'application/zip',
+    'application/x-zip-compressed',
+    'application/x-rar-compressed',
+    'application/x-tar',
+    'application/x-7z-compressed',
+    'application/x-gzip',
+    'application/x-ole-storage',
     
     # Images
     'image/jpeg',
@@ -64,6 +73,13 @@ class FileSecurityService
     '.txt',
     '.rtf',
     '.eml',
+    '.zip',
+    '.rar',
+    '.tar',
+    '.7z',
+    '.gz',
+    '.tar.gz',
+    '.tgz',
     '.msg',
     '.jpg',
     '.jpeg',
