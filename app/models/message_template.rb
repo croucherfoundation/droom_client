@@ -10,7 +10,7 @@ class MessageTemplate
     if layout == 'message'
       html = Nokogiri::HTML.parse(body)
       html.css('a[href]').each do |a|
-        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+        a['style'] = 'text-decoration: none; color: #EE3A43; cursor: default'
       end
       Mustache.render(html.to_html, person.for_email)
     else

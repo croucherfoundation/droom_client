@@ -25,7 +25,7 @@ class Message
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
-        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+        a['style'] = 'text-decoration: none; color: #EE3A43; cursor: default'
       end
       Mustache.render(html.to_html, attributes)
     else
@@ -42,7 +42,7 @@ class Message
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
-        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+        a['style'] = 'text-decoration: none; color: #EE3A43; cursor: default'
       end
       Mustache.render(html.to_html, attributes)
     else
