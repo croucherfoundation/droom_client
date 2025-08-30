@@ -14,6 +14,7 @@ class Message
     award_id = options[:award_id]
     event_application = options[:event_application]
     event_id = options[:event_id]
+    candidate_confirmation = options[:candidate_confirmation]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
     message_body = transform_body_for_event_application(person, message_body, event_id) if event_application || event_id
@@ -21,6 +22,7 @@ class Message
     message_body = transform_body_for_test_survey(survey_code, message_body) if survey_code.present?
     message_body = transform_body_for_reminder(person, message_body) if reminder.present?
     message_body = transform_body_for_notify(person, message_body, award_id) if award_id.present?
+    message_body = transform_body_for_candidate_confirmation(person, message_body) if candidate_confirmation.present?
 
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
@@ -269,6 +271,11 @@ class Message
     HTML
 
     body.gsub('{{award_type_name}}', award_type_name).gsub('{{issued_at}}', issue_date)
+  end
+
+  def transform_body_for_candidate_confirmation(person, body)
+    finish_date = person.round.finish.strftime('%B %Y')
+    body.gsub('{{finish_date}}', finish_date)
   end
 
   def render_summary_for(person)
