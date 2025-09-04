@@ -52,15 +52,15 @@ module DroomAuthentication
     else
       path = use_stored_location_for(user) || default_location_for(user)
       path = root_path if path == droom_client.sign_in_path
-    end  
-    
+    end
+
     path
   end
-  
+
   def after_sign_out_path_for(user)
     root_path
   end
-  
+
   def after_user_update_path_for(user)
     root_path
   end
@@ -77,9 +77,9 @@ module DroomAuthentication
     url = ENV['DISCOURSE_URL']
     "#{url}/session/sso_login?#{payload(user)}"
   end
-  
+
 protected
-  
+
   ## Authentication filters
   #
   # Use in controllers to require various states of authentication.
@@ -173,6 +173,7 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
+    puts "From header: X-API-KEY: #{request.headers["x-api-key"]}"
     if request.headers["x-api-key"] && request.headers["x-api-key"].present?
       unique_session_id = JSON.parse(request.headers["x-api-key"])
       authenticate_with(unique_session_id[1][0])
@@ -199,10 +200,13 @@ protected
       authenticate_with(params[:tok])
     end
   end
-  
+
   def authenticate_from_cookie
+    puts "From cookie: #{cookies}"
     cookie = DroomClient::AuthCookie.new(cookies)
+    puts "DroomClient Cookie: #{cookie.inspect}"
     if cookie.valid? && cookie.fresh?
+      puts "DroomClient Cookie: Valid and Fresh"
       user = authenticate_with(cookie.token)
       user
     end
@@ -222,11 +226,11 @@ protected
   def user_signed_in?
     !!current_user
   end
-  
+
   def sign_in(user)
     RequestStore.store[:current_user] = user
   end
-  
+
   def sign_in_and_remember(user)
     sign_in(user)
     set_auth_cookie_for(user)
