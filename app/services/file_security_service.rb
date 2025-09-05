@@ -130,6 +130,8 @@ class FileSecurityService
     'text/csv' # .csv
   ].freeze
 
+  ALLOWED_SUPPORTING_DOCUMENT_TYPES = ["application/pdf", "image/jpeg"].freeze
+
   class << self
     # Main validation methods
     def allowed_file?(file_path, mime_type = nil)
@@ -165,6 +167,16 @@ class FileSecurityService
     def allowed_spreadsheet?(mime_type)
       return false if mime_type.blank?
       ALLOWED_SPREADSHEET_MIME_TYPES.include?(normalize_mime_type(mime_type))
+    end
+
+    def allowed_supporting_document?(mime_type)
+      return false if mime_type.blank?
+      ALLOWED_SUPPORTING_DOCUMENT_TYPES.include?(normalize_mime_type(mime_type))
+    end
+
+    def allowed_only_jpeg?(mime_type)
+      return false if mime_type.blank?
+      normalize_mime_type(mime_type) == 'image/jpeg'
     end
 
     # Validation with exceptions
