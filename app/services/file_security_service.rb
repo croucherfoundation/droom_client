@@ -174,9 +174,9 @@ class FileSecurityService
       ALLOWED_SUPPORTING_DOCUMENT_TYPES.include?(normalize_mime_type(mime_type))
     end
 
-    def allowed_only_jpeg?(mime_type)
+    def allowed_image_document?(mime_type)
       return false if mime_type.blank?
-      normalize_mime_type(mime_type) == 'image/jpeg'
+      mime_type.start_with?("image/")
     end
 
     # Validation with exceptions
