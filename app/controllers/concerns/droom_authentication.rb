@@ -173,7 +173,6 @@ protected
   # a uid in the options hash.
   #
   def authenticate_from_header
-    puts "From header: X-API-KEY: #{request.headers["x-api-key"]}"
     if request.headers["x-api-key"] && request.headers["x-api-key"].present?
       unique_session_id = JSON.parse(request.headers["x-api-key"])
       authenticate_with(unique_session_id[1][0])
@@ -202,11 +201,8 @@ protected
   end
 
   def authenticate_from_cookie
-    puts "From cookie: #{cookies}"
     cookie = DroomClient::AuthCookie.new(cookies)
-    puts "DroomClient Cookie: #{cookie.inspect}"
     if cookie.valid? && cookie.fresh?
-      puts "DroomClient Cookie: Valid and Fresh"
       user = authenticate_with(cookie.token)
       user
     end
