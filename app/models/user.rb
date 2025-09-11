@@ -301,4 +301,9 @@ class User
     correspondence_address.presence || address
   end
 
+  def needs_setup?
+    user = self.class.get("/api/users/#{uid}")
+    user.needs_setup
+  end
+
 end
