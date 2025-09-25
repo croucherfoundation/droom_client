@@ -43,7 +43,7 @@ class Api::SessionsController < ApplicationController
         RequestStore.store.delete :current_user
         unset_auth_cookie
         reset_session
-        message = "We haven't received your confirmation. Please check your email."
+        message = "The email address or password you entered is incorrect."
         return render json: { error_message: message }, status: 400
       end
     else
