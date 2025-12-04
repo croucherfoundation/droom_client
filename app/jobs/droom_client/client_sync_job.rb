@@ -24,26 +24,30 @@ module DroomClient
 
     def sync_to_target(record, changes)
       return unless should_sync?(record.class)
-
       target_class = record.class.client_sync_target
       return unless target_class
       
-      target_id = record.id.to_s
-      
-      target = target_class.all.to_a.select do |c|
+      target = nil
+
+      if record.is_a?(Stakeholder) 
+        stakeholder_id = record.id.to_s 
         
-        associated_data = c.associated_with
-        
-        unless associated_data.is_a?(Hash)
-          associated_data = JSON.parse(associated_data) rescue {} if associated_data.is_a?(String) && associated_data.present?
-          associated_data ||= {}
+        target = target_class.all.to_a.find do |contact|
+          associated_stakeholder_ids = find_associated_ids(contact, "stakeholder")
+          associated_stakeholder_ids.include?(stakeholder_id)
         end
         
-        supervisor_ids = associated_data.dig("supervisor")
-        
-        supervisor_ids.is_a?(Array) && supervisor_ids.map(&:to_s).include?(target_id)
-        
-      end.first
+        unless target
+          Rails.logger.warn("Stakeholder sync: Contact not found for Stakeholder ID: #{stakeholder_id}")
+        end
+
+      elsif record.is_a?(Supervisor)
+        supervisor_id = record.id.to_s
+        target = target_class.all.to_a.find do |contact|
+          associated_supervisor_ids = find_associated_ids(contact, "supervisor")
+          associated_supervisor_ids.include?(supervisor_id)
+        end
+      end
 
       return unless target 
 
@@ -55,7 +59,7 @@ module DroomClient
 
     def should_sync?(klass)
       # Supervisor can sync to Contact
-      return true if klass.name == "Supervisor"
+      return true if klass.name.in?(["Supervisor",  "Stakeholder"]) 
 
       # Contact should NOT sync back to supervisor for now
       return false if klass.name == "Contact"
@@ -105,6 +109,23 @@ module DroomClient
       # Ensure logging handles cases where 'target' might not have an ID (though unlikely here)
       target_info = target ? "#{target.class}(#{target.id})" : target.class.name
       Rails.logger.error "❌ Sync failed for #{target_info}: #{e.message}"
+    end
+
+    # helper method for associated_with
+    def find_associated_ids(contact, key)
+      associated_data = parse_associated_data(contact)
+      ids = associated_data.dig(key)
+      ids.is_a?(Array) ? ids.map(&:to_s) : []
+    end
+
+    def parse_associated_data(contact)
+      associated_data = contact.associated_with
+      
+      unless associated_data.is_a?(Hash)
+        associated_data = JSON.parse(associated_data) rescue {} if associated_data.is_a?(String) && associated_data.present?
+        associated_data ||= {}
+      end
+      associated_data
     end
 
   end
