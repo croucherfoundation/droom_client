@@ -28,6 +28,7 @@ module DroomClient
       return unless target_class
       
       target = nil
+      person_uid = nil
 
       if record.is_a?(Stakeholder) 
         stakeholder_id = record.id.to_s 
@@ -47,6 +48,24 @@ module DroomClient
           associated_supervisor_ids = find_associated_ids(contact, "supervisor")
           associated_supervisor_ids.include?(supervisor_id)
         end
+
+        unless target
+          Rails.logger.warn("Supervisor sync: Contact not found for Supervisor ID: #{supervisor_id}")
+        end
+      
+      # NEW LOGIC: Handle Person sync using Person's UID
+      elsif record.is_a?(Person)
+        person_uid = record.uid.to_s # Use UID as the unique identifier for Person
+        
+        target = target_class.all.to_a.find do |contact|
+          # Assuming the Dataroom Contact is associated with the Core Person's UID under the key 'person'
+          associated_person_uids = find_associated_ids(contact, "person")
+          associated_person_uids.include?(person_uid)
+        end
+
+        unless target
+          Rails.logger.warn("Person sync: Contact not found for Person UID: #{person_uid}")
+        end
       end
 
       return unless target 
@@ -58,13 +77,11 @@ module DroomClient
 
 
     def should_sync?(klass)
-      # Supervisor can sync to Contact
-      return true if klass.name.in?(["Supervisor",  "Stakeholder"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person"]) 
 
       # Contact should NOT sync back to supervisor for now
       return false if klass.name == "Contact"
 
-      # other sync paths later
       false
     end
 
@@ -97,10 +114,8 @@ module DroomClient
       end
 
       if updates_made
-        # The logging of changes works best just before the save.
         Rails.logger.info("Her Changes: #{target.changed_attributes.keys.join(', ')}")
         
-        # KEEP this final, single save.
         target.save! 
       end
       
