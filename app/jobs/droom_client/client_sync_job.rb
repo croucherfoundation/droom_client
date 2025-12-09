@@ -42,6 +42,18 @@ module DroomClient
           Rails.logger.warn("Stakeholder sync: Contact not found for Stakeholder ID: #{stakeholder_id}")
         end
 
+      elsif record.is_a?(Actor)
+        actor_id = record.id.to_s
+        
+        target = target_class.all.to_a.find do |contact|
+          associated_actor_ids = find_associated_ids(contact, "actor")
+          associated_actor_ids.include?(actor_id)
+        end
+
+        unless target
+          Rails.logger.warn("Actor sync: Contact not found for Actor ID: #{actor_id}")
+        end
+
       elsif record.is_a?(Supervisor)
         supervisor_id = record.id.to_s
         target = target_class.all.to_a.find do |contact|
@@ -66,6 +78,8 @@ module DroomClient
         unless target
           Rails.logger.warn("Person sync: Contact not found for Person UID: #{person_uid}")
         end
+
+      
       end
 
       return unless target 
@@ -77,7 +91,7 @@ module DroomClient
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor"]) 
 
       # Contact should NOT sync back to supervisor for now
       return false if klass.name == "Contact"
@@ -93,14 +107,9 @@ module DroomClient
         when "name"
           full_name = new_val.to_s.strip
           names = NameSplitter::Splitter.call(full_name)
-          Rails.logger.info("NameSplitter Result: #{names.inspect}")
           target.given_name = names.first_name
-          Rails.logger.info("#{target.given_name} ---- given_name")
           target.family_name = names.last_name
-          Rails.logger.info("#{target.family_name} ---- family_name")
           target.title = names.salutation
-          Rails.logger.info("#{target.title} ---- title")
-          updates_made = true
           next
 
         else
