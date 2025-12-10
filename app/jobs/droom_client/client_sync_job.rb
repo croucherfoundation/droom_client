@@ -102,6 +102,18 @@ module DroomClient
           Rails.logger.warn("Application sync: Contact not found for Reviewer ID: #{reviewer_id}")
         end
 
+      elsif record.is_a?(Speaker)
+        speaker_id = record.id.to_s
+        
+        target = target_class.all.to_a.find do |contact|
+          associated_speaker_ids = find_associated_ids(contact, "speaker")
+          associated_speaker_ids.include?(speaker_id)
+        end
+
+        unless target
+          Rails.logger.warn("Application sync: Contact not found for Speaker ID: #{speaker_id}")
+        end
+
       elsif record.is_a?(Supervisor)
         supervisor_id = record.id.to_s
         target = target_class.all.to_a.find do |contact|
@@ -137,7 +149,7 @@ module DroomClient
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker"]) 
 
       return false if klass.name == "Contact"
 
