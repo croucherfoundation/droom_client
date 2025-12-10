@@ -63,7 +63,19 @@ module DroomClient
         end
 
         unless target
-          Rails.logger.warn("Application sync: Contact not found for Applicatioin ID: #{application_id}")
+          Rails.logger.warn("Application sync: Contact not found for Application ID: #{application_id}")
+        end
+
+      elsif record.is_a?(Grantor)
+        grantor_id = record.id.to_s
+        
+        target = target_class.all.to_a.find do |contact|
+          associated_grantor_ids = find_associated_ids(contact, "grantor")
+          associated_grantor_ids.include?(grantor_id)
+        end
+
+        unless target
+          Rails.logger.warn("Application sync: Contact not found for Grantor ID: #{grantor_id}")
         end
 
       elsif record.is_a?(Supervisor)
@@ -77,12 +89,10 @@ module DroomClient
           Rails.logger.warn("Supervisor sync: Contact not found for Supervisor ID: #{supervisor_id}")
         end
       
-      # NEW LOGIC: Handle Person sync using Person's UID
       elsif record.is_a?(Person)
-        person_uid = record.uid.to_s # Use UID as the unique identifier for Person
+        person_uid = record.uid.to_s 
         
         target = target_class.all.to_a.find do |contact|
-          # Assuming the Dataroom Contact is associated with the Core Person's UID under the key 'person'
           associated_person_uids = find_associated_ids(contact, "person")
           associated_person_uids.include?(person_uid)
         end
@@ -97,22 +107,22 @@ module DroomClient
       return unless target 
 
       record.class.silence do
+        Rails.logger.info("000999999999")
         apply_changes(target, changes)
       end
     end
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor"]) 
 
-      # Contact should NOT sync back to supervisor for now
       return false if klass.name == "Contact"
 
       false
     end
 
     def apply_changes(target, changes)
-      updates_made = false
+      # updates_made = false
 
       changes.each do |attr, (_old, new_val)|
         case attr
@@ -130,17 +140,18 @@ module DroomClient
           next if target.public_send(attr) == new_val
 
           target.public_send("#{attr}=", new_val)
-          updates_made = true
+          # updates_made = true
         end
       end
 
-      if updates_made
+      # if updates_made
+      if target.changed?
         Rails.logger.info("Her Changes: #{target.changed_attributes.keys.join(', ')}")
         
         target.save! 
       end
       
-      Rails.logger.info "🔁 Synced → #{target.class}(#{target.id})" if updates_made
+      Rails.logger.info "🔁 Synced → #{target.class}(#{target.id})" if target.changed?
     rescue => e
       # Ensure logging handles cases where 'target' might not have an ID (though unlikely here)
       target_info = target ? "#{target.class}(#{target.id})" : target.class.name
