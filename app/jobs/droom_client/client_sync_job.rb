@@ -41,7 +41,7 @@ module DroomClient
         unless target
           Rails.logger.warn("Stakeholder sync: Contact not found for Stakeholder ID: #{stakeholder_id}")
         end
-        
+
       elsif record.is_a?(Csw::Attendee)
         csw_attendee_id = record.id.to_s
         
@@ -52,6 +52,18 @@ module DroomClient
 
         unless target
           Rails.logger.warn("Application sync: Contact not found for Speaker ID: #{csw_attendee_id}")
+        end
+
+      elsif record.is_a?(Csw::Newsletter)
+        csw_newsletter_id = record.id.to_s
+        
+        target = target_class.all.to_a.find do |contact|
+          associated_csw_newsletter_ids = find_associated_ids(contact, "csw_newsletter")
+          associated_csw_newsletter_ids.include?(csw_newsletter_id)
+        end
+
+        unless target
+          Rails.logger.warn("Application sync: Contact not found for Speaker ID: #{csw_newsletter_id}")
         end
 
       elsif record.is_a?(Actor)
@@ -161,7 +173,7 @@ module DroomClient
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker", "Csw::Attendee"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker", "Csw::Attendee", "Csw::Newsletter"]) 
 
       return false if klass.name == "Contact"
 
