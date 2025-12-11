@@ -41,6 +41,18 @@ module DroomClient
         unless target
           Rails.logger.warn("Stakeholder sync: Contact not found for Stakeholder ID: #{stakeholder_id}")
         end
+        
+      elsif record.is_a?(Csw::Attendee)
+        csw_attendee_id = record.id.to_s
+        
+        target = target_class.all.to_a.find do |contact|
+          associated_csw_attendee_ids = find_associated_ids(contact, "csw_attendee")
+          associated_csw_attendee_ids.include?(csw_attendee_id)
+        end
+
+        unless target
+          Rails.logger.warn("Application sync: Contact not found for Speaker ID: #{csw_attendee_id}")
+        end
 
       elsif record.is_a?(Actor)
         actor_id = record.id.to_s
@@ -149,7 +161,7 @@ module DroomClient
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker"]) 
+      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker", "Csw::Attendee"]) 
 
       return false if klass.name == "Contact"
 
@@ -167,6 +179,18 @@ module DroomClient
           target.given_name = names.first_name
           target.family_name = names.last_name
           target.title = names.salutation
+          next
+        
+        when "first_name"
+          next if new_val.blank?
+          next if target.given_name == new_val
+          target.given_name = new_val
+          next
+
+        when "last_name"
+          next if new_val.blank?
+          next if target.family_name == new_val
+          target.family_name = new_val
           next
 
         else
