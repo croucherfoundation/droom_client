@@ -160,6 +160,17 @@ module DroomClient
         unless target
           Rails.logger.warn("Supervisor sync: Contact not found for Supervisor ID: #{supervisor_id}")
         end
+
+      elsif record.is_a?(EventParticipant)
+        event_participant_id = record.id.to_s
+        target = target_class.all.to_a.find do |contact|
+          associated_event_participant_ids = find_associated_ids(contact, "event_participant")
+          associated_event_participant_ids.include?(event_participant_id)
+        end
+
+        unless target
+          Rails.logger.warn("event_participant sync: Contact not found for event_participant ID: #{event_participant_id}")
+        end
       
       elsif record.is_a?(Person)
         person_uid = record.uid.to_s 
@@ -185,7 +196,7 @@ module DroomClient
 
 
     def should_sync?(klass)
-      return true if klass.name.in?(["Supervisor",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker", "Csw::Attendee", "Csw::Newsletter", "PageInvitation"]) 
+      return true if klass.name.in?(["Supervisor", "EventParticipant",  "Stakeholder", "Person", "Actor", "Application", "Grantor", "Interviewer", "Reviewer", "Speaker", "Csw::Attendee", "Csw::Newsletter", "PageInvitation"]) 
 
       return false if klass.name == "Contact"
 
