@@ -3,15 +3,19 @@
   #emailConfirmModal.modal
     .modal-wrapper{role: "document"}
       .modal-content
-        .croucher_container.my-custom-modal-content
-          %h1 Confirm your email
-          .form-fields
-            %section
-              %p
-                Your account has been successfully created!
-              %p
-                To activate your account, please check your inbox and click the confirmation link we've sent to your email.
+        .standard-modal-overlay.active
+          .standard-modal-container.active
+            %svg.logo
+              %use{"xlink:href" => "#croucher_logo"}
+            .container
+              %h2 Confirm your email
+              .form-fields
+                %section
+                  %p
+                    Your account has been successfully created!
+                  %p
+                    To activate your account, please check your inbox and click the confirmation link we've sent to your email.
 
-            %section.actions
-              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
-                Close
+                %section.actions.buttons.m-0
+                  %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
+                    Close

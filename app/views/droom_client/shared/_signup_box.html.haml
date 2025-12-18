@@ -12,14 +12,14 @@
           .container
             %h2 Sign up for a Croucher account
             .form-fields.inputs
-              %section
+              %section.mb-0
                 %p.mb-3
                   With a Croucher account, you'll be able to:
                 .modal-content
                   %ul.mb-3
                     %li Book tickets, register for events, and apply for funding opportunities
                     %li Stay informed with our monthly newsletter featuring the latest updates about Croucher and Hong Kong science
-                %p.mb-3
+                %p.mb.mobile-mb-38
                   To set up your account, fill in the details below. We will send you an email with a confirmation link.
                 .user-name
                   .given-name
@@ -42,7 +42,7 @@
                 Password
                 .password 
                   .croucher_input.passwords-input.passwords-input-primary
-                    = f.password_field :password, placeholder: t("placeholders.password"), data: {role: "password"}, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
+                    = f.password_field :password, placeholder: t("placeholders.password"), data: {role: "password"}, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');", :class => "mb_0"
                     %span
                       %img.passwords-eye{alt: "Eye", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}
                 = hidden_field_tag :group, 'applicants'
