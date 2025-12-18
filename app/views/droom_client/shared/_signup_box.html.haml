@@ -41,10 +41,10 @@
                       to apply.
                 Password
                 .password 
-                  .croucher_input.passwords-input.passwords-input-primary
+                  .croucher_input.passwords-input.passwords-input-primary.relative
                     = f.password_field :password, placeholder: t("placeholders.password"), data: {role: "password"}, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');", :class => "mb_0"
-                    %span
-                      %img.passwords-eye{alt: "Eye", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}
+                    %span.password-toggle
+                      %img{alt: "Eye", src: "https://cmss.croucher.org.hk/assets/images/icons/eye-02.svg"}
                 = hidden_field_tag :group, 'applicants'
           %section.actions.buttons.m-0
             %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button"}
