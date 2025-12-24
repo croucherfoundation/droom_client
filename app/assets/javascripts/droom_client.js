@@ -36,7 +36,7 @@
       $('#profile-upload').val('');
       $('#profile-avatar').attr(
         'src',
-        'https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png'
+        'https://croucher.org.hk/assets/images/croucher-admin-1.png'
       );
     });
 
