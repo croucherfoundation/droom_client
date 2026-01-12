@@ -63,13 +63,13 @@
 
               - if admin?
                 %section.organisation_admin.std-input-mb
-                  = f.check_box :organisation_admin, class: 'radio'
-                  = f.label :organisation_admin, 'Organisation admin?', class: 'radio_label pr-10'
                   = f.check_box :admin, class: 'radio'
                   = f.label :admin, 'Site admin?', class: 'radio_label pr-10'
                   %span.subordinate{data: {dependent: "#user_admin"}}
                     = f.check_box :gatekeeper, class: 'radio'
                     = f.label :gatekeeper, 'Admissions?', class: 'radio_label'
+                  = f.check_box :organisation_admin, class: 'radio'
+                  = f.label :organisation_admin, 'HKFx admin?', class: 'radio_label pr-10'
 
               = hidden_field_tag :reload, true
           %section.actions.buttons
