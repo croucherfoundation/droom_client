@@ -173,7 +173,7 @@ class Message
       session_datetime = application.event_session_datetime
       session_location = application.event_session_location
     else
-      session_date_time = event.session_datetime
+      session_datetime = event.session_datetime
       session_location = event.session_location
     end
 
@@ -214,15 +214,11 @@ class Message
     HTML
 
     session_datetime = <<~HTML.strip
-      <span style='display: inline-block'>
-        #{session_datetime}
-      </span>
+      #{session_datetime}
     HTML
 
     session_location = <<~HTML.strip
-      <span style='display: inline-block'>
-        #{session_location}
-      </span>
+      #{session_location}
     HTML
 
     body.gsub('{{payment_url}}', payment_link).gsub('{{payment_url_button}}', payment_link_button).gsub('{{session_datetime}}', session_datetime).gsub('{{session_location}}', session_location)
