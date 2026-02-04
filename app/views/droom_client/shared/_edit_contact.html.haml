@@ -3,27 +3,29 @@
 
 #editContact.modal
   .modal-wrapper{role: "document"}
-    -# .modal-content
-    -#   .croucher_container.my-custom-modal-content
     .standard-modal-overlay.active
       .standard-modal-container.active
-        .standard-modal-close-btn.cursor-pointer
-          %svg.standard_close_icon{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
-            %line{stroke: "#D3D3D3 ", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
-            %line{stroke: "#D3D3D3", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 0.694719 -0.669051 0.743216 0 1.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
-        %svg.logo
-          %use{"xlink:href" => "#croucher_logo"}
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user',  :multipart => true, :autocomplete => false} do |f|
-          .container
-            %h2 Edit profile
-            .inputs
+
+          .standard-modal-header
+            .standard-modal-close-btn.cursor-pointer
+              %svg.standard_close_icon
+                %use{"xlink:href" => "#standard_close_symbol"}
+
+            %svg.logo
+              %use{"xlink:href" => "#croucher_logo"}
+
+            .container
+              %h2 Edit profile
+
+          .standard-modal-body
+            .container
               = hidden_field_tag :reload, true
-              .form-fields
+              .inputs
                 %section
                   %div Emails
                   .email-fields
                     .email-input
-                      -# = render "droom_client/shared/contact/emails", f: f, user: @user
                       - email_count = 0
                       - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
                       - @user.emails.each_with_index do |email, index|
@@ -48,7 +50,6 @@
                   %div Addresses
                   .address-fields
                     .address-input
-                      -# = render "droom_client/shared/contact/addresses", f: f, user: @user
                       - address_count = 0
                       - @user.addresses = @user.addresses.map { |e| e.is_a?(Hash) ? Address.new(e) : e }
                       - @user.addresses.each_with_index do |address, index|
@@ -75,8 +76,9 @@
 
                 = hidden_field_tag :reload, true
 
-          %section.actions.buttons
-            %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
-              Cancel
-            %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
-              Save
+          .standard-modal-footer
+            .buttons
+              %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
+                Save

@@ -2,24 +2,30 @@
 - if @show_email_confirm_popup
   #emailConfirmModal.modal
     .modal-wrapper{role: "document"}
-      .modal-content
-        .standard-modal-overlay.active
-          .standard-modal-container.active
+      .standard-modal-overlay.active
+        .standard-modal-container.active
+
+          .standard-modal-header
             .standard-modal-close-btn.cursor-pointer
-              %svg.standard_close_icon{fill: "none", height: "23", viewbox: "0 0 24 23", width: "24", xmlns: "http://www.w3.org/2000/svg"}
-                %line{stroke: "#D3D3D3 ", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 -0.694719 0.765788 0.643093 1.93701 22.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
-                %line{stroke: "#D3D3D3", "stroke-linecap" => "round", "stroke-width" => "2", transform: "matrix(0.719281 0.694719 -0.669051 0.743216 0 1.1875)", x1: "1", x2: "29.4986", y1: "-1", y2: "-1"}
+              %svg.standard_close_icon
+                %use{"xlink:href" => "#standard_close_symbol"}
+
             %svg.logo
               %use{"xlink:href" => "#croucher_logo"}
+
             .container
               %h2 Confirm your email
-              .form-fields
+
+          .standard-modal-body
+            .container
+              .inputs
                 %section
                   %p
                     Your account has been successfully created!
                   %p
                     To activate your account, please check your inbox and click the confirmation link we've sent to your email.
 
-                %section.actions.buttons.m-0
-                  %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
-                    Close
+          .standard-modal-footer
+            .buttons
+              %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
+                Close
