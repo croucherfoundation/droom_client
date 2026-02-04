@@ -42,7 +42,7 @@ class User
       phone: phone,
       mobile: mobile,
       address: address,
-      correspondence_address: correspondence_address
+      correspondence_address: try(:correspondence_address)
     }
   end
 
@@ -262,6 +262,10 @@ class User
     permitted?("csw.login")
   end
 
+  def csw_helper?
+    permitted?("csw.helper")
+  end
+
   def sysadmin?
     status == "admin"
   end
@@ -295,6 +299,11 @@ class User
 
   def best_address
     correspondence_address.presence || address
+  end
+
+  def needs_setup?
+    user = self.class.get("/api/users/#{uid}")
+    user.needs_setup
   end
 
 end

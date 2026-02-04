@@ -63,4 +63,5 @@ en:
   forgot_password_title: "Enter the email address associated with your Croucher account."
   password_reset_instructions: "We will send you a message with instructions."
   send_reset_instructions: "Send"
+  password_reset_not_delivered: "We cannot currently deliver emails to the email address you have given us. This may be due to a full mailbox or an incorrect email address. Please check and resolve this issue before requesting another password reset."
   password_reset_sent: "If the email exists, a password reset email has been sent."

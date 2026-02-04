@@ -12,4 +12,8 @@ class Email
       { id: 5, name: "Original" }
     ]
   end
+
+  def can_receive_email?
+    ses_status.nil? || ses_status == 'delivered'
+  end
 end

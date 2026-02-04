@@ -1,25 +1,31 @@
 - @user ||= User.new_with_defaults 
-- profile_image = @user.profile_image.present? ? @user.profile_image : "https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png"
+- profile_image = @user.profile_image.present? ? @user.profile_image : "https://croucher.org.hk/assets/images/croucher-admin-1.png"
 
 #editContact.modal
   .modal-wrapper{role: "document"}
-    -# .modal-content
-    -#   .croucher_container.my-custom-modal-content
     .standard-modal-overlay.active
       .standard-modal-container.active
-        %svg.logo.ml-56
-          %use{"xlink:href" => "#croucher_logo"}
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user',  :multipart => true, :autocomplete => false} do |f|
-          .container
-            %h2 Edit profile
-            .inputs
+
+          .standard-modal-header
+            .standard-modal-close-btn.cursor-pointer
+              %svg.standard_close_icon
+                %use{"xlink:href" => "#standard_close_symbol"}
+
+            %svg.logo
+              %use{"xlink:href" => "#croucher_logo"}
+
+            .container
+              %h2 Edit profile
+
+          .standard-modal-body
+            .container
               = hidden_field_tag :reload, true
-              .form-fields
+              .inputs
                 %section
                   %div Emails
                   .email-fields
                     .email-input
-                      -# = render "droom_client/shared/contact/emails", f: f, user: @user
                       - email_count = 0
                       - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
                       - @user.emails.each_with_index do |email, index|
@@ -44,7 +50,6 @@
                   %div Addresses
                   .address-fields
                     .address-input
-                      -# = render "droom_client/shared/contact/addresses", f: f, user: @user
                       - address_count = 0
                       - @user.addresses = @user.addresses.map { |e| e.is_a?(Hash) ? Address.new(e) : e }
                       - @user.addresses.each_with_index do |address, index|
@@ -71,8 +76,9 @@
 
                 = hidden_field_tag :reload, true
 
-          %section.actions.buttons
-            %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
-              Cancel
-            %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
-              Save
+          .standard-modal-footer
+            .buttons
+              %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
+                Save

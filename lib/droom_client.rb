@@ -1,4 +1,3 @@
-require 'settingslogic'
 require 'request_store'
 require 'droom_client/engine'
 require 'responders'

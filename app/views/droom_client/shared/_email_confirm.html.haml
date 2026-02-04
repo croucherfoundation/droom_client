@@ -2,16 +2,30 @@
 - if @show_email_confirm_popup
   #emailConfirmModal.modal
     .modal-wrapper{role: "document"}
-      .modal-content
-        .croucher_container.my-custom-modal-content
-          %h1 Confirm your email
-          .form-fields
-            %section
-              %p
-                Your account has been successfully created!
-              %p
-                To activate your account, please check your inbox and click the confirmation link we've sent to your email.
+      .standard-modal-overlay.active
+        .standard-modal-container.active
 
-            %section.actions
+          .standard-modal-header
+            .standard-modal-close-btn.cursor-pointer
+              %svg.standard_close_icon
+                %use{"xlink:href" => "#standard_close_symbol"}
+
+            %svg.logo
+              %use{"xlink:href" => "#croucher_logo"}
+
+            .container
+              %h2 Confirm your email
+
+          .standard-modal-body
+            .container
+              .inputs
+                %section
+                  %p
+                    Your account has been successfully created!
+                  %p
+                    To activate your account, please check your inbox and click the confirmation link we've sent to your email.
+
+          .standard-modal-footer
+            .buttons
               %button.croucher-standard-btn.modal-btn.cancel{type: "button", data: {turbo: false}}
                 Close

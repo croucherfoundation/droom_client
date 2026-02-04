@@ -14,6 +14,7 @@ class Message
     award_id = options[:award_id]
     event_application = options[:event_application]
     event_id = options[:event_id]
+    candidate_confirmation = options[:candidate_confirmation]
     message_body = template.present? ? template.body : body
     attributes = person.present? ? person.for_email : for_email
     message_body = transform_body_for_event_application(person, message_body, event_id) if event_application || event_id
@@ -25,7 +26,7 @@ class Message
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
-        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+        a['style'] = 'text-decoration: none; color: #EE3A43; cursor: default'
       end
       Mustache.render(html.to_html, attributes)
     else
@@ -42,7 +43,7 @@ class Message
     if template.present? && template&.layout == 'message'
       html = Nokogiri::HTML.parse(message_body)
       html.css('a[href]').each do |a|
-        a['style'] = 'text-decoration: none; color: #000000; cursor: default'
+        a['style'] = 'text-decoration: none; color: #EE3A43; cursor: default'
       end
       Mustache.render(html.to_html, attributes)
     else
@@ -165,8 +166,17 @@ class Message
   end
 
   def transform_body_for_event_application(application, body, event_id)
-    payment_url = event_id.present? ? Event.find(event_id)&.payment_url : application.event_payment_url
+    event = Event.find(event_id) if event_id.present?
+    payment_url = event.present? ? event&.payment_url : application.event_payment_url
     payment_url = payment_url.present? ? payment_url : "#"
+    if application.present?
+      session_datetime = application.event_session_datetime
+      session_location = application.event_session_location
+    else
+      session_datetime = event.session_datetime
+      session_location = event.session_location
+    end
+
     payment_link = <<~HTML.strip
       <span style='display: inline-block'>
         <a
@@ -203,7 +213,15 @@ class Message
       </table>
     HTML
 
-    body.gsub('{{payment_url}}', payment_link).gsub('{{payment_url_button}}', payment_link_button)
+    session_datetime = <<~HTML.strip
+      #{session_datetime}
+    HTML
+
+    session_location = <<~HTML.strip
+      #{session_location}
+    HTML
+
+    body.gsub('{{payment_url}}', payment_link).gsub('{{payment_url_button}}', payment_link_button).gsub('{{session_datetime}}', session_datetime).gsub('{{session_location}}', session_location)
   end
 
   def transform_body_for_test_survey(survey_code, body)

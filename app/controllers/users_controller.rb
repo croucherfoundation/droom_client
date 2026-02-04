@@ -80,6 +80,7 @@ class UsersController < ApplicationController
     hashed_params = user_params
     hashed_params[:emails_attributes] = hashed_params[:emails_attributes]&.to_h
     hashed_params[:addresses_attributes] = hashed_params[:addresses_attributes]&.to_h
+    # Validate image if present
     if hashed_params[:image].present?
       unless is_valid_image?(hashed_params[:image])
         error_message = "Image must be a valid image file (JPEG, PNG, GIF, etc.)"
@@ -152,6 +153,14 @@ class UsersController < ApplicationController
       @users = User.where(name_q: params[:name], limit: limit)
     end
     render json: @users.to_a
+  end
+
+  def check_authenticate
+    if current_user.present?
+      render json: { email: current_user['email'], name: current_user['name']}, status: :ok
+    else
+      render json: { errors: "Token not recognised" }, status: :unauthorized
+    end
   end
 
 

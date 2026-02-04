@@ -1,79 +1,90 @@
 #modal1.modal
   .modal-wrapper{role: "document"}
-    -# .modal-content
-    -#   .croucher_container.my-custom-modal-content
     .standard-modal-overlay.active
       .standard-modal-container.active
-        %svg.logo.ml-56
-          %use{"xlink:href" => "#croucher_logo"}
         = form_for @user, url: droom_client.user_path(@user), :html => {:class => 'edit user password', :autocomplete => false} do |f|
-          .container
-            %h2 Edit your account
-            = hidden_field_tag :reload, true
-            .form-fields.inputs
-              %section
-                %p
-                  These are administrative settings like your password and
-                  preferred email address.
-                %p
-                  You can sign in or request a password reset with any email
-                  address that we have on record.
-                
-                .email-fields
-                  .email-input
-                    -# = render "droom_client/shared/account_settings/emails", f: f, user: @user
-                    - email_count = 0
-                    - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
-                    - @user.emails.each_with_index do |email, index|
-                      = f.fields_for :emails, email, child_index: index do |email_fields|
-                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: index), required: index<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
-                        = email_fields.hidden_field :address_type_id
-                        %span.warning.hidden.email_error
-                          This email already exists! Please try with a different email address.
-                          %br
-                          %strong
-                      - email_count+=1
-                    - while email_count < 2
-                      = f.fields_for :emails, Email.new, child_index: email_count do |email_fields|
-                        = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: email_count), required: email_count<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
-                        = email_fields.hidden_field :address_type_id, value: email_count < 1 ? 1 : 4
-                        %span.warning.hidden.email_error
-                          This email already exists! Please try with a different email address.
-                          %br
-                          %strong
-                      - email_count += 1
-                
-                - if !@user.confirmed? && (admin? || @user.organisation_admin?)
-                  %p
-                    = f.check_box :send_confirmation, class: "fancy"
-                    = f.label :send_confirmation
-                
-              %section.passwords
-                %h2.font-bold Forgot your password?
-                %p
-                  To set a new password please enter it in this field below.
-                = render "droom_client/shared/account_settings/passwords", f: f, user: @user
-                
-              %section.timezones
-                %h2.font-bold Timezones
-                %p
-                  Select your timezone from the list below. This will convert
-                  and display event times according to your selected timezone.
-                = render "droom_client/shared/account_settings/timezones", f: f, user: @user
 
-              - if admin?
-                %section.organisation_admin.std-input-mb
-                  = f.check_box :organisation_admin, class: 'radio'
-                  = f.label :organisation_admin, 'Organisation admin?', class: 'radio_label pr-10'
-                  = f.check_box :admin, class: 'radio'
-                  = f.label :admin, 'Site admin?', class: 'radio_label pr-10'
-                  %span.subordinate{data: {dependent: "#user_admin"}}
-                    = f.check_box :gatekeeper, class: 'radio'
-                    = f.label :gatekeeper, 'Admissions?', class: 'radio_label'
+          .standard-modal-header
+            .standard-modal-close-btn.cursor-pointer
+              %svg.standard_close_icon
+                %use{"xlink:href" => "#standard_close_symbol"}
 
+            %svg.logo
+              %use{"xlink:href" => "#croucher_logo"}
+
+            .container
+              %h2 Edit your account
+
+          .standard-modal-body
+            .container
               = hidden_field_tag :reload, true
-          %section.actions.buttons
-            %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
-              Cancel
-            %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
-              Save
+              .form-fields.inputs
+                %section
+                  %p
+                    These are administrative settings like your password and
+                    preferred email address.
+                  %p
+                    You can sign in or request a password reset with any email
+                    address that we have on record.
+                  
+                  .email-fields
+                    .email-input
+                      - email_count = 0
+                      - @user.emails = @user.emails.map { |e| e.is_a?(Hash) ? Email.new(e) : e }
+                      - @user.emails.each_with_index do |email, index|
+                        = f.fields_for :emails, email, child_index: index do |email_fields|
+                          = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: index), required: index<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                          = email_fields.hidden_field :address_type_id
+                          %span.warning.hidden.email_error
+                            This email already exists! Please try with a different email address.
+                            %br
+                            %strong
+                        - email_count+=1
+                      - while email_count < 2
+                        = f.fields_for :emails, Email.new, child_index: email_count do |email_fields|
+                          = email_fields.email_field :email, placeholder: t("placeholders.standard_modal.email", count: email_count), required: email_count<1 ? true : false, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}, class: 'bd-radius-unset'
+                          = email_fields.hidden_field :address_type_id, value: email_count < 1 ? 1 : 4
+                          %span.warning.hidden.email_error
+                            This email already exists! Please try with a different email address.
+                            %br
+                            %strong
+                        - email_count += 1
+                  
+                  - if !@user.confirmed? && (admin? || @user.organisation_admin?)
+                    %p
+                      = f.check_box :send_confirmation, class: "fancy"
+                      = f.label :send_confirmation
+                  
+                %section.passwords
+                  %h2.font-bold Forgot your password?
+                  %p
+                    To set a new password please enter it in this field below.
+                  = render "droom_client/shared/account_settings/passwords", f: f, user: @user
+                  
+                %section.timezones
+                  %h2.font-bold Timezones
+                  %p
+                    Select your timezone from the list below. This will convert
+                    and display event times according to your selected timezone.
+                  = render "droom_client/shared/account_settings/timezones", f: f, user: @user
+
+                - if admin?
+                  %section.organisation_admin.std-input-mb
+                    %span.standard-checkbox
+                      = f.check_box :admin
+                      = f.label :admin, 'Site admin?', class: 'standard-checkbox-label pr-10'
+                    %span.standard-checkbox.subordinate{data: {dependent: "#user_admin"}}
+                      = f.check_box :gatekeeper, class: 'gatekeeper-checkbox'
+                      = f.label :gatekeeper, 'Admissions?', class: 'standard-checkbox-label pr-10'
+                    %span.standard-checkbox
+                      = f.check_box :organisation_admin
+                      = f.label :organisation_admin, 'HKFx admin?', class: 'standard-checkbox-label pr-10'
+
+                = hidden_field_tag :reload, true
+
+          .standard-modal-footer
+            .buttons
+              %button.croucher-standard-btn.modal-btn.cancel.submit-button{type: "button", data: {turbo: false}}
+                Cancel
+              %button.croucher-standard-btn.modal-btn.save.submit{type: "button", data: {turbo: false}}
+                Save

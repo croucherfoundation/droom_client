@@ -1,8 +1,4 @@
-# require 'concerns/droom_authentication'
-# require 'concerns/has_droom_user'
-# require 'concerns/might_have_droom_user'
-# require 'concerns/hk_names'
-# require 'concerns/user_administration'
+require_relative "../../app/helpers/droom_client_helper"
 
 module DroomClient
   class Engine < ::Rails::Engine
@@ -11,10 +7,10 @@ module DroomClient
       g.test_framework :rspec
       g.fixture_replacement :factory_girl, :dir => 'spec/factories'
     end
-    
+
     initializer "droom_client.integration" do
       ActiveSupport.on_load :action_controller do
-        helper DroomClientHelper
+        helper ::DroomClientHelper
       end
     end
 

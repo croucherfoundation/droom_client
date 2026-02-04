@@ -9,20 +9,16 @@ class MessageEnvelope
   belongs_to :message
 
   def for_mandrill_message(with_html=false, survey_code=nil, test_email=false, options={})
-    if options[:review_id].present?
-      @review_id = options[:review_id]
-    end
-    if options[:reminder].present?
-      @reminder = options[:reminder]
-    end
-    if options[:award_id].present?
-      @award_id = options[:award_id]
-    end
-    if options[:event_application].present?
-      @event_application = options[:event_application]
-    end
-    if options[:event_id].present?
-      @event_id = options[:event_id]
+    %i[
+      review_id
+      reminder
+      award_id
+      event_application
+      event_id
+      candidate_confirmation
+    ].each do |key|
+      value = options[key]
+      instance_variable_set("@#{key}", value) if value.present?
     end
 
     @survey_code = survey_code
@@ -51,8 +47,8 @@ class MessageEnvelope
       end
 
     ::ApplicationController.renderer.new.render_to_string(
-                                        template: template_path, 
-                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant, system_name: system_name, reminder: @reminder},
+                                        template: template_path,
+                                        locals: {envelope: @envelope, subject: @subject, summary: @summary, body: @body, applicant: @applicant, system_name: system_name, reminder: @reminder, candidate_confirmation: @candidate_confirmation},
                                         layout: false)
   end
 
@@ -104,7 +100,7 @@ class MessageEnvelope
 
   def render_body
     return @body if @body
-  
+
     @body = if @reminder
               message.render_body_for(applicant, reminder: @reminder)
             elsif @award_id
@@ -113,10 +109,12 @@ class MessageEnvelope
               message.render_body_for_reviewer(applicant, review_id: @review_id)
             elsif @event_application.present? || @event_id.present?
               message.render_body_for(applicant, event_application: @event_application, event_id: @event_id)
+            elsif @candidate_confirmation.present?
+              message.render_body_for(applicant, candidate_confirmation: @candidate_confirmation)
             else
               message.render_body_for(applicant, survey_code: @survey_code)
             end
-  
+
     self.rendered_body = @body
   end
 
@@ -132,5 +130,5 @@ class MessageEnvelope
     @applicant ||= Person.find_by_uid(person_uid) if person_uid.present? && system_name == 'core_notify'
     @applicant
   end
-  
+
 end
