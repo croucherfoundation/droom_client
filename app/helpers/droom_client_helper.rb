@@ -37,11 +37,7 @@ module DroomClientHelper
         :data => {:menu => "#{classname}_#{thing.id}", action: 'toggle-actions-dropdown', affected: ".#{classname}_#{thing.id}_actions"}
       })
       html_options[:class] << " menu"
-      link_to 'javascript:void(0)', html_options do
-        content_tag(:svg) do
-          content_tag(:use, '', href: "#edit_symbol")
-        end
-      end
+      link_to '', 'javascript:void(0)', html_options
     end
   end
 
