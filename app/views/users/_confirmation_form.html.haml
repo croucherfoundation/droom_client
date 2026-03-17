@@ -2,30 +2,40 @@
 - destination ||= false
 - unique_session_id = user.unique_session_id.presence || User.for_authentication(user.uid).unique_session_id
 
-= form_for user, url: droom_client.set_password_user_path(user), method: "PUT" do |f|
-  = hidden_field_tag :tok, unique_session_id
-  - if destination
-    = hidden_field_tag :destination, destination
+.standard-modal-overlay.active
+  .standard-modal-container.active
+    = form_for user, url: droom_client.set_password_user_path(user), method: "PUT", html: {class: "user setup custom-validate"} do |f|
+      = hidden_field_tag :tok, unique_session_id
+      - if destination
+        = hidden_field_tag :destination, destination
 
-  %fieldset{data: {role: 'password'}}
-    %p.set_password
-      %span.col.password>
-        = f.label :password, class: "required"
-        = f.password_field :password, placeholder: "Six characters or more, please", required: true, data: {role: "password"}
-      %span.col.confirmation{:data => {:role => "confirmation"}}>
-        = f.label :password_confirmation, class: "required"
-        = f.password_field :password_confirmation, placeholder: "", required: true
+      .standard-modal-header
+        %svg.logo
+          %use{"xlink:href" => "#croucher_logo"}
 
-    %p.password_quality.floating{data: {role: "meter"}}
-      %span.instructions{data: {role: "warnings"}}
-      %span.meter{data: {role: "gauge"}}
-        %svg
-          %use{"xlink:href" => "#warning_symbol"}
-    
-    %p.actions
-      = f.submit "Continue", class: 'croucher-standard-btn'
-    
-    %p.password_instructions
-      %span.notes{data: {role: "notes"}}
-        When the password is strong enough, the 'confirmation' box will become available, and when the two passwords match the 'continue' button will go green and become clickable.
-        Dictionary words, repetition and common passwords are likely to be rejected. Please add complication, either in the form of punctuation and strange characters or just by adding more words.
+        .container
+          %h2
+            Set up your account
+
+          %br
+
+          %p.std-mt
+            Create a password to get started.
+
+      .standard-modal-body
+        .container.std-mt
+          .inputs
+            .std-row
+              .input-group
+                = f.text_field :given_name, required: true, placeholder: t("placeholders.user.given_name"), data: { validation_message: "Please enter your first name" }
+              .input-group
+                = f.text_field :family_name, required: true, placeholder: t("placeholders.user.family_name"), data: { validation_message: "Please enter your last name" }
+
+            .input-group
+              = f.password_field :password, placeholder: t("placeholders.user.password"), required: true, minlength: 8, data: { validation_message: "Password must be at least 8 characters" }
+              %button.eye-icon{type: "button"}
+                %img{alt: "open", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}/
+
+      .standard-modal-footer
+        .buttons
+          = f.submit t(:continue), class: 'submit croucher-standard-btn'
