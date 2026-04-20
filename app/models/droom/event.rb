@@ -1,4 +1,4 @@
-class Event
+class Droom::Event
   include Her::JsonApi::Model
 
   use_api DROOM
@@ -14,6 +14,16 @@ class Event
 
   def associates
     @associates ||= []
+  end
+
+  def self.new_with_defaults(attributes={})
+    Droom::Event.new({
+      name: "",
+      description: nil,
+      start: nil,
+      finish: nil,
+      end_date: nil
+    }.merge(attributes))
   end
 
   # Invite a Droom user to this event.

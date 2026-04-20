@@ -21,7 +21,7 @@ describe "Event and Invitation client round-trip" do
        { event: { id: 42, name: "Test Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1 } }.to_json]
     end
 
-    event = Event.create(name: "Test Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
+    event = Droom::Event.create(name: "Test Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
     expect(event.id).to eq(42)
     expect(event.name).to eq("Test Screening")
   end
@@ -32,7 +32,7 @@ describe "Event and Invitation client round-trip" do
        { event: { id: 42, name: "Updated Screening", start: "2026-05-02T09:00:00Z", event_type_id: 1 } }.to_json]
     end
 
-    event = Event.new(id: 42, name: "Test Screening")
+    event = Droom::Event.new(id: 42, name: "Test Screening")
     event.name = "Updated Screening"
     event.save
     expect(event.name).to eq("Updated Screening")
@@ -43,7 +43,7 @@ describe "Event and Invitation client round-trip" do
       [200, { 'Content-Type' => 'application/json' }, ""]
     end
 
-    event = Event.new(id: 42, name: "Test Screening")
+    event = Droom::Event.new(id: 42, name: "Test Screening")
     expect { event.destroy }.not_to raise_error
   end
 
@@ -82,7 +82,7 @@ describe "Event and Invitation client round-trip" do
     end
 
     # Create event
-    event = Event.create(name: "Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
+    event = Droom::Event.create(name: "Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
     expect(event.id).to eq(42)
 
     # Invite user
