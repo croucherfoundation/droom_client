@@ -16,18 +16,18 @@ class Invitation
 
   def save
     raise ArgumentError, "event_id is required" unless event_id.present?
+
     params = { invitation: { user_id: user_id } }
-    response = DROOM.connection.post("/api/events/#{event_id}/invitations", params)
-    parsed = JSON.parse(response.body)
-    if parsed["invitation"]
-      assign_attributes(parsed["invitation"])
-    end
+    invitation = self.class.post "/api/events/#{event_id}/invitations", params
+    assign_attributes(invitation.attributes) if invitation.respond_to?(:attributes)
+    self.event_id = event_id
     self
   end
 
   def destroy
     raise ArgumentError, "event_id is required" unless event_id.present?
-    DROOM.connection.delete("/api/events/#{event_id}/invitations/#{id}")
+
+    self.class.delete "/api/events/#{event_id}/invitations/#{id}"
     self
   end
 
@@ -38,7 +38,14 @@ class Invitation
     invitation.save
   end
 
+  def self.for_event(event_id)
+    invitations = get "/api/events/#{event_id}/invitations"
+  rescue => e
+    Rails.logger.error "[droom_client] Error getting invitations: #{e.message}"
+    []
+  end
+
   def self.destroy(event_id:, id:)
-    DROOM.connection.delete("/api/events/#{event_id}/invitations/#{id}")
+    delete "/api/events/#{event_id}/invitations/#{id}"
   end
 end

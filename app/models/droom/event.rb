@@ -26,6 +26,15 @@ class Droom::Event
     }.merge(attributes))
   end
 
+  def self.update_by_uuid(uuid, params = {})
+    put "/api/events/#{uuid}", params
+  end
+
+  def self.destroy_by_uuid(uuid)
+    delete "/api/events/#{uuid}"
+    true
+  end
+
   # Invite a Droom user to this event.
   # Returns the created Invitation.
   def invite_user(user_id)
