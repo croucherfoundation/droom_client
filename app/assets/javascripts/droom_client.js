@@ -40,11 +40,11 @@
       );
     });
 
-    // Password reset form
-    $('.password-reset-btn').on('click', function (e) {
+    // Handle the password reset form the same way for click and Enter submits.
+    $('form.edit_user.password').on('submit', function (e) {
       e.preventDefault();
 
-      var $form = $(this).closest('form');
+      var $form = $(this);
 
       $.ajax({
         url: $form.attr('action'),
@@ -56,7 +56,7 @@
           $('#passwordConfirmModal').addClass('modal-open');
         })
         .fail(function (xhr) {
-          errorMsg = xhr.responseJSON.error;
+          var errorMsg = xhr.responseJSON.error;
           $('#passwordModal').removeClass('modal-open');
           $('#passwordResetFailureModal').find('.alert-message').text(errorMsg);
           $('#passwordResetFailureModal').addClass('modal-open');
