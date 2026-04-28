@@ -56,7 +56,7 @@ module DroomClientHelper
 
   def determine_dataroom_url(user)
     public_systems = %w[pub yearbook search]
-    committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
+    committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff', 'Screeners', 'Interviewers']
 
     # Determine base URL and text based on subdomain
     base_url = public_systems.include?(Settings.service_name) ? ENV['DROOM_URL'] : Settings.home_url
