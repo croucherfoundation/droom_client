@@ -75,7 +75,7 @@ module DroomClientHelper
     end
 
     # Reviewer users
-    if user.user_groups&.include?('Reviewer')
+    if user.user_groups&.include?('Reviewer') && !user.user_groups&.include?('Risk Management Reviewers')
       return { url: "#{ENV['APPL_URL']}/reviewers/user/#{user.uid}/profile", text: 'Go to data room' }
     end
 
