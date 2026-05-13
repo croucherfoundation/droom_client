@@ -189,6 +189,20 @@ class User
     nil
   end
 
+  def self.account_setting_update(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/account_setting_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.verify_email(token)
+    params = { token: token }
+    get "/api/users/verify_email", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def self.sync_profile_image(user_uid, params={})
     params = params.to_h unless params == {}
     get "/api/users/#{user_uid}/sync_profile_image", params
