@@ -42,8 +42,6 @@ class User
       phone: phone,
       mobile: mobile,
       address: address,
-      primary_email: primary_email,
-      backup_email: backup_email,
       correspondence_address: try(:correspondence_address)
     }
   end
