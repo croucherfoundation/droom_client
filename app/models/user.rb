@@ -189,6 +189,17 @@ class User
     nil
   end
 
+  def self.check_valid_password(user_uid, password)
+    response = DROOM.connection.post("/api/users/#{user_uid}/check_valid_password") do |req|
+      req.body = { user: { current_password: password } }.to_json
+      req.headers['Content-Type'] = 'application/json'
+    end
+    response.status == 200
+  rescue Faraday::Error, JSON::ParserError => e
+    Rails.logger.error "[droom_client] check_valid_password error: #{e.message}"
+    false
+  end
+
   def self.account_setting_update(user_uid, params={})
     params = params.to_h unless params == {}
     put "/api/users/#{user_uid}/account_setting_update", params
