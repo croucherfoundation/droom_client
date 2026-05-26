@@ -1,5 +1,5 @@
-- primary_email = @user.emails.first.email
-- backup_email = @user.emails.second.email
+- primary_email = @user.emails.first&.email
+- backup_email = @user.emails.second&.email
 - profile_image = @user.profile_image.presence || "https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png"
 
 #modal2.modal{data: {'upload-url' => droom_client.upload_profile_image_path(@user.uid), 'remove-url' => droom_client.remove_profile_path(@user.uid)}}
