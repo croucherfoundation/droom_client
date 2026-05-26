@@ -301,7 +301,6 @@ protected
     account[:timezone] = params[:timezone] if params[:timezone].present?
     account[:current_password] = params[:current_password] if params[:current_password].present?
     account[:new_password] = params[:password] if params[:password].present?
-    account[:destination] = request.referer || root_url
     account
   end
 
