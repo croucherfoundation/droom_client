@@ -15,6 +15,7 @@ DroomClient::Engine.routes.draw do
 
   get '/users/remove_profile/:id' => 'users#remove_profile', as: 'remove_profile'
   put '/users/upload_profile_image/:id' => 'users#upload_profile_image', as: 'upload_profile_image'
+  put '/users/account_setting_update/:id' => 'users#account_setting_update', as: 'account_setting_update'
 
   resources :users do
     put :set_password, on: :member
