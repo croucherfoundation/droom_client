@@ -9,19 +9,22 @@
     .croucher_container
       .account
         .account_title
-          %h2.text-subtitle 
+          %h2.text-subtitle
             = t('user_profile.your_account')
         .account_settings
           %div
-            %button{data: {'toggle': 'modal', 'target': 'editContact'}} 
+            %button{data: {'toggle': 'modal', 'target': 'editContact'}}
               = t('user_profile.edit_contact_info')
           %div
-            %button{data: {'toggle': 'modal', 'target': 'modal1'}} 
+            %button{data: {'toggle': 'modal', 'target': 'modal1'}}
               = t('user_profile.account_settings')
+          -# %div
+          -#   %button{data: {'toggle': 'modal', 'target': 'modal2'}}
+          -#     = t('user_profile.account_settings_modify')
           %div
             = button_to droom_client.sign_out_path, :method => :delete, :class => 'signout', data: {turbo: false} do
               = t('user_profile.sign_out')
-        
+
         - dataroom = determine_dataroom_url(current_user)
         - if dataroom[:url]
           .goto_dataroom

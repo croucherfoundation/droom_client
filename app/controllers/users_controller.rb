@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   respond_to :html, :json
 
   skip_before_action :authenticate_user!, raise: false
-  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile]
+  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile, :upload_profile_image]
   before_action :get_users, only: [:index]
-  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile]
+  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile, :upload_profile_image]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
@@ -30,13 +30,13 @@ class UsersController < ApplicationController
     uri = URI.parse(referer_url)
     referer_params = Rack::Utils.parse_query(uri.query || '')
     destination = referer_params['destination'].presence || root_url
-  
+
     permitted_params = user_params.merge(
       ip_address: request.ip,
       browser_agent: request.user_agent,
       after_confirmed_url: destination
     )
-  
+
     @user = User.sign_up(permitted_params)
     error_messages = @user&.metadata&.[](:error_message)
 
@@ -99,11 +99,25 @@ class UsersController < ApplicationController
     else
       respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
     end
-    
   end
 
   def remove_profile
-    @user.remove_profile(@user.uid)
+    result = @user.remove_profile(@user.uid)
+    if result
+      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+    else
+      render json: { error: 'Failed to remove profile image.' }, status: :unprocessable_entity
+    end
+  end
+
+  def upload_profile_image
+    base64_image = params[:user][:image]
+    result = @user.upload_profile_image(@user.uid, base64_image)
+    if result
+      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+    else
+      render json: { error: 'Failed to upload profile image.' }, status: :unprocessable_entity
+    end
   end
 
 
@@ -215,13 +229,13 @@ protected
     # Read the image file
     file = File.open(image_path, 'rb')
     image_data = file.read
-  
+
     # Get MIME type (e.g., "image/png" or "image/jpeg")
     mime_type = Marcel::MimeType.for(image_path)
-  
+
     # Encode to Base64
     base64_image = Base64.encode64(image_data)
-  
+
     # Combine with MIME type
     "data:#{mime_type};base64,#{base64_image}"
   ensure

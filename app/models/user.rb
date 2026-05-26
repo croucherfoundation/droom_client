@@ -227,6 +227,12 @@ class User
     nil
   end
 
+  def upload_profile_image(user_uid, base64_image)
+    self.class.put "/api/users/#{user_uid}/upload_profile_image", image: base64_image
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def remove_reviewer_group(user_uid)
     self.class.delete "/api/users/#{user_uid}/remove_reviewer_group"
   end
