@@ -43,18 +43,18 @@
 
                   .input-group
                     = f.email_field :primary_email, placeholder: "your@email.com", required: true, value: primary_email, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}
-                    %span.warning.hidden.email_error
+                    %span.warning.hidden.email_error.email-err-msg
                       This email already exists! Please try with a different email address.
 
                   .input-group
                     = f.email_field :backup_email, placeholder: "backup@email.com", required: false, value: backup_email, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}
-                    %span.warning.hidden.email_error
+                    %span.warning.hidden.email_error.email-err-msg
                       This email already exists! Please try with a different email address.
 
                   %span.account-field-help
                     A second email where we can reach you if your main email changes.
 
-                %section.timezones
+                %section.timezones.std-input-mb
                   = render "droom_client/shared/account_settings/timezones_modify", f: f, user: @user
 
 
@@ -69,18 +69,20 @@
 
                 #password-fields-modal2.account-password-fields
                   .inputs{style: "margin-top: 0 !important;"}
-                    .input-group{style: "position: relative;"}
+                    .input-group.relative
                       .croucher_input.passwords-input.passwords-input-primary
                         = f.password_field :current_password, placeholder: "Current password", minlength: 8, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
                         %span
-                          %img.passwords-eye{alt: "Eye", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
+                          %button.password-toggle.password-toggle-btn{type: "button", 'aria-label': "Show password"}
+                            %img{alt: "", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
                         %p.error_message
 
-                    .input-group{style: "position: relative;"}
+                    .input-group.relative
                       .croucher_input.passwords-input.passwords-input-confirm
                         = f.password_field :password, placeholder: "New password", minlength: 8, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
                         %span
-                          %img.passwords-eye{alt: "Eye", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
+                          %button.password-toggle.password-toggle-btn{type: "button", 'aria-label': "Show password"}
+                            %img{alt: "", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
                         %p.error_message
                     %span.account-field-help
                       At least 8 characters
