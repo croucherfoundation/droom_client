@@ -137,49 +137,6 @@
       $('#password-toggle-icon-modal2').toggleClass('expanded');
     });
 
-    // Email validation for modal2 — check availability and toggle Save button
-    (function initEmailValidation() {
-      var debounceTimer;
-      var $modal = $('#modal2');
-      if (!$modal.length) return;
-
-      var $saveBtn = $modal.find('button.account-settings-save');
-
-      function toggleSaveBtn() {
-        var hasVisibleError = $modal.find('.email_error').filter(function () {
-          return $(this).css('display') !== 'none';
-        }).length > 0;
-
-        $saveBtn.prop('disabled', hasVisibleError).toggleClass('disabled', hasVisibleError);
-      }
-
-      $(document).on('keyup change', '#modal2 input[data-role="email"]', function () {
-        var $field = $(this);
-        var email = $field.val().trim();
-        var $warning = $field.siblings('.email_error');
-        var checkUrl = $field.data('check-url');
-        var userId = $field.data('user-id');
-
-        clearTimeout(debounceTimer);
-
-        if (email === '') {
-          $warning.hide();
-          toggleSaveBtn();
-          return;
-        }
-
-        // Debounce server check
-        debounceTimer = setTimeout(function () {
-          if (checkUrl) {
-            $.getJSON(checkUrl, { email: email, user_id: userId }, function (response) {
-              response.message === 'oops' ? $warning.show() : $warning.hide();
-              toggleSaveBtn();
-            });
-          }
-        }, 300);
-      });
-    })();
-
     // Handle the password reset form the same way for click and Enter submits.
     $('form.edit_user.password').on('submit', function (e) {
       e.preventDefault();
