@@ -1,0 +1,95 @@
+- primary_email = @user.emails.first&.email
+- backup_email = @user.emails.second&.email
+- profile_image = @user.profile_image.presence || "https://cmss.croucher.org.hk/assets/images/croucher-admin-1.png"
+
+#modal2.modal{data: {'upload-url' => droom_client.upload_profile_image_path(@user.uid), 'remove-url' => droom_client.remove_profile_path(@user.uid)}}
+  .modal-wrapper{role: "document"}
+    .modal-content
+      .standard-modal-overlay.active
+        .standard-modal-container.active
+          = form_for @user, url: droom_client.account_setting_update_path(@user.uid), method: :put, html: {class: 'edit user custom-validate', autocomplete: false, multipart: true} do |f|
+            .standard-modal-header
+              .standard-modal-close-btn.cursor-pointer
+                %svg.standard_close_icon
+                  %use{"xlink:href" => "#standard_close_symbol"}
+              %svg.logo
+                %use{"xlink:href" => "#croucher_logo"}
+              .container
+                %h2 Account
+
+            .standard-modal-body
+              .container.std-mt
+
+                .account-photo.profile-image
+                  = f.file_field :image, id: "profile-upload-modal2", accept: "image/jpeg,image/png"
+
+                  .account-photo-avatar-container.profile-avatar-container
+                    %img#profile-avatar-modal2.account-photo-avatar.profile-avatar{src: profile_image, alt: "Profile"}
+                    %button#photo-remove-btn-modal2.account-photo-remove.profile-remove-button.profile-remove-button-modal2{type: "button", style: "display: #{@user.show_initial_image ? 'none' : 'block'}", data: {'user-uid' => @user.uid}, 'aria-label': "Remove photo"}
+                      %svg{viewBox: "0 0 12 12", fill: "none", stroke: "currentColor", 'stroke-width': "2"}
+                        %path{d: "M2 2l8 8M10 2l-8 8"}
+
+                  %button#photo-upload-btn-modal2.account-photo-upload-text.profile-upload-text{type: "button"}
+                    Upload photo
+
+                  = hidden_field_tag :remove_image, false, id: "remove_image_modal2"
+
+                .inputs
+                  .account-name-row
+                    .input-group
+                      = f.text_field :given_name, placeholder: "First name", maxlength: 100, required: true
+                    .input-group
+                      = f.text_field :family_name, placeholder: "Last name", maxlength: 100, required: true
+
+                  .input-group
+                    = f.email_field :primary_email, placeholder: "your@email.com", required: true, value: primary_email, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}
+                    %span.warning.hidden.email_error.email-err-msg
+                      This email already exists! Please try with a different email address.
+
+                  .input-group
+                    = f.email_field :backup_email, placeholder: "backup@email.com", required: false, value: backup_email, data: {role: "email", check_url: droom_client.check_email_path, users_path: droom_client.users_path, user_id: @user.id}
+                    %span.warning.hidden.email_error.email-err-msg
+                      This email already exists! Please try with a different email address.
+
+                  %span.account-field-help
+                    A second email where we can reach you if your main email changes.
+
+                %section.timezones.std-input-mb
+                  = render "droom_client/shared/account_settings/timezones_modify", f: f, user: @user
+
+
+                %hr.account-divider
+
+                %button#password-toggle-btn-modal2.account-password-toggle{type: "button"}
+                  %span.account-password-toggle-label
+                    Change password
+                  %span#password-toggle-icon-modal2.account-password-toggle-icon
+                    %svg{viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", 'stroke-width': "2", 'stroke-linecap': "round"}
+                      %path{d: "M6 4l4 4-4 4"}
+
+                #password-fields-modal2.account-password-fields
+                  .inputs{style: "margin-top: 0 !important;"}
+                    .input-group.relative
+                      .croucher_input.passwords-input.passwords-input-primary
+                        = f.password_field :current_password, placeholder: "Current password", minlength: 8, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
+                        %span
+                          %button.password-toggle.password-toggle-btn{type: "button", 'aria-label': "Show password"}
+                            %img{alt: "", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
+                        %p.error_message
+
+                    .input-group.relative
+                      .croucher_input.passwords-input.passwords-input-confirm
+                        = f.password_field :password, placeholder: "New password", minlength: 8, autocomplete: false, readonly: true, onfocus: "this.removeAttribute('readonly');"
+                        %span
+                          %button.password-toggle.password-toggle-btn{type: "button", 'aria-label': "Show password"}
+                            %img{alt: "", src: "https://croucher.org.hk/assets/images/icons/eye-02.svg"}
+                        %p.error_message
+                    %span.account-field-help
+                      At least 8 characters
+
+            .standard-modal-footer
+              .buttons
+                %button.croucher-standard-btn.modal-btn.cancel{type: "button"}
+                  Cancel
+                %button.croucher-standard-btn.submit.modal-btn.account-settings-save{type: "button"}
+                  Save

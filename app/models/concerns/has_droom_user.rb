@@ -39,13 +39,21 @@ module HasDroomUser
   end
 
   def find_or_create_user
-    unless user
-      @_user = User.create({
+    group_slug = respond_to?(:user_group) ? user_group : nil
+    if user
+      if group_slug.present?
+        user.user_group = group_slug
+        user.save
+      end
+    else
+      attrs = {
         given_name: given_name,
         family_name: family_name,
         chinese_name: chinese_name,
         email: email
-      })
+      }
+      attrs[:user_group] = group_slug if group_slug.present?
+      @_user = User.create(attrs)
       self.user_uid = @_user.uid
     end
     @_user

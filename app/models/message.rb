@@ -166,9 +166,16 @@ class Message
   end
 
   def transform_body_for_event_application(application, body, event_id)
-    event = Event.find(event_id) if event_id.present?
-    payment_url = event.present? ? event&.payment_url : application.event_payment_url
-    payment_url = payment_url.present? ? payment_url : "#"
+    event = Event.find_by(id: event_id) if event_id.present?
+    payment_url =
+      if event&.payment_type == 'qr_and_tt'
+        event.qr_and_tt_payment_url
+      else
+        event&.payment_url || application&.event_payment_url
+      end
+
+    payment_url = payment_url.presence || '#'
+
     if application.present?
       session_datetime = application.event_session_datetime
       session_location = application.event_session_location

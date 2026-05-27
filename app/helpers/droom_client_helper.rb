@@ -56,7 +56,7 @@ module DroomClientHelper
 
   def determine_dataroom_url(user)
     public_systems = %w[pub yearbook search]
-    committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff']
+    committees = ['Trustees', 'Audit Committee', 'Investment Committee', 'Nomination Committee', 'Staff', 'Screeners', 'Interviewers']
 
     # Determine base URL and text based on subdomain
     base_url = public_systems.include?(Settings.service_name) ? ENV['DROOM_URL'] : Settings.home_url
@@ -75,7 +75,7 @@ module DroomClientHelper
     end
 
     # Reviewer users
-    if user.user_groups&.include?('Reviewer')
+    if user.user_groups&.include?('Reviewer') && !user.user_groups&.include?('Risk Management Reviewers')
       return { url: "#{ENV['APPL_URL']}/reviewers/user/#{user.uid}/profile", text: 'Go to data room' }
     end
 

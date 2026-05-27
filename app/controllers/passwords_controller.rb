@@ -11,18 +11,18 @@ class PasswordsController < ApplicationController
       return render json: { error: error_message }, status: :bad_request
     end
 
-    @user = User.reset_password_request(password_params)
+    @user = User.reset_password_request(reset_password_request_params)
     if @user
       render json: { message: 'Password reset request sent' }
     else
-      render json: { error: error_message }, status: bad_request
+      render json: { error: error_message }, status: :bad_request
     end
   end
 
   protected
 
   def set_email
-    @email_record = Email.where(email: password_params[:email]).first
+    @email_record = Email.where(email: reset_password_request_params[:email]).first
   end
 
   def password_params
@@ -31,6 +31,17 @@ class PasswordsController < ApplicationController
     else
       {}
     end
+  end
+
+  def reset_password_request_params
+    password_params.slice(:email).merge(destination: reset_password_destination)
+  end
+
+  def reset_password_destination
+    params[:destination].presence ||
+      params[:backto].presence ||
+      params.dig(:user, :destination).presence ||
+      params.dig(:user, :backto).presence
   end
 
 

@@ -37,6 +37,7 @@ module MightHaveDroomUser
           email: email
         })
         self.user_uid = @_user.uid
+        self.update_columns(user_uid: @_user.uid) if @_user.uid
       end
     end
     @_user

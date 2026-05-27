@@ -189,6 +189,31 @@ class User
     nil
   end
 
+  def self.check_valid_password(user_uid, password)
+    response = DROOM.connection.post("/api/users/#{user_uid}/check_valid_password") do |req|
+      req.body = { user: { current_password: password } }.to_json
+      req.headers['Content-Type'] = 'application/json'
+    end
+    response.status == 200
+  rescue Faraday::Error, JSON::ParserError => e
+    Rails.logger.error "[droom_client] check_valid_password error: #{e.message}"
+    false
+  end
+
+  def self.account_setting_update(user_uid, params={})
+    params = params.to_h unless params == {}
+    put "/api/users/#{user_uid}/account_setting_update", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def self.verify_email(token)
+    params = { token: token }
+    get "/api/users/verify_email", params
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   def self.sync_profile_image(user_uid, params={})
     params = params.to_h unless params == {}
     get "/api/users/#{user_uid}/sync_profile_image", params
@@ -198,6 +223,12 @@ class User
 
   def remove_profile(user_uid)
     self.class.get "/api/users/#{user_uid}/remove_profile"
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
+  def upload_profile_image(user_uid, base64_image)
+    self.class.put "/api/users/#{user_uid}/upload_profile_image", image: base64_image
   rescue JSON::ParserError, Her::Errors::ParseError
     nil
   end

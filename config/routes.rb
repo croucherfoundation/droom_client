@@ -2,7 +2,7 @@ DroomClient::Engine.routes.draw do
 
   get '/users/sign_in' => "user_sessions#new", as: "sign_in"
   post '/users/sign_in' => "user_sessions#create"
-  
+
   delete '/users/sign_out' => "user_sessions#destroy", as: "sign_out"
   get '/users/preferences' => "users#edit", as: "preferences"
   get '/users/suggest' => "users#suggest", as: "suggest_users"
@@ -14,6 +14,8 @@ DroomClient::Engine.routes.draw do
   get 'check_authenticate' => 'users#check_authenticate'
 
   get '/users/remove_profile/:id' => 'users#remove_profile', as: 'remove_profile'
+  put '/users/upload_profile_image/:id' => 'users#upload_profile_image', as: 'upload_profile_image'
+  put '/users/account_setting_update/:id' => 'users#account_setting_update', as: 'account_setting_update'
 
   resources :users do
     put :set_password, on: :member

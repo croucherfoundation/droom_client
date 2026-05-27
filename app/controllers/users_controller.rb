@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   respond_to :html, :json
 
   skip_before_action :authenticate_user!, raise: false
-  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile]
+  before_action :require_authenticated_user, only: [:index, :show, :edit, :update, :suggest, :remove_profile, :upload_profile_image, :account_setting_update]
   before_action :get_users, only: [:index]
-  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile]
+  before_action :get_user, only: [:show, :edit, :update, :confirm, :welcome, :remove_profile, :upload_profile_image, :account_setting_update]
   before_action :get_view, only: [:edit]
   layout :no_layout_if_pjax
 
@@ -30,13 +30,13 @@ class UsersController < ApplicationController
     uri = URI.parse(referer_url)
     referer_params = Rack::Utils.parse_query(uri.query || '')
     destination = referer_params['destination'].presence || root_url
-  
+
     permitted_params = user_params.merge(
       ip_address: request.ip,
       browser_agent: request.user_agent,
       after_confirmed_url: destination
     )
-  
+
     @user = User.sign_up(permitted_params)
     error_messages = @user&.metadata&.[](:error_message)
 
@@ -99,13 +99,45 @@ class UsersController < ApplicationController
     else
       respond_with @user, location: params[:reload] == "true" ? request.referer : droom_client.user_url(@user)
     end
-    
   end
 
   def remove_profile
-    @user.remove_profile(@user.uid)
+    result = @user.remove_profile(@user.uid)
+    if result
+      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+    else
+      render json: { error: 'Failed to remove profile image.' }, status: :unprocessable_entity
+    end
   end
 
+  def upload_profile_image
+    base64_image = params[:user][:image]
+    result = @user.upload_profile_image(@user.uid, base64_image)
+    if result
+      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+    else
+      render json: { error: 'Failed to upload profile image.' }, status: :unprocessable_entity
+    end
+  end
+
+  def account_setting_update
+    authorize! :update, @user
+    return if password_change_invalid?(user_params)
+
+    permitted = sanitized_account_params(user_params)
+
+    result = User.account_setting_update(@user.uid, permitted)
+
+    if result.present? && result.try(:uid).present?
+      respond_to_successful_update(permitted)
+    else
+      error_msg = result.try(:metadata)&.[](:error) || "Failed to update account settings"
+      render_update_error(error_msg)
+    end
+  rescue StandardError => e
+    render_update_error("An unexpected error occurred.")
+    Rails.logger.error("[AccountSettingUpdate] #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}")
+  end
 
   ## Confirmation
   #
@@ -208,20 +240,20 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :email, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+    params.require(:user).permit(:email, :primary_email, :backup_email, :password, :password_confirmation, :current_password, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
   end
 
   def convert_image_to_base64(image_path)
     # Read the image file
     file = File.open(image_path, 'rb')
     image_data = file.read
-  
+
     # Get MIME type (e.g., "image/png" or "image/jpeg")
     mime_type = Marcel::MimeType.for(image_path)
-  
+
     # Encode to Base64
     base64_image = Base64.encode64(image_data)
-  
+
     # Combine with MIME type
     "data:#{mime_type};base64,#{base64_image}"
   ensure
@@ -231,6 +263,74 @@ protected
 
   def is_valid_image?(image)
     FileSecurityService.allowed_image?(image.content_type)
+  end
+
+  # Mirrors droom's password_change_invalid? logic
+  def password_change_invalid?(params)
+    current_password = params[:current_password]
+    new_password = params[:password]
+
+    return false if current_password.blank? && new_password.blank?
+
+    if current_password.blank?
+      return render_update_error("Current password is required to set a new password.")
+    end
+
+    unless User.check_valid_password(@user.uid, current_password)
+      return render_update_error("Current password is incorrect.")
+    end
+
+    if new_password.blank?
+      return render_update_error("New password cannot be blank.")
+    end
+
+    if new_password == current_password
+      return render_update_error("New password must be different from current password.")
+    end
+
+    false
+  end
+
+  # Maps form fields to what droom's API account_setting_update expects
+  def sanitized_account_params(params)
+    account = {}
+    account[:first_name] = params[:given_name] if params[:given_name].present?
+    account[:last_name] = params[:family_name] if params[:family_name].present?
+    account[:email] = params[:primary_email] if params[:primary_email].present?
+    account[:backup_email] = params[:backup_email] if params.key?(:backup_email)
+    account[:timezone] = params[:timezone] if params[:timezone].present?
+    account[:current_password] = params[:current_password] if params[:current_password].present?
+    account[:new_password] = params[:password] if params[:password].present?
+    account
+  end
+
+  def render_update_error(message, status = :unprocessable_entity)
+    if request.xhr?
+      render json: { error_message: message }, status: status
+    else
+      flash[:alert] = message
+      redirect_to request.referer
+    end
+    true
+  end
+
+  def respond_to_successful_update(permitted)
+    if permitted[:email].present? && permitted[:email] != current_user.primary_email
+      message = "Verification email sent to #{permitted[:email]}. Please check your inbox."
+      if request.xhr?
+        render json: { message: message, verification_required: true }, status: :ok
+      else
+        flash[:notice] = message
+        redirect_to request.referer
+      end
+    else
+      if request.xhr?
+        render json: { message: "Account settings saved successfully." }, status: :ok
+      else
+        flash[:notice] = "Account settings saved successfully."
+        redirect_to request.referer
+      end
+    end
   end
 
 end
