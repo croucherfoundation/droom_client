@@ -161,12 +161,16 @@ class UsersController < ApplicationController
   #
 
   def check_email
-    in_use = params[:email].present? && User.where(email: params[:email]).any?
     message = 'whoops'
-    if in_use
-      message = 'oops'
+    if params[:email].present?
+      users = User.where(email: params[:email])
+      # Exclude current user's own email from the check
+      if params[:user_id].present?
+        users = users.reject { |u| u.id.to_s == params[:user_id].to_s }
+      end
+      message = 'oops' if users.any?
     end
-    render json: {message: message}
+    render json: { message: message }
   end
 
 
