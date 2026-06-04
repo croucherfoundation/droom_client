@@ -20,10 +20,16 @@ class Api::SessionsController < ApplicationController
           if sign_in_cookie
             begin
               parsed_cookie = JSON.parse(sign_in_cookie)
+              submitted_email = sign_in_params[:email].to_s.strip.downcase
+              primary_email = user.try(:primary_email).to_s.strip.downcase
+              show_backup_email_banner = primary_email.present? && submitted_email.present? && submitted_email != primary_email
               user_data = {
                 _s: parsed_cookie[0],
                 _k: parsed_cookie[1][0],
-                _d: parsed_cookie[1][1]
+                _d: parsed_cookie[1][1],
+                show_backup_email_banner: show_backup_email_banner,
+                primary_email: primary_email,
+                date: Date.new(2026, 9, 1).strftime("%d-%B-%Y")
               }
               return render json: user_data
             rescue JSON::ParserError, NoMethodError => e
