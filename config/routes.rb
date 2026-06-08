@@ -17,6 +17,9 @@ DroomClient::Engine.routes.draw do
   put '/users/upload_profile_image/:id' => 'users#upload_profile_image', as: 'upload_profile_image'
   put '/users/account_setting_update/:id' => 'users#account_setting_update', as: 'account_setting_update'
 
+  # Dismiss the backup-email reminder banner shown after signing in with a backup email.
+  delete '/banners/backup_email' => 'banners#dismiss_backup_email', as: :dismiss_backup_email_banner
+
   resources :users do
     put :set_password, on: :member
     resources :emails
