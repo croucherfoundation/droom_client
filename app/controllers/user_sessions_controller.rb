@@ -13,6 +13,7 @@ class UserSessionsController < ApplicationController
       if user.confirmed?
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
+        flag_backup_email_sign_in(user)
       else
         RequestStore.store.delete :current_user
         unset_auth_cookie
@@ -78,6 +79,19 @@ class UserSessionsController < ApplicationController
       params.require(:user).permit(:email, :password, :remember_me)
     else
       {}
+    end
+  end
+
+  # Flag the session when a user signs in using an email that is not their
+  # primary email (i.e. a backup email), so the layout can show a banner
+  # reminding them to use their primary email in future.
+  def flag_backup_email_sign_in(user)
+    submitted = sign_in_params[:email].to_s.strip.downcase
+    primary = user.try(:primary_email).to_s.strip.downcase
+    if submitted.present? && primary.present? && submitted != primary
+      session[:show_backup_email_banner] = true
+    else
+      session.delete(:show_backup_email_banner)
     end
   end
 

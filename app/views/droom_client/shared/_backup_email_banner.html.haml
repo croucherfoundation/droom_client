@@ -1,0 +1,33 @@
+- if current_user && session[:show_backup_email_banner] && (primary_email = current_user.try(:primary_email)).present?
+  #backup-email-banner.croucher-backup-email-banner{role: "alert"}
+    .croucher-backup-email-banner__content
+      %span.croucher-backup-email-banner__icon{"aria-hidden" => true} ⚠
+      %p.croucher-backup-email-banner__text
+        You're logging in with your backup email. From
+        %span#backup-email-date September 1, 2026
+        \, you'll need to use your primary email (
+        %span#primary-email-address= primary_email
+        ) to log in. Update in
+        %button.croucher-backup-email-banner__action{type: "button", data: {toggle: "modal", target: "modal2"}} Account
+        \.
+    .croucher-backup-email-banner__close
+      %button#backup-email-banner-dismiss.croucher-backup-email-banner__close-btn{type: "button", "aria-label" => "Dismiss"}
+        %span.sr-only{style: "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;"} Dismiss
+        %svg{stroke: "currentColor", fill: "currentColor", "stroke-width" => "0", viewBox: "0 0 24 24", height: "1em", width: "1em", xmlns: "http://www.w3.org/2000/svg"}
+          %path{fill: "none", stroke: "#000", "stroke-width" => "2", d: "M3,3 L21,21 M3,21 L21,3"}
+  :javascript
+    (function () {
+      var banner = document.getElementById('backup-email-banner');
+      if (!banner) return;
+      var btn = document.getElementById('backup-email-banner-dismiss');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        banner.parentNode && banner.parentNode.removeChild(banner);
+        var token = (document.querySelector('meta[name="csrf-token"]') || {}).content;
+        fetch('#{droom_client.dismiss_backup_email_banner_path}', {
+          method: 'DELETE',
+          credentials: 'same-origin',
+          headers: { 'X-CSRF-Token': token || '', 'Accept': 'application/json' }
+        });
+      });
+    })();
