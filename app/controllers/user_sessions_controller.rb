@@ -4,6 +4,10 @@ class UserSessionsController < ApplicationController
   before_action :authenticate_user!, only: [:destroy]
   skip_before_action :verify_authenticity_token, only: [:destroy], raise: false
 
+  # From this date, signing in with a backup email is no longer allowed;
+  # until then we only show a reminder banner (see #flag_backup_email_sign_in).
+  BACKUP_EMAIL_ENFORCEMENT_DATE = Date.new(2026, 9, 1)
+
   def new
     render
   end
@@ -11,6 +15,13 @@ class UserSessionsController < ApplicationController
   def create
     if user = User.sign_in(sign_in_params.to_h)
       if user.confirmed?
+        if backup_email_login_blocked?(user)
+          RequestStore.store.delete :current_user
+          unset_auth_cookie
+          reset_session
+          flash[:alert] = "Please log in with your primary email address. If you need to update your primary email, use the password reset flow."
+          redirect_to droom_client.sign_in_path and return
+        end
         RequestStore.store[:current_user] = user
         set_auth_cookie_for(user)
         flag_backup_email_sign_in(user)
@@ -93,6 +104,15 @@ class UserSessionsController < ApplicationController
     else
       session.delete(:show_backup_email_banner)
     end
+  end
+
+  # On or after the enforcement date, a user may no longer sign in using a
+  # backup email; they must use their primary email instead.
+  def backup_email_login_blocked?(user)
+    return false if Date.current < BACKUP_EMAIL_ENFORCEMENT_DATE
+    submitted = sign_in_params[:email].to_s.strip.downcase
+    primary = user.try(:primary_email).to_s.strip.downcase
+    submitted.present? && primary.present? && submitted != primary
   end
 
   def redirect_url(redirect_to_url, additional_params = {})
