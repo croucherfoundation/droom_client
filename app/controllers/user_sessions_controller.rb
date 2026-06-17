@@ -6,7 +6,7 @@ class UserSessionsController < ApplicationController
 
   # From this date, signing in with a backup email is no longer allowed;
   # until then we only show a reminder banner (see #flag_backup_email_sign_in).
-  BACKUP_EMAIL_ENFORCEMENT_DATE = Date.new(2026, 9, 1)
+  BACKUP_EMAIL_ENFORCEMENT_DATE = Date.new(2026, 9, 9)
 
   def new
     render
