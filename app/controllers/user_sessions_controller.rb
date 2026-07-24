@@ -37,7 +37,7 @@ class UserSessionsController < ApplicationController
         redirect_to redirect_to_url and return
       end
       unless request.xhr?
-        flash[:notice] = t("flash.greeting", name: user.given_name).html_safe
+        set_notice(t('notifications.authentication.login_success', name: user.given_name))
       end
       destination = params[:destination]
       if destination.present? && destination =~ /^\//
@@ -74,7 +74,7 @@ class UserSessionsController < ApplicationController
     if request.xhr?
       head :ok
     else
-      flash[:notice] = t("flash.goodbye", name: name).html_safe
+      set_notice(t('notifications.authentication.logout', name: name))
       if params[:back_to].present?
         redirect_to params[:back_to], method: "get"
       else

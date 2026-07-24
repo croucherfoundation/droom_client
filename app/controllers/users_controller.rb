@@ -149,7 +149,7 @@ class UsersController < ApplicationController
     if @user = User.authenticate(params[:tok])
       sign_in_and_remember @user
       @user.set_password!(user_params)
-      flash[:notice] = t(:password_set)
+      set_notice(t('notifications.authentication.password_set'))
       respond_with @user, location: params[:destination].present? ? params[:destination] : after_sign_in_path_for(@user)
     else
       raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
