@@ -37,7 +37,7 @@ class UserSessionsController < ApplicationController
         redirect_to redirect_to_url and return
       end
       unless request.xhr?
-        set_notice(t('notifications.authentication.login_success', name: user.given_name))
+        set_notice(t('notifications.authentication.login_success', name: user.name))
       end
       destination = params[:destination]
       if destination.present? && destination =~ /^\//
@@ -67,7 +67,7 @@ class UserSessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    name = current_user.given_name
+    name = current_user.name
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
