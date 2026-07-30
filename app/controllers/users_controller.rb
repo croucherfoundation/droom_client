@@ -38,7 +38,7 @@ class UsersController < ApplicationController
     )
 
     @user = User.sign_up(permitted_params)
-    error_messages = @user&.metadata&.[](:error_message)
+    error_messages = @user.errors
 
     @show_email_confirm_popup = true
     referer_url = request.referer
@@ -52,10 +52,10 @@ class UsersController < ApplicationController
       error_message = Array(error_messages).first.to_s
 
       if error_message.end_with?("Email address provided is invalid")
-        error_message = "Email address provided is invalid"
+        error_message = "Email address provided is invalid."
       end
 
-      render json: { error_message: error_message }, status: :unprocessable_entity
+      render json: { r: error_message }, status: :unprocessable_entity
     else
       if request.xhr? || request.format.json?
         render json: { redirect_url: redirect_url }
@@ -104,7 +104,7 @@ class UsersController < ApplicationController
   def remove_profile
     result = @user.remove_profile(@user.uid)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to remove profile image.' }, status: :unprocessable_entity
     end
@@ -114,7 +114,7 @@ class UsersController < ApplicationController
     base64_image = params[:user][:image]
     result = @user.upload_profile_image(@user.uid, base64_image)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to upload profile image.' }, status: :unprocessable_entity
     end
