@@ -38,7 +38,7 @@ class UsersController < ApplicationController
     )
 
     @user = User.sign_up(permitted_params)
-    error_messages = @user&.metadata&.[](:error_message)
+    error_messages = @user.errors
 
     @show_email_confirm_popup = true
     referer_url = request.referer
@@ -52,10 +52,10 @@ class UsersController < ApplicationController
       error_message = Array(error_messages).first.to_s
 
       if error_message.end_with?("Email address provided is invalid")
-        error_message = "Email address provided is invalid"
+        error_message = "Email address provided is invalid."
       end
 
-      render json: { error_message: error_message }, status: :unprocessable_entity
+      render json: { r: error_message }, status: :unprocessable_entity
     else
       if request.xhr? || request.format.json?
         render json: { redirect_url: redirect_url }
