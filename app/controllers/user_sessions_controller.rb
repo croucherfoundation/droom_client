@@ -37,7 +37,7 @@ class UserSessionsController < ApplicationController
         redirect_to redirect_to_url and return
       end
       unless request.xhr?
-        flash[:notice] = t("flash.greeting", name: user.given_name).html_safe
+        flash[:notice] = t("flash.greeting", name: user.name)
       end
       destination = params[:destination]
       if destination.present? && destination =~ /^\//
@@ -67,14 +67,14 @@ class UserSessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    name = current_user.given_name
+    name = current_user.name
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
     if request.xhr?
       head :ok
     else
-      flash[:notice] = t("flash.goodbye", name: name).html_safe
+      flash[:notice] = t("flash.goodbye", name: name)
       if params[:back_to].present?
         redirect_to params[:back_to], method: "get"
       else

@@ -104,7 +104,7 @@ class UsersController < ApplicationController
   def remove_profile
     result = @user.remove_profile(@user.uid)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to remove profile image.' }, status: :unprocessable_entity
     end
@@ -114,7 +114,7 @@ class UsersController < ApplicationController
     base64_image = params[:user][:image]
     result = @user.upload_profile_image(@user.uid, base64_image)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to upload profile image.' }, status: :unprocessable_entity
     end
