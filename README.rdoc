@@ -7,3 +7,18 @@ Notes:
 * the events api isn't yet set up in droom.
 
 * what should we do about the duplication of HkNames and Settings. It should be ok since they're identical, but not very pleasing. HkNames I guess will disappear from here once all person data is consolidated in core and the user class is just an authentication mechanism.
+
+== Rich Text Sanitizer Foundation
+
+`DroomClient::SafeHtmlSanitizer` provides a centralized allowlist sanitizer for rich-text fields.
+
+Usage:
+
+	sanitized = DroomClient::SafeHtmlSanitizer.sanitize(input_html)
+
+Notes:
+
+* Nil-safe input handling (`nil` returns empty string)
+* Explicit allowlist tags and attributes
+* Unsafe link protocols (for example `javascript:`) are stripped
+* Foundation-only; consuming apps must opt in per rich-text field
