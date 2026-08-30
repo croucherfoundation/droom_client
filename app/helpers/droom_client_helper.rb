@@ -29,6 +29,23 @@ module DroomClientHelper
     "#{request.protocol}#{request.host}"
   end
 
+  def safe_back_url(url = params[:backurl], fallback = '/')
+    value = url.to_s.strip
+    return fallback if value.blank?
+    return value if value.start_with?('/') && !value.start_with?('//')
+
+    begin
+      uri = URI.parse(value)
+      return fallback unless uri.absolute?
+      return fallback unless %w[http https].include?(uri.scheme.to_s.downcase)
+      return fallback unless uri.host.to_s == request.host.to_s
+
+      uri.to_s
+    rescue URI::InvalidURIError, ArgumentError, NoMethodError
+      fallback
+    end
+  end
+
   def action_menulink(thing, html_options={})
     if can?(:edit, thing)
       classname = thing.class.to_s.underscore.split('/').last
