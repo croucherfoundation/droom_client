@@ -92,7 +92,7 @@ module HasDroomUser
   #
   def user_attributes=(attributes)
     if attributes.any?
-      if user = self.user
+      if user = User.find(attributes[:id])
         user.assign_attributes(attributes.with_indifferent_access)
         user.save
       else
