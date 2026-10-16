@@ -6,12 +6,12 @@
   = render 'droom_client/shared/search', search_system: search_system
 
   - if user_signed_in?
-    - if @user = User.find(current_user.uid)
+    - if @user = User.find(current_user.uid, type: "account_settings")
       = render 'droom_client/shared/signout_box'
       = render 'droom_client/shared/edit_contact'
       = render 'droom_client/shared/account_setting'
       = render 'droom_client/shared/account_setting_modify'
-      
+
   - else
     = render 'droom_client/shared/signup_box'
     = render 'droom_client/shared/email_confirm'

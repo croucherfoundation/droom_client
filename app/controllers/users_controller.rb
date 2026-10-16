@@ -244,7 +244,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :primary_email, :backup_email, :password, :password_confirmation, :current_password, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+    params.require(:user).permit(:email, :primary_email, :backup_email, :password, :password_confirmation, :current_password, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy], emergency_contact_attributes: [:name, :relationship, :address, :phone])
   end
 
   def convert_image_to_base64(image_path)
@@ -305,6 +305,9 @@ protected
     account[:timezone] = params[:timezone] if params[:timezone].present?
     account[:current_password] = params[:current_password] if params[:current_password].present?
     account[:new_password] = params[:password] if params[:password].present?
+    if params[:emergency_contact_attributes].present?
+      account[:emergency_contact_attributes] = params[:emergency_contact_attributes].to_h
+    end
     account
   end
 
