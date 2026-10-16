@@ -63,7 +63,7 @@
                     .input-group
                       = text_field_tag "user[emergency_contact_attributes][address]", emergency_contact[:address], placeholder: "Address", maxlength: 120
                     .input-group
-                      = telephone_field_tag "user[emergency_contact_attributes][phone]", emergency_contact[:phone], placeholder: "+852 1234 5678", autocomplete: "tel"
+                      = telephone_field_tag "user[emergency_contact_attributes][phone]", emergency_contact[:phone], placeholder: "Contact phone", autocomplete: "tel"
 
                 %section.timezones.std-input-mb
                   = render "droom_client/shared/account_settings/timezones_modify", f: f, user: @user
