@@ -29,7 +29,7 @@ class Api::SessionsController < ApplicationController
                 _d: parsed_cookie[1][1],
                 show_backup_email_banner: show_backup_email_banner,
                 primary_email: primary_email,
-                date: Date.new(2026, 9, 1).strftime("%d-%B-%Y")
+                date: Date.new(2026, 9, 9).strftime("%d-%B-%Y")
               }
               return render json: user_data
             rescue JSON::ParserError, NoMethodError => e

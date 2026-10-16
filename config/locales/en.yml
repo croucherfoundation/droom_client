@@ -13,8 +13,8 @@ en:
   authentication_required: "This part of the site is private. Please sign in to continue."
   edit_account_settings: "Edit your account settings"
   flash:
-    greeting: "<strong>Hello %{name}!</strong><br>You have signed in."
-    goodbye: "<strong>Goodbye %{name}.</strong><br>You have signed out."
+    greeting: "Hello %{name}!"
+    goodbye: "Goodbye %{name}."
     not_recognised: "<strong>Not recognised</strong><br>Sorry: this email / password combination is not correct."
   forgot_password: "Forgotten your password?"
   or_sign_up: "or create a new account"

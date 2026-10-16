@@ -38,7 +38,7 @@ class UsersController < ApplicationController
     )
 
     @user = User.sign_up(permitted_params)
-    error_messages = @user&.metadata&.[](:error_message)
+    error_messages = @user.errors
 
     @show_email_confirm_popup = true
     referer_url = request.referer
@@ -52,10 +52,10 @@ class UsersController < ApplicationController
       error_message = Array(error_messages).first.to_s
 
       if error_message.end_with?("Email address provided is invalid")
-        error_message = "Email address provided is invalid"
+        error_message = "Email address provided is invalid."
       end
 
-      render json: { error_message: error_message }, status: :unprocessable_entity
+      render json: { r: error_message }, status: :unprocessable_entity
     else
       if request.xhr? || request.format.json?
         render json: { redirect_url: redirect_url }
@@ -104,7 +104,7 @@ class UsersController < ApplicationController
   def remove_profile
     result = @user.remove_profile(@user.uid)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to remove profile image.' }, status: :unprocessable_entity
     end
@@ -114,7 +114,7 @@ class UsersController < ApplicationController
     base64_image = params[:user][:image]
     result = @user.upload_profile_image(@user.uid, base64_image)
     if result
-      render json: { data: { attributes: { profile_image: result.try(:profile_image) || result.try(:[], :profile_image) } } }, status: :ok
+      render json: { data: { attributes: { profile_image: result.try(:image) || result.try(:[], :image) } } }, status: :ok
     else
       render json: { error: 'Failed to upload profile image.' }, status: :unprocessable_entity
     end
@@ -149,7 +149,7 @@ class UsersController < ApplicationController
     if @user = User.authenticate(params[:tok])
       sign_in_and_remember @user
       @user.set_password!(user_params)
-      flash[:notice] = t(:password_set)
+      set_notice(t('notifications.authentication.password_set'))
       respond_with @user, location: params[:destination].present? ? params[:destination] : after_sign_in_path_for(@user)
     else
       raise ActiveRecord::RecordNotFound, "Sorry: User credentials not recognised."
@@ -244,7 +244,7 @@ protected
   end
 
   def user_params
-    params.require(:user).permit(:email, :primary_email, :backup_email, :password, :password_confirmation, :current_password, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy])
+    params.require(:user).permit(:email, :primary_email, :backup_email, :password, :password_confirmation, :current_password, :title, :family_name, :given_name, :chinese_name, :affiliation, :confirmed, :phone, :mobile, :address, :image, :correspondence_address, :timezone, :organisation_admin, :admin, :gatekeeper, emails_attributes: [:id, :email, :current_email, :address_type_id, :_destroy], addresses_attributes: [:id, :address, :address_type_id, :_destroy], emergency_contact_attributes: [:name, :relationship, :address, :phone])
   end
 
   def convert_image_to_base64(image_path)
@@ -305,6 +305,9 @@ protected
     account[:timezone] = params[:timezone] if params[:timezone].present?
     account[:current_password] = params[:current_password] if params[:current_password].present?
     account[:new_password] = params[:password] if params[:password].present?
+    if params[:emergency_contact_attributes].present?
+      account[:emergency_contact_attributes] = params[:emergency_contact_attributes].to_h
+    end
     account
   end
 

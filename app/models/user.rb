@@ -86,6 +86,12 @@ class User
     nil
   end
 
+  def self.eligible_event_admins
+    get "/api/users/eligible_event_admins"
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   ## Retrieval
   #
   # User#find returns a user data object suitable for management or display but without auth information.
