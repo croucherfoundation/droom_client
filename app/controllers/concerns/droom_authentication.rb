@@ -28,7 +28,7 @@ module DroomAuthentication
   end
 
   def store_location!
-    session["user_return_to"] = request.path
+    session["user_return_to"] = request.fullpath
   end
 
   def use_stored_location_for(user)
