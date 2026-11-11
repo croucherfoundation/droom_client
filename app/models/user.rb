@@ -92,6 +92,22 @@ class User
     nil
   end
 
+  class StaffDirectoryAccessDenied < StandardError; end
+
+  def self.eligible_event_staff(session_token:)
+    return nil if session_token.blank?
+
+    get_raw "/api/users/eligible_event_staff",
+      _headers: { "Authorization" => "Token token=#{session_token.to_json}" } do |parsed, response|
+      raise StaffDirectoryAccessDenied if response.status == 403
+      return nil unless response.status == 200 && parsed[:data].is_a?(Array)
+
+      new_collection(parsed)
+    end
+  rescue JSON::ParserError, Her::Errors::ParseError
+    nil
+  end
+
   ## Retrieval
   #
   # User#find returns a user data object suitable for management or display but without auth information.
