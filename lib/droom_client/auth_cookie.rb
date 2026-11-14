@@ -30,6 +30,9 @@ module DroomClient
 
     def created_at
       DateTime.parse(values[1]) if valid?
+    rescue Date::Error
+      Rails.logger.warn "[droom_client] Invalid authentication cookie timestamp"
+      nil
     end
 
     def valid?
@@ -61,7 +64,13 @@ module DroomClient
     #
     def values
       begin
-        signer.decode(@cookies[cookie_name])
+        decoded = signer.decode(@cookies[cookie_name])
+        if decoded.is_a?(Array) && decoded.length == 2 &&
+            decoded.all? { |value| value.is_a?(String) && value.present? }
+          decoded
+        else
+          [nil, nil]
+        end
       rescue SignedJson::Error
         [nil, nil]
       end
@@ -92,11 +101,8 @@ module DroomClient
     end
 
     def cookie_options
-      @session_options ||= Rails.configuration.session_options
-      @session_options[:domain] = cookie_domain
-      @session_options[:httponly] = true
-      @session_options[:secure] = true
-      @session_options.slice(:path, :domain, :secure, :httponly)
+      Rails.configuration.session_options.slice(:path, :domain, :secure, :httponly).
+        merge(domain: cookie_domain, httponly: true, secure: true)
     end
 
     def signer
