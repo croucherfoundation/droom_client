@@ -59,14 +59,12 @@ class Api::SessionsController < ApplicationController
 
   def destroy
     current_user.sign_out!
-    name = current_user.given_name
     RequestStore.store.delete :current_user
     unset_auth_cookie
     reset_session
     if request.xhr? || (request.headers["x-api-key"] && request.headers["x-api-key"].present?)
       head :ok
     else
-      flash[:notice] = t("flash.goodbye", name: name).html_safe
       redirect_to after_sign_out_path_for(current_user), method: "get"
     end
   end
