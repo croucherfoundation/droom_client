@@ -8,6 +8,8 @@
 module HasDroomUser
   extend ActiveSupport::Concern
 
+  DIRECTORY_NAME_FIELDS = %i[title given_name family_name chinese_name preferred_name preferred_professional_name].freeze
+
   included do
     scope :by_user, -> user_or_uid {
       uid = user_or_uid.respond_to?(:uid) ? user_or_uid.uid : user_or_uid
@@ -93,7 +95,10 @@ module HasDroomUser
   def user_attributes=(attributes)
     if attributes.any?
      if user = User.find(attributes[:id])
-        user.assign_attributes(attributes.with_indifferent_access)
+        changes = attributes.with_indifferent_access.reject do |key, value|
+          DIRECTORY_NAME_FIELDS.include?(key.to_sym) && value.blank?
+        end
+        user.assign_attributes(changes)
         user.save
       else
         attributes.reverse_merge!(defer_confirmation: confirmation_usually_deferred?)
@@ -117,7 +122,9 @@ module HasDroomUser
     if user
       [:title, :given_name, :family_name, :chinese_name, :email, :emai, :preferred_professional_name, :preferred_name, :preferred_pronoun].each do |col|
         if has_attribute?(col)
-          if send("#{col}_changed?")
+          # An incomplete local form can omit or clear a name. Keep the
+          # Directory value and bring it back into the local record on save.
+          if send("#{col}_changed?") && !(DIRECTORY_NAME_FIELDS.include?(col) && send(col).blank?)
             user.send "#{col}=".to_sym, send(col)
           elsif user.send(col) != send(col)
             send "#{col}=".to_sym, user.send(col)

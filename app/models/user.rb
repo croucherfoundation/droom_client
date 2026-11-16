@@ -22,6 +22,15 @@ class User
     !respond_to?(:uid) || uid.nil?
   end
 
+  # The client can serialise a cached account during an unrelated update.
+  # Omit absent identity values so that save cannot erase a newer Directory edit.
+  def saved_attributes
+    values = super
+    return values if new?
+
+    values.reject { |key, value| HasDroomUser::DIRECTORY_NAME_FIELDS.include?(key.to_sym) && value.blank? }
+  end
+
   def associates
     @associates ||= []
   end
