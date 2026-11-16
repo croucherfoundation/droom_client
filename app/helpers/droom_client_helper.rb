@@ -113,12 +113,12 @@ module DroomClientHelper
       if (nominator = Nominator.find_by(user_uid: user.uid))
         nominator.institution_code
       elsif (csw_admin = CswAdmin.find_by(user_uid: user.uid))
-        CswPartner.find(csw_admin.csw_partner_id).code
+        CswPartner.find(csw_admin.csw_partner_id)&.code
       end
 
     return unless subdomain
 
-    subdomain << 's' if Rails.env.staging?
+    subdomain << '-staging' if Rails.env.staging?
     domain = Rails.env.development? ? 'croucher.localhost' : 'croucher.org.hk'
     URI.join("https://#{subdomain}.#{domain}", '/dashboard').to_s
   end
