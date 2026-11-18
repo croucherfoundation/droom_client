@@ -1,7 +1,11 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe "Event and Invitation client round-trip" do
   let(:stubs) { Faraday::Adapter::Test::Stubs.new }
+
+  def resource(type, id, attributes)
+    { success: true, data: { type: type, id: id.to_s, attributes: attributes } }.to_json
+  end
 
   before do
     DROOM.setup url: "http://droom.test" do |c|
@@ -11,120 +15,80 @@ describe "Event and Invitation client round-trip" do
     end
   end
 
-  after do
-    stubs.verify_stubbed_calls
-  end
+  after { stubs.verify_stubbed_calls }
 
-  it "creates an event via POST /api/events" do
+  it "creates an event and reads its server UUID from the JSON:API response" do
     stubs.post("/api/events") do
       [201, { 'Content-Type' => 'application/json' },
-       { event: { id: 42, name: "Test Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1 } }.to_json]
+        resource("events", 42, name: "Deadline", uuid: "stable-uuid")]
     end
-
-    event = Droom::Event.create(name: "Test Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
-    expect(event.id).to eq(42)
-    expect(event.name).to eq("Test Screening")
+    event = Droom::Event.create(name: "Deadline", start: "2026-12-31T00:00:00+08:00")
+    expect(event.id).to eq("42")
+    expect(event.uuid).to eq("stable-uuid")
   end
 
-  it "updates an event via PUT /api/events/:id" do
-    stubs.put("/api/events/42") do
+  it "updates a deadline by UUID with exactly one Rails event wrapper" do
+    stubs.put("/api/events/stable-uuid") do |env|
+      expect(JSON.parse(env.body)).to eq("event" => {
+        "name" => "Updated deadline", "all_day" => true, "url" => "https://apps.example.test/screening"
+      })
       [200, { 'Content-Type' => 'application/json' },
-       { event: { id: 42, name: "Updated Screening", start: "2026-05-02T09:00:00Z", event_type_id: 1 } }.to_json]
+        resource("events", 42, uuid: "stable-uuid", name: "Updated deadline")]
     end
-
-    event = Droom::Event.new(id: 42, name: "Test Screening")
-    event.name = "Updated Screening"
-    event.save
-    expect(event.name).to eq("Updated Screening")
+    event = Droom::Event.update_by_uuid("stable-uuid",
+      name: "Updated deadline", all_day: true, url: "https://apps.example.test/screening")
+    expect(event.uuid).to eq("stable-uuid")
+    expect(event.name).to eq("Updated deadline")
   end
 
-  it "updates an event via PUT /api/events/:uuid through the client helper" do
-    stubs.put("/api/events/evt-uuid-42") do
-      [200, { 'Content-Type' => 'application/json' },
-       { event: { id: 42, uuid: "evt-uuid-42", name: "Updated Screening", start: "2026-05-02T09:00:00Z", event_type_id: 1 } }.to_json]
+  it "raises on failed deadline updates rather than hiding validation errors" do
+    stubs.put("/api/events/stable-uuid") do
+      [422, { 'Content-Type' => 'application/json' }, { errors: ["Invalid deadline"] }.to_json]
     end
-
-    event = Droom::Event.update_by_uuid("evt-uuid-42", name: "Updated Screening", start: "2026-05-02T09:00:00Z", event_type_id: 1)
-    expect(event.uuid).to eq("evt-uuid-42")
-    expect(event.name).to eq("Updated Screening")
+    expect { Droom::Event.update_by_uuid("stable-uuid", start: nil) }.to raise_error(/HTTP 422/)
   end
 
-  it "destroys an event via DELETE /api/events/:id" do
-    stubs.delete("/api/events/42") do
-      [200, { 'Content-Type' => 'application/json' }, ""]
+  it "does not report successful event deletion on an API failure" do
+    stubs.delete("/api/events/stable-uuid") do
+      [503, { 'Content-Type' => 'application/json' }, { errors: ["Unavailable"] }.to_json]
     end
-
-    event = Droom::Event.new(id: 42, name: "Test Screening")
-    expect { event.destroy }.not_to raise_error
+    expect { Droom::Event.destroy_by_uuid("stable-uuid") }.to raise_error(/HTTP 503/)
   end
 
-  it "destroys an event via DELETE /api/events/:uuid through the client helper" do
-    stubs.delete("/api/events/evt-uuid-42") do
-      [200, { 'Content-Type' => 'application/json' }, ""]
-    end
-
-    expect(Droom::Event.destroy_by_uuid("evt-uuid-42")).to eq(true)
-  end
-
-  it "creates an invitation via POST /api/events/:event_id/invitations" do
-    stubs.post("/api/events/42/invitations") do
+  it "creates, lists and removes a judge's event invitation using event UUIDs" do
+    stubs.post("/api/events/stable-uuid/invitations") do |env|
+      expect(JSON.parse(env.body)).to eq("invitation" => { "user_id" => "judge-uid" })
       [201, { 'Content-Type' => 'application/json' },
-       { invitation: { id: 99, event_id: 42, user_id: 7 } }.to_json]
+        resource("invitations", 99, event_id: "stable-uuid", user_uid: "judge-uid")]
     end
-
-    invitation = Invitation.create(event_id: 42, user_id: 7)
-    expect(invitation.id).to eq(99)
+    stubs.get("/api/events/stable-uuid/invitations") do
+      [200, { 'Content-Type' => 'application/json' }, {
+        success: true, data: [{ id: "99", type: "invitations", attributes: {
+          event_id: "stable-uuid", user_uid: "judge-uid"
+        } }]
+      }.to_json]
+    end
+    stubs.delete("/api/events/stable-uuid/invitations/99") do
+      [200, { 'Content-Type' => 'application/json' }, { success: true }.to_json]
+    end
+    invitation = Invitation.create(event_id: "stable-uuid", user_id: "judge-uid")
+    expect(invitation.id).to eq("99")
+    invitations = Invitation.for_event("stable-uuid")
+    expect(invitations.map(&:user_uid)).to eq(["judge-uid"])
+    expect { invitation.destroy }.not_to raise_error
   end
 
-  it "lists invitations via GET /api/events/:event_id/invitations" do
-    stubs.get("/api/events/42/invitations") do
-      [200, { 'Content-Type' => 'application/json' },
-       { invitations: [{ id: 99, event_id: 42, user_id: 7, user_uid: "uid-7" }] }.to_json]
+  it "raises when invitation retrieval fails rather than treating the audience as empty" do
+    stubs.get("/api/events/stable-uuid/invitations") do
+      [503, { 'Content-Type' => 'application/json' }, { errors: ["Unavailable"] }.to_json]
     end
-
-    invitations = Invitation.for_event(42)
-    expect(invitations.map(&:id)).to eq([99])
-    expect(invitations.first.user_uid).to eq("uid-7")
-    expect(invitations.first.event_id).to eq(42)
+    expect { Invitation.for_event("stable-uuid") }.to raise_error(/HTTP 503/)
   end
 
-  it "destroys an invitation via DELETE /api/events/:event_id/invitations/:id" do
-    stubs.delete("/api/events/42/invitations/99") do
-      [200, { 'Content-Type' => 'application/json' }, ""]
+  it "raises when removing a former judge fails" do
+    stubs.delete("/api/events/stable-uuid/invitations/99") do
+      [503, { 'Content-Type' => 'application/json' }, { errors: ["Unavailable"] }.to_json]
     end
-
-    expect { Invitation.destroy(event_id: 42, id: 99) }.not_to raise_error
-  end
-
-  it "performs a full round-trip: create event → invite user → remove invitation → destroy event" do
-    stubs.post("/api/events") do
-      [201, { 'Content-Type' => 'application/json' },
-       { event: { id: 42, name: "Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1 } }.to_json]
-    end
-    stubs.post("/api/events/42/invitations") do
-      [201, { 'Content-Type' => 'application/json' },
-       { invitation: { id: 99, event_id: 42, user_id: 7 } }.to_json]
-    end
-    stubs.delete("/api/events/42/invitations/99") do
-      [200, { 'Content-Type' => 'application/json' }, ""]
-    end
-    stubs.delete("/api/events/42") do
-      [200, { 'Content-Type' => 'application/json' }, ""]
-    end
-
-    # Create event
-    event = Droom::Event.create(name: "Screening", start: "2026-05-01T09:00:00Z", event_type_id: 1)
-    expect(event.id).to eq(42)
-
-    # Invite user
-    invitation = event.invite_user(7)
-    expect(invitation.id).to eq(99)
-
-    # Remove invitation
-    event.uninvite(99)
-
-    # Destroy event
-    event.destroy
+    expect { Invitation.destroy(event_id: "stable-uuid", id: 99) }.to raise_error(/HTTP 503/)
   end
 end
-

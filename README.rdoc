@@ -6,6 +6,10 @@ Notes:
 
 * the events api isn't yet set up in droom.
 
+* DroomAuthentication stores the complete requested path, including the query string,
+  for the standard sign-in return flow. Authentication must resolve before permission
+  checks; a missing or expired session is not an access-denied account.
+
 * what should we do about the duplication of HkNames and Settings. It should be ok since they're identical, but not very pleasing. HkNames I guess will disappear from here once all person data is consolidated in core and the user class is just an authentication mechanism.
 
 == Rich Text Sanitizer Foundation

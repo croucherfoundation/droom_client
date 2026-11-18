@@ -27,11 +27,16 @@ class Droom::Event
   end
 
   def self.update_by_uuid(uuid, params = {})
-    put "/api/events/#{uuid}", params
+    put_raw("/api/events/#{uuid}", to_params(params)) do |parsed_data, response|
+      raise "Failed to update calendar event #{uuid} (HTTP #{response.status})" unless response.success?
+      new_from_parsed_data(parsed_data)
+    end
   end
 
   def self.destroy_by_uuid(uuid)
-    delete "/api/events/#{uuid}"
+    delete_raw("/api/events/#{uuid}") do |_, response|
+      raise "Failed to delete calendar event #{uuid} (HTTP #{response.status})" unless response.success? || response.status == 404
+    end
     true
   end
 

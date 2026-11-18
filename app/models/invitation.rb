@@ -18,7 +18,10 @@ class Invitation
     raise ArgumentError, "event_id is required" unless event_id.present?
 
     params = { invitation: { user_id: user_id } }
-    invitation = self.class.post "/api/events/#{event_id}/invitations", params
+    invitation = self.class.post_raw("/api/events/#{event_id}/invitations", params) do |parsed_data, response|
+      raise "Failed to create calendar invitation (HTTP #{response.status})" unless response.success?
+      self.class.new_from_parsed_data(parsed_data)
+    end
     assign_attributes(invitation.attributes) if invitation.respond_to?(:attributes)
     self.event_id = event_id
     self
@@ -27,7 +30,7 @@ class Invitation
   def destroy
     raise ArgumentError, "event_id is required" unless event_id.present?
 
-    self.class.delete "/api/events/#{event_id}/invitations/#{id}"
+    self.class.destroy(event_id: event_id, id: id)
     self
   end
 
@@ -39,13 +42,18 @@ class Invitation
   end
 
   def self.for_event(event_id)
-    invitations = get "/api/events/#{event_id}/invitations"
+    get_raw("/api/events/#{event_id}/invitations") do |parsed_data, response|
+      raise "Failed to list calendar invitations (HTTP #{response.status})" unless response.success?
+      new_collection(parsed_data)
+    end
   rescue => e
     Rails.logger.error "[droom_client] Error getting invitations: #{e.message}"
-    []
+    raise
   end
 
   def self.destroy(event_id:, id:)
-    delete "/api/events/#{event_id}/invitations/#{id}"
+    delete_raw("/api/events/#{event_id}/invitations/#{id}") do |_, response|
+      raise "Failed to remove calendar invitation (HTTP #{response.status})" unless response.success? || response.status == 404
+    end
   end
 end
